@@ -19,6 +19,12 @@ import Checkout from '../pages/Checkout';
 import Success from '../pages/Success';
 import MyPurchases from '../pages/MyPurchases';
 
+//dashboard
+import DashboardLayout from './layouts/DashboardLayout';
+import Overview from './pages/dashboard/Overview';
+import AccountSettings from './pages/dashboard/AccountSettings';
+
+
 // General Pages
 import NotFound from '../pages/NotFound';
 
@@ -31,6 +37,7 @@ const AppRouter = () => {
         <Route path="/explorar" element={<Explore />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
         <Route path="/my-purchases" element={<MyPurchases />} />
+        <Route path="/u/:username" element={<Profile />} />
       </Route>
 
       {/* Rutas de Autenticación (Diseño Centrado) */}
@@ -42,6 +49,12 @@ const AppRouter = () => {
         <Route path="verify-email" element={<VerifyEmail />} />
         {/* Callback para OAuth y Magic Links */}
         <Route path="callback" element={<AuthCallback />} />
+      </Route>
+
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<Overview />} /> {/* Dashboard Home */}
+        <Route path="settings" element={<AccountSettings />} />
+        {/* Agrega las otras rutas aquí */}
       </Route>
 
       {/* Rutas de Marketplace */}
