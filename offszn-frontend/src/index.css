@@ -46,3 +46,45 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #8b5cf6;
 }
+
+/* =========================================
+   GLOBAL OVERLAYS & ANIMATIONS (Migrado de global-overlays.css)
+   ========================================= */
+
+/* Backdrop (Fondo oscuro) */
+.overlay-backdrop {
+  @apply fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-[4px] z-[9999] opacity-0 invisible transition-all duration-300;
+}
+.overlay-backdrop.active {
+  @apply opacity-100 visible;
+}
+
+/* Paneles Laterales (Carrito / Notificaciones) */
+.side-panel {
+  @apply fixed top-0 right-0 w-[400px] max-w-[85vw] h-full bg-[#0a0a0a] border-l border-white/10 z-[10000] flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-out translate-x-full;
+}
+.side-panel.active {
+  @apply translate-x-0;
+}
+
+.side-panel-header {
+  @apply p-6 border-b border-white/10 flex justify-between items-center bg-[#141414]/95;
+}
+
+/* Scrollbar oculta para paneles */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Animaciones personalizadas */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
