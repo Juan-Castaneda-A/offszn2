@@ -11,6 +11,8 @@ import ForgotPassword from '../pages/auth/ForgotPassword';
 import UpdatePassword from '../pages/auth/UpdatePassword';
 import VerifyEmail from '../pages/auth/VerifyEmail';
 import AuthCallback from '../pages/auth/AuthCallback';
+import Explore from '../pages/Explore';
+import ProductDetail from '../pages/ProductDetail';
 
 // General Pages
 import NotFound from '../pages/NotFound';
@@ -21,7 +23,8 @@ const AppRouter = () => {
       {/* Rutas Públicas con Layout Principal */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/explorar" element={<div className="p-20 text-center text-white">Explorar (Próximamente)</div>} />
+        <Route path="/explorar" element={<Explore />} />
+        <Route path="/producto/:id" element={<ProductDetail />} />
       </Route>
 
       {/* Rutas de Autenticación (Diseño Centrado) */}

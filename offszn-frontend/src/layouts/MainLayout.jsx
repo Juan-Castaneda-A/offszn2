@@ -2,6 +2,8 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/ui/Navbar';
 import Footer from '../components/ui/Footer';
+import StickyPlayer from '../components/player/StickyPlayer';
+import CartSidebar from '../components/CartSidebar';
 
 const MainLayout = () => {
   return (
@@ -14,6 +16,9 @@ const MainLayout = () => {
       </main>
 
       <Footer />
+
+      <StickyPlayer />
+      <CartSidebar />
     </div>
   );
 };
