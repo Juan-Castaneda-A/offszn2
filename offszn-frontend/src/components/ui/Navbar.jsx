@@ -168,8 +168,10 @@ const Navbar = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <UserLink to="/cuenta/dashboard" icon={BarChart} label="Dashboard" />
-                      <UserLink to="/favoritos" icon={Heart} label="Mis Favoritos" />
+                      <UserLink to="/dashboard/plans" icon={Rocket} label="Mejorar Plan" className="text-amber-400" />
+                      <UserLink to="/dashboard/coupons" icon={Tag} label="Cupones" />
+                      <UserLink to="/dashboard/analytics" icon={BarChart} label="Analíticas" />
+                      <UserLink to="/dashboard/collaborations" icon={Users} label="Colaboraciones" />
                       <UserLink to="/dashboard/licenses" icon={Settings} label="Configuración" />
 
                       <button
