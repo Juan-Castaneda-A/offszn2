@@ -41,9 +41,10 @@ const AppRouter = () => {
         <Route path="/producto/:id" element={<ProductDetail />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/success" element={<Success />} />
-        
+
         {/* Rutas de Usuario Público */}
         <Route path="/u/:username" element={<Profile />} />
+        <Route path="/@:username" element={<Profile />} />
       </Route>
 
       {/* --- RUTAS DE AUTENTICACIÓN --- */}
@@ -58,13 +59,13 @@ const AppRouter = () => {
 
       {/* --- RUTAS DEL DASHBOARD (Protegidas) --- */}
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<Overview />} /> 
+        <Route index element={<Overview />} />
         <Route path="settings" element={<AccountSettings />} />
         <Route path="my-purchases" element={<MyPurchases />} />
-        
+
         {/* 🔥 AQUÍ ESTÁ LA RUTA DEL WIZARD QUE HICIMOS HOY */}
         <Route path="upload-beat" element={<UploadBeats />} />
-        
+
         {/* Placeholder para rutas futuras */}
         <Route path="kits" element={<div>Mis Kits (Próximamente)</div>} />
         <Route path="licencias" element={<div>Licencias (Próximamente)</div>} />

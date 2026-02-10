@@ -1,46 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { MOCK_PRODUCTS } from '../mocks/products';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { apiClient } from '../api/client';
 import { usePlayerStore } from '../store/playerStore';
 import { useCartStore } from '../store/cartStore';
-import '../styles/product-premium.css'; // Importamos tus estilos
+import { useCurrencyStore } from '../store/currencyStore';
+import { BiPlay, BiPause, BiCartPlus, BiInfoCircle, BiLayoutThreeColumns, BiHeart, BiUpload, BiPlusLg, BiChevronDown, BiPatchCheckFill, BiDownload, BiArrowDownCircle } from 'react-icons/bi';
+import '../styles/product-premium.css';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedLicense, setSelectedLicense] = useState('basic');
-  const [activeAccordion, setActiveAccordion] = useState(['desc', 'terms']); // Abiertos por defecto
+  const [activeAccordion, setActiveAccordion] = useState(['desc', 'terms']);
+
   const addToCart = useCartStore(state => state.addToCart);
-  
-  // Store del Reproductor
+  const { formatPrice } = useCurrencyStore();
   const { playTrack, currentTrack, isPlaying, togglePlay } = usePlayerStore();
 
   useEffect(() => {
-    // 1. Simulación de Fetch (Aquí iría tu código de Supabase de product-core.js)
-    const found = MOCK_PRODUCTS.find(p => p.id === id);
-    if (found) {
-      setProduct({
-        ...found,
-        // Simulamos licencias disponibles basado en tu lógica
-        available_licenses: [
-          { id: 'basic', name: 'Basic Lease', price: found.price_basic, features: ['MP3', '5,000 Streams'] },
-          { id: 'premium', name: 'Premium Lease', price: found.price_basic + 20, features: ['MP3', 'WAV', '50,000 Streams'] },
-          { id: 'unlimited', name: 'Unlimited', price: found.price_basic + 80, features: ['MP3', 'WAV', 'STEMS', 'Ilimitado'] }
-        ]
-      });
-    } else {
-      navigate('/explorar');
-    }
-    // Scroll al inicio al cargar
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        // Intentar buscar por ID or Slug (backend manejara esto si lo implementamos)
+        const response = await apiClient.get(`/products/${id}`);
+        const found = response.data;
+
+        if (found) {
+          setProduct({
+            ...found,
+            available_licenses: [
+              { id: 'basic', name: 'Basic Lease', price: found.price_basic, features: ['MP3', '5,000 Streams'] },
+              { id: 'premium', name: 'Premium Lease', price: found.price_premium || (found.price_basic + 20), features: ['MP3', 'WAV', '50,000 Streams'] },
+              { id: 'unlimited', name: 'Unlimited', price: found.price_exclusive || (found.price_basic + 80), features: ['MP3', 'WAV', 'STEMS', 'Ilimitado'] }
+            ].filter(l => l.price > 0 || found.is_free)
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        // Fallback for demo/safety
+        // navigate('/explorar');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
     window.scrollTo(0, 0);
   }, [id, navigate]);
 
-  if (!product) return <div className="loading-state"><div className="spinner"></div></div>;
+  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center"><div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div></div>;
+  if (!product) return <div className="min-h-screen bg-black flex flex-center text-white">Producto no encontrado</div>;
 
   const isCurrent = currentTrack?.id === product.id;
 
-  // --- HANDLERS ---
   const handlePlay = (e) => {
     e.stopPropagation();
     if (isCurrent) {
@@ -51,210 +65,157 @@ const ProductDetail = () => {
   };
 
   const toggleAccordion = (section) => {
-    if (activeAccordion.includes(section)) {
-      setActiveAccordion(activeAccordion.filter(s => s !== section));
-    } else {
-      setActiveAccordion([...activeAccordion, section]);
-    }
+    setActiveAccordion(prev =>
+      prev.includes(section) ? prev.filter(s => s !== section) : [...prev, section]
+    );
   };
 
   const handleAddToCart = () => {
-    alert(`Añadido al carrito:\n${product.name}\nLicencia: ${selectedLicense}`);
-    // Aquí conectaremos tu script/cart.js o el Store de carrito más adelante
     addToCart(product, selectedLicense);
+    // window.toast.success('Añadido al carrito');
   };
 
-  // --- RENDERIZADO DE MÓDULOS DE COMPRA (Simulando renderBeatSpecifics/renderKitSpecifics) ---
   const renderBuyingModule = () => {
-    // Si es un KIT (Sample Pack / Preset)
-    if (product.category === 'Drum Kits' || product.category === 'Loops' || product.category === 'Presets') {
+    const isKit = ['drumkit', 'loopkit', 'presets', 'plantilla'].includes(product.product_type?.toLowerCase());
+
+    if (isKit) {
       return (
         <div id="buying-modules">
-          <button 
-            className="btn-purchase-kit"
-            onClick={handleAddToCart}
-          >
-            {product.is_free ? 'DESCARGA GRATIS' : `COMPRAR KIT - $${product.price_basic}`}
+          <button className="btn-purchase-kit" onClick={handleAddToCart}>
+            {product.is_free ? 'DESCARGA GRATIS' : `COMPRAR KIT - ${formatPrice(product.price_basic)}`}
           </button>
-          
-          {product.product_type !== 'drumkit' && (
-             // Botón secundario para demos si aplica
-             <button className="btn-minimal-link" style={{margin: '10px auto', width:'100%', justifyContent:'center'}}>
-               <i className="bi bi-arrow-down-circle"></i> Descargar Demo / Gratis
-             </button>
-          )}
+          <button className="btn-minimal-link" style={{ margin: '10px auto', width: '100%', justifyContent: 'center' }}>
+            <BiArrowDownCircle /> Descargar Demo / Gratis
+          </button>
         </div>
       );
     }
 
-    // Si es un BEAT (Default)
     return (
       <div id="buying-modules">
-        {/* Header con botón comparar */}
-        <div className="section-headline" style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <span>Licencias</span>
-            <button className="btn-minimal-link" style={{fontSize:'0.9rem'}}>
-                <i className="bi bi-layout-three-columns"></i> Comparar
-            </button>
+        <div className="section-headline flex justify-between items-center">
+          <span>Licencias</span>
+          <button className="btn-minimal-link text-sm">
+            <BiLayoutThreeColumns /> Comparar
+          </button>
         </div>
 
-        {/* Grid de Licencias (V2) */}
         <div className="license-grid-v2">
           {product.available_licenses.map((lic) => (
-            <div 
+            <div
               key={lic.id}
               className={`license-card-v2 ${selectedLicense === lic.id ? 'selected' : ''}`}
               onClick={() => setSelectedLicense(lic.id)}
             >
               <div className="lic-card-header">
                 <span className="lic-name">{lic.name}</span>
-                <i className="bi bi-info-circle lic-details-trigger"></i>
+                <BiInfoCircle className="lic-details-trigger" />
               </div>
               <div className="lic-card-body">
                 <span className="lic-files-preview">{lic.features.join(' + ')}</span>
-                <span className="lic-price-v2">${lic.price.toFixed(2)}</span>
+                <span className="lic-price-v2">{formatPrice(lic.price)}</span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Footer Actions */}
-        <div className="beat-actions-footer" style={{marginTop:'20px', display:'flex', flexDirection:'column', gap:'10px'}}>
-            <button className="btn-glass-primary" onClick={handleAddToCart}>
-                <i className="bi bi-cart-plus"></i> Añadir al Carrito
+        <div className="beat-actions-footer mt-5 flex flex-col gap-2">
+          <button className="btn-glass-primary w-full" onClick={handleAddToCart}>
+            <BiCartPlus /> Añadir al Carrito
+          </button>
+          {product.is_free && (
+            <button className="btn-minimal-link w-full justify-center">
+              <BiDownload /> Descargar Gratis (MP3 con Tag)
             </button>
-            {product.is_free && (
-                <button className="btn-minimal-link" style={{justifyContent:'center', width:'100%'}}>
-                    <i className="bi bi-download"></i> Descargar Gratis (MP3 con Tag)
-                </button>
-            )}
+          )}
         </div>
       </div>
     );
   };
 
   return (
-    <div id="product-page-container">
+    <div id="product-page-container" className="bg-black min-h-screen">
       <div className="product-split-layout">
-        
-        {/* --- LEFT: SIDEBAR --- */}
         <div className="product-sidebar">
-          {/* Cover Art & Play Overlay */}
-          <div className="product-cover-art group">
-            <img src={product.image_url} alt={product.name} />
-            
-            {/* Player Target (Simulado visualmente para coincidir con tu CSS) */}
-            <div style={{position:'absolute', bottom:'15px', left:'15px', right:'15px'}}>
-               <div className="product-hero-player-box" style={{background: 'rgba(0,0,0,0.6)', backdropFilter:'blur(5px)'}}>
-                  <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
-                      <button onClick={handlePlay} style={{background:'none', border:'none', color:'#fff', fontSize:'1.5rem', cursor:'pointer'}}>
-                          {isCurrent && isPlaying ? <i className="bi bi-pause-fill"></i> : <i className="bi bi-play-fill"></i>}
-                      </button>
-                      <div style={{flex:1, height:'30px', background:'rgba(255,255,255,0.1)', borderRadius:'4px'}}>
-                         {/* Aquí iría la waveform pequeña */}
-                      </div>
-                  </div>
-               </div>
+          <div className="product-cover-art relative group rounded-2xl overflow-hidden aspect-square">
+            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all flex items-center justify-center">
+              <button onClick={handlePlay} className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center text-white shadow-2xl scale-90 group-hover:scale-100 transition-transform">
+                {isCurrent && isPlaying ? <BiPause size={48} /> : <BiPlay size={48} className="ml-1" />}
+              </button>
             </div>
           </div>
 
-          {/* Social Actions */}
-          <div className="action-row" style={{justifyContent:'center', marginTop:'20px'}}>
-             <button className="action-btn-icon">
-                <i className="bi bi-heart"></i>
-                <span className="stat-value">{product.plays_count}</span>
-             </button>
-             <button className="action-btn-icon">
-                <i className="bi bi-upload"></i>
-                <span className="stat-value">&nbsp;</span>
-             </button>
-             <button className="action-btn-icon">
-                <i className="bi bi-plus-lg"></i>
-                <span className="stat-value">&nbsp;</span>
-             </button>
+          <div className="action-row flex justify-center mt-6 gap-4">
+            <button className="action-btn-icon flex flex-col items-center gap-1">
+              <BiHeart size={24} />
+              <span className="text-xs text-zinc-500">{product.likes_count || 0}</span>
+            </button>
+            <button className="action-btn-icon">
+              <BiUpload size={24} />
+            </button>
+            <button className="action-btn-icon">
+              <BiPlusLg size={24} />
+            </button>
           </div>
 
-          {/* Info List */}
-          <div className="info-list">
-             <div style={{fontSize:'0.8rem', color:'#666', marginBottom:'5px', fontWeight:700, textTransform:'uppercase'}}>Información</div>
-             <div className="info-row"><span className="info-label">Publicado</span> <span className="info-val">Hoy</span></div>
-             <div className="info-row"><span className="info-label">BPM</span> <span className="info-val">150</span></div>
-             <div className="info-row"><span className="info-label">Key</span> <span className="info-val">Cm</span></div>
-             <div className="info-row"><span className="info-label">Plays</span> <span className="info-val">{product.plays_count}</span></div>
+          <div className="info-list mt-8 bg-zinc-900/50 p-6 rounded-2xl border border-white/5 space-y-4">
+            <div className="text-[10px] text-zinc-600 font-bold uppercase tracking-[2px]">Detalles Técnicos</div>
+            <div className="flex justify-between text-sm"><span className="text-zinc-500">Publicado</span> <span className="text-white">Reciente</span></div>
+            {product.bpm && <div className="flex justify-between text-sm"><span className="text-zinc-500">BPM</span> <span className="text-white">{product.bpm}</span></div>}
+            {product.key && <div className="flex justify-between text-sm"><span className="text-zinc-500">Key</span> <span className="text-white">{product.key}</span></div>}
+            <div className="flex justify-between text-sm"><span className="text-zinc-500">Reproducciones</span> <span className="text-white">{product.plays_count || 0}</span></div>
           </div>
 
-          {/* Tags */}
-          <div className="tags-section" style={{marginTop:'20px'}}>
-             <div className="tags-row">
-                <span className="tag-pill">#Dark</span>
-                <span className="tag-pill">#Trap</span>
-                <span className="tag-pill">#Tainy</span>
-             </div>
-          </div>
-        </div>
-
-        {/* --- RIGHT: MAIN CONTENT --- */}
-        <div className="product-main-content">
-           
-           {/* Header */}
-           <div>
-              <h1 style={{fontSize:'3rem', fontWeight:800, lineHeight:1.1, marginBottom:'10px'}}>{product.name}</h1>
-              <span style={{color:'#aaa', fontSize:'1rem', marginBottom:'20px', display:'inline-flex', alignItems:'center', cursor:'pointer'}}>
-                 {product.producer_name} <i className="bi bi-patch-check-fill" style={{color:'#A020F0', marginLeft:'4px'}}></i>
-              </span>
-           </div>
-
-           {/* Logic Switcher: Beats vs Kits */}
-           {renderBuyingModule()}
-
-           {/* Description Accordion */}
-           <div className="section-headline" onClick={() => toggleAccordion('desc')} style={{cursor:'pointer', marginTop:'25px'}}>
-              <span>Descripción</span>
-              <i className={`bi bi-chevron-down chevron-icon ${activeAccordion.includes('desc') ? 'rotate' : ''}`} style={{color:'#666'}}></i>
-           </div>
-           <div className={`terms-accordion-content ${activeAccordion.includes('desc') ? 'open' : ''}`} style={{color:'#888', fontSize:'1rem', lineHeight:1.6, whiteSpace:'pre-line'}}>
-              Este pack contiene los sonidos más duros del género. Inspirado en artistas top.
-              <br/>Incluye todo lo necesario para tu próximo hit.
-           </div>
-
-           {/* Terms Accordion */}
-           <div className="section-headline" onClick={() => toggleAccordion('terms')} style={{cursor:'pointer', marginTop:'15px'}}>
-              <span>Términos de Uso</span>
-              <i className={`bi bi-chevron-down chevron-icon ${activeAccordion.includes('terms') ? 'rotate' : ''}`} style={{color:'#666'}}></i>
-           </div>
-           <div className={`terms-accordion-content ${activeAccordion.includes('terms') ? 'open' : ''}`} style={{color:'#888', fontSize:'0.9rem', lineHeight:1.6, marginBottom:'40px'}}>
-              <p>Este producto está sujeto a licencias de uso. Lee los términos completos antes de distribuir tu obra.</p>
-           </div>
-
-        </div>
-
-      </div>
-
-      {/* --- RELATED PRODUCTS SECTION --- */}
-      <div className="related-products-section">
-         <div className="section-header" style={{marginBottom:'24px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-            <h3 style={{color:'#fff', fontSize:'1.5rem', fontWeight:800}}>Recomendado para ti</h3>
-            <div className="nav-arrows" style={{display:'flex', gap:'10px'}}>
-               <button className="nav-arrow-btn"><i className="bi bi-chevron-left"></i></button>
-               <button className="nav-arrow-btn"><i className="bi bi-chevron-right"></i></button>
+          {product.tags && (
+            <div className="tags-row flex flex-wrap gap-2 mt-6">
+              {product.tags.split(',').map(tag => (
+                <span key={tag} className="px-3 py-1 bg-zinc-900 text-zinc-400 text-[10px] font-bold rounded-full border border-white/5 uppercase">#{tag.trim()}</span>
+              ))}
             </div>
-         </div>
-         {/* Grid simulado, aquí mapearíamos más productos */}
-         <div className="trending-grid">
-            {MOCK_PRODUCTS.filter(p => p.id !== product.id).slice(0, 5).map(rel => (
-               <div key={rel.id} className="trending-card" onClick={() => navigate(`/producto/${rel.id}`)}>
-                   <div className="t-card-cover">
-                      <img src={rel.image_url} alt={rel.name} />
-                   </div>
-                   <div className="t-card-info">
-                      <h4>{rel.name}</h4>
-                      <p>{rel.producer_name}</p>
-                   </div>
-               </div>
-            ))}
-         </div>
-      </div>
+          )}
+        </div>
 
+        <div className="product-main-content pt-10">
+          <div>
+            <h1 className="text-5xl md:text-6xl font-black text-white leading-tight mb-4 tracking-tight uppercase">{product.name}</h1>
+            <Link to={`/u/${product.users?.nickname || product.producer_nickname}`} className="text-violet-400 text-lg font-bold hover:text-violet-300 transition-colors flex items-center gap-2">
+              {product.users?.nickname || product.producer_nickname || 'Productor'}
+              <BiPatchCheckFill className="text-violet-500" />
+            </Link>
+          </div>
+
+          <div className="mt-10">
+            {renderBuyingModule()}
+          </div>
+
+          <div className="mt-10 space-y-4">
+            <div className="border-t border-white/10 pt-6">
+              <button onClick={() => toggleAccordion('desc')} className="flex items-center justify-between w-full text-lg font-bold text-white uppercase tracking-wider">
+                <span>Información</span>
+                <BiChevronDown className={`transition-transform duration-300 ${activeAccordion.includes('desc') ? 'rotate-180' : ''}`} />
+              </button>
+              <div className={`overflow-hidden transition-all duration-300 ${activeAccordion.includes('desc') ? 'max-h-96 mt-4' : 'max-h-0'}`}>
+                <p className="text-zinc-400 leading-relaxed italic">
+                  {product.description || "Sin descripción proporcionada."}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 pt-6">
+              <button onClick={() => toggleAccordion('terms')} className="flex items-center justify-between w-full text-lg font-bold text-white uppercase tracking-wider">
+                <span>Licencia y Uso</span>
+                <BiChevronDown className={`transition-transform duration-300 ${activeAccordion.includes('terms') ? 'rotate-180' : ''}`} />
+              </button>
+              <div className={`overflow-hidden transition-all duration-300 ${activeAccordion.includes('terms') ? 'max-h-96 mt-4' : 'max-h-0'}`}>
+                <p className="text-zinc-500 text-sm leading-relaxed">
+                  Al adquirir este producto, obtienes una licencia de uso limitada según el plan seleccionado. Está prohibido el re-sellado o distribución no autorizada.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

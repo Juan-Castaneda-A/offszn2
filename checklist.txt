@@ -1,0 +1,11 @@
+[x] NavbarState Object -> Convertido a useUIStore.
+
+[ ] Smart Toggle System -> Lógica de activePanel en el Store.
+
+[ ] Search Pipeline -> Componente SearchPanel con Supabase.
+
+[ ] Currency Aware Display -> Hook de conversión usePrice.
+
+[ ] 4-Layer Sync Protocol -> Sincronización en el Store.
+
+[ ] Self-Healing Guest Modal -> Componente GlobalModa
