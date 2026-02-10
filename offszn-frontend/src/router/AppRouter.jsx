@@ -1,10 +1,24 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+
+// Layouts
 import MainLayout from '../layouts/MainLayout';
 import AuthLayout from '../layouts/AuthLayout';
-import Home from '../pages/Home';
+import DashboardLayout from '../layouts/DashboardLayout';
 
-// Auth Pages
+// Pages - General
+import Home from '../pages/Home';
+import Explore from '../pages/Explore';
+import ProductDetail from '../pages/ProductDetail';
+import NotFound from '../pages/NotFound';
+import Success from '../pages/Success';
+import Checkout from '../pages/Checkout'; // Si existe
+import MyPurchases from '../pages/MyPurchases'; // Si existe
+
+// Pages - Public (AQUÍ FALTABA ESTE IMPORT)
+import Profile from '../pages/public/Profile';
+
+// Pages - Auth
 import Login from '../pages/auth/Login';
 import Register from '../pages/auth/Register';
 import ForgotPassword from '../pages/auth/ForgotPassword';
@@ -12,56 +26,52 @@ import UpdatePassword from '../pages/auth/UpdatePassword';
 import VerifyEmail from '../pages/auth/VerifyEmail';
 import AuthCallback from '../pages/auth/AuthCallback';
 
-//marketplace
-import Explore from '../pages/Explore';
-import ProductDetail from '../pages/ProductDetail';
-import Checkout from '../pages/Checkout';
-import Success from '../pages/Success';
-import MyPurchases from '../pages/MyPurchases';
-
-//dashboard
-import DashboardLayout from './layouts/DashboardLayout';
-import Overview from './pages/dashboard/Overview';
-import AccountSettings from './pages/dashboard/AccountSettings';
-
-
-// General Pages
-import NotFound from '../pages/NotFound';
+// Pages - Dashboard
+import Overview from '../pages/dashboard/Overview';
+import AccountSettings from '../pages/dashboard/AccountSettings';
+import UploadBeats from '../pages/account/UploadBeats'; // El Wizard Nuevo
 
 const AppRouter = () => {
   return (
     <Routes>
-      {/* Rutas Públicas con Layout Principal */}
+      {/* --- RUTAS PÚBLICAS (Con MainLayout) --- */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/explorar" element={<Explore />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
-        <Route path="/my-purchases" element={<MyPurchases />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/success" element={<Success />} />
+        
+        {/* Rutas de Usuario Público */}
         <Route path="/u/:username" element={<Profile />} />
       </Route>
 
-      {/* Rutas de Autenticación (Diseño Centrado) */}
+      {/* --- RUTAS DE AUTENTICACIÓN --- */}
       <Route path="/auth" element={<AuthLayout />}>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="update-password" element={<UpdatePassword />} />
         <Route path="verify-email" element={<VerifyEmail />} />
-        {/* Callback para OAuth y Magic Links */}
         <Route path="callback" element={<AuthCallback />} />
       </Route>
 
+      {/* --- RUTAS DEL DASHBOARD (Protegidas) --- */}
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<Overview />} /> {/* Dashboard Home */}
+        <Route index element={<Overview />} /> 
         <Route path="settings" element={<AccountSettings />} />
-        {/* Agrega las otras rutas aquí */}
+        <Route path="my-purchases" element={<MyPurchases />} />
+        
+        {/* 🔥 AQUÍ ESTÁ LA RUTA DEL WIZARD QUE HICIMOS HOY */}
+        <Route path="upload-beat" element={<UploadBeats />} />
+        
+        {/* Placeholder para rutas futuras */}
+        <Route path="kits" element={<div>Mis Kits (Próximamente)</div>} />
+        <Route path="licencias" element={<div>Licencias (Próximamente)</div>} />
+        <Route path="analytics" element={<div>Analytics (Próximamente)</div>} />
       </Route>
 
-      {/* Rutas de Marketplace */}
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/success" element={<Success />} />
-
-      {/* Redirección 404 */}
+      {/* --- 404 NOT FOUND --- */}
       <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
     </Routes>
   );

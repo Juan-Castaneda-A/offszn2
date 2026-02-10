@@ -1,28 +1,11 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase'; // Asumo que tienes tu cliente configurado
-import { useAuth } from '../contexts/AuthContext'; // Asumo contexto de auth
+import { supabase } from '../api/client'; // Asegúrate de que este import apunte a tu cliente supabase configurado
+import { useAuth } from '../store/authStore'; // O donde tengas tu auth store
 
 export const useBeatUpload = () => {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Asumiendo que obtienes el usuario logueado así
   const [isPublishing, setIsPublishing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ message: '', progress: 0 });
-
-  // --- HELPER: Delete File ---
-  const deleteFileFromStorage = async (pathOrUrl, bucket = 'beat-drafts') => {
-    if (!pathOrUrl) return;
-    try {
-      let path = pathOrUrl;
-      // Lógica para extraer path relativo si viene URL completa
-      if (pathOrUrl.startsWith('http')) {
-        const parts = pathOrUrl.split(`/${bucket}/`);
-        if (parts.length > 1) path = parts[1];
-      }
-      console.log(`🗑️ Deleting from ${bucket}:`, path);
-      await supabase.storage.from(bucket).remove([path]);
-    } catch (e) {
-      console.warn(`⚠️ Cleanup failed for ${pathOrUrl}`, e);
-    }
-  };
 
   // --- HELPER: Sanitize Filename ---
   const sanitize = (name) => {
@@ -31,122 +14,121 @@ export const useBeatUpload = () => {
       .substring(0, 100);
   };
 
-  // --- MAIN FUNCTION: Save/Publish ---
-  const handleSaveProduct = async (formData, formState, isDraft = false, editId = null, originalData = null) => {
+  // --- MAIN FUNCTION ---
+  const handleSaveProduct = async (fileObjects, formState, isDraft = false) => {
     if (isPublishing) return;
     setIsPublishing(true);
-    setUploadProgress({ message: 'Preparando archivos...', progress: 10 });
+    setUploadProgress({ message: 'Iniciando carga...', progress: 5 });
 
     try {
-      const updates = {
+      if (!user) throw new Error("Usuario no autenticado");
+
+      // 1. Preparamos el objeto para la DB (Mapeo exacto a tus columnas)
+      const productData = {
         name: formState.title,
-        description: formState.description || null,
-        release_date: formState.releaseDate,
-        visibility: formState.visibility,
-        tags: formState.tags.length > 0 ? formState.tags : null,
+        description: formState.description || '',
         bpm: parseInt(formState.bpm) || null,
-        key_scale: formState.key || null,
-        // Precios
-        discount_amount: parseInt(formState.discountAmount) || null,
+        key: formState.key || null,
+        product_type: 'beat', // Fijo según tu lógica
+        tags: formState.tags || [], // Tu DB dice ARRAY, así que enviamos array
+        genres: [], // Puedes agregar esto al form si quieres
+        moods: [], // Puedes agregar esto al form si quieres
+        
+        // Precios y Licencias
+        licenses: formState.licenses, // JSONB
+        price_basic: formState.licenses.basic?.enabled ? formState.licenses.basic.price : 0,
+        price_premium: formState.licenses.premium?.enabled ? formState.licenses.premium.price : 0,
+        price_stems: formState.licenses.unlimited?.enabled ? formState.licenses.unlimited.price : 0, // Asumiendo unlimited = stems
+        
+        discount_amount: parseFloat(formState.discountAmount) || 0,
         discount_type: formState.discountType || 'percent',
-        licenses: formState.licenses, // JSON completo
-        collaborators: formState.collaborators.length > 0 ? formState.collaborators : null,
-        // Calcular precio base
-        price_basic: Object.values(formState.licenses).some(l => l.enabled) 
-          ? Math.min(...Object.values(formState.licenses).filter(l => l.enabled).map(l => l.price))
-          : 0
+        
+        is_free: formState.isFree,
+        release_date: formState.releaseDate ? new Date(formState.releaseDate).toISOString() : new Date().toISOString(),
+        visibility: formState.visibility || 'public',
+        status: isDraft ? 'draft' : 'published',
+        
+        producer_id: user.id,
+        created_at: new Date().toISOString(),
       };
 
-      // Recalcular is_free
-      updates.is_free = updates.price_basic === 0;
-
-      // 1. Upload Cover (Si cambió)
-      if (formData.coverFile) {
+      // 2. Subida de Archivos (Buckets)
+      
+      // A) Portada (image_url)
+      if (fileObjects.coverFile) {
         setUploadProgress({ message: 'Subiendo portada...', progress: 20 });
-        // Limpiar anterior
-        if (originalData?.image_url) await deleteFileFromStorage(originalData.image_url, 'products');
+        const ext = fileObjects.coverFile.name.split('.').pop();
+        const path = `${user.id}/covers/${Date.now()}_cover.${ext}`;
         
-        const coverPath = `${user.id}/covers/${Date.now()}_cover.jpg`;
-        const { data, error } = await supabase.storage.from('products').upload(coverPath, formData.coverFile);
+        const { data, error } = await supabase.storage.from('products').upload(path, fileObjects.coverFile);
         if (error) throw error;
         
-        const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(data.path);
-        updates.image_url = publicUrl.publicUrl;
+        // Obtener URL Pública
+        const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(path);
+        productData.image_url = publicUrl.publicUrl;
       }
 
-      // 2. Upload MP3 (Si cambió)
-      if (formData.mp3File) {
+      // B) MP3 Tagged (mp3_url / download_url_mp3)
+      if (fileObjects.mp3File) {
         setUploadProgress({ message: 'Subiendo MP3...', progress: 40 });
-        if (originalData?.mp3_url) await deleteFileFromStorage(originalData.mp3_url, 'products');
-
-        const cleanName = sanitize(formData.mp3File.name);
-        const path = `${user.id}/mp3_tagged/${Date.now()}_${cleanName}`;
-        const { data, error } = await supabase.storage.from('products').upload(path, formData.mp3File);
+        const name = sanitize(fileObjects.mp3File.name);
+        const path = `${user.id}/mp3_tagged/${Date.now()}_${name}`;
+        
+        const { data, error } = await supabase.storage.from('products').upload(path, fileObjects.mp3File);
         if (error) throw error;
-
-        const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(data.path);
-        updates.mp3_url = publicUrl.publicUrl;
-        updates.audio_url = updates.mp3_url; // Legacy
+        
+        const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(path);
+        productData.mp3_url = publicUrl.publicUrl;
+        productData.audio_url = publicUrl.publicUrl; // Para el reproductor
+        productData.download_url_mp3 = publicUrl.publicUrl; // Para descargas free
       }
 
-      // 3. Upload WAV (Secure)
-      if (formData.wavFile) {
+      // C) WAV Untagged (wav_url - Secure)
+      if (fileObjects.wavFile) {
         setUploadProgress({ message: 'Subiendo WAV...', progress: 60 });
-        if (originalData?.wav_url) await deleteFileFromStorage(originalData.wav_url, 'secure-products');
-
-        const cleanName = sanitize(formData.wavFile.name);
-        const path = `${user.id}/wav_untagged/${Date.now()}_${cleanName}`;
-        const { data, error } = await supabase.storage.from('secure-products').upload(path, formData.wavFile);
+        const name = sanitize(fileObjects.wavFile.name);
+        const path = `${user.id}/wav_untagged/${Date.now()}_${name}`;
+        
+        // Usamos bucket 'secure-products' o 'products' según tu config. 
+        // Asumo 'secure-products' para archivos de venta.
+        const { data, error } = await supabase.storage.from('secure-products').upload(path, fileObjects.wavFile);
         if (error) throw error;
-        updates.wav_url = data.path; // Guardamos path interno para secure bucket
+        
+        productData.wav_url = data.path; // Guardamos PATH interno, no URL pública
       }
 
-      // 4. Upload Stems (Secure)
-      if (formData.stemsFile) {
+      // D) Stems (stems_url - Secure)
+      if (fileObjects.stemsFile) {
         setUploadProgress({ message: 'Subiendo Stems...', progress: 80 });
-        if (originalData?.stems_url) await deleteFileFromStorage(originalData.stems_url, 'secure-products');
-
-        const cleanName = sanitize(formData.stemsFile.name);
-        const path = `${user.id}/stems/${Date.now()}_${cleanName}`;
-        const { data, error } = await supabase.storage.from('secure-products').upload(path, formData.stemsFile);
+        const name = sanitize(fileObjects.stemsFile.name);
+        const path = `${user.id}/stems/${Date.now()}_${name}`;
+        
+        const { data, error } = await supabase.storage.from('secure-products').upload(path, fileObjects.stemsFile);
         if (error) throw error;
-        updates.stems_url = data.path;
+        
+        productData.stems_url = data.path;
       }
 
-      // 5. Database Update or Insert
+      // 3. Insertar en Base de Datos
       setUploadProgress({ message: 'Guardando datos...', progress: 90 });
       
-      let result;
-      if (editId) {
-        // UPDATE
-        result = await supabase.from('products').update(updates).eq('id', editId);
-      } else {
-        // INSERT
-        updates.user_id = user.id;
-        updates.product_type = 'beat';
-        result = await supabase.from('products').insert(updates);
-      }
+      const { data: insertedData, error: dbError } = await supabase
+        .from('products')
+        .insert([productData])
+        .select();
 
-      if (result.error) throw result.error;
+      if (dbError) throw dbError;
 
-      // 6. Collab Logic (Simplificada para React)
-      // Aquí iría la lógica de invitaciones que tenías en el script...
-      
-      setUploadProgress({ message: '¡Listo!', progress: 100 });
-      return { success: true };
+      setUploadProgress({ message: '¡Completado!', progress: 100 });
+      return { success: true, data: insertedData };
 
     } catch (error) {
-      console.error('Error uploading:', error);
+      console.error("Upload Error:", error);
       return { success: false, error: error.message };
     } finally {
       setIsPublishing(false);
     }
   };
 
-  return {
-    isPublishing,
-    uploadProgress,
-    handleSaveProduct,
-    deleteFileFromStorage
-  };
+  return { handleSaveProduct, isPublishing, uploadProgress };
 };

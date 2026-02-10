@@ -3,7 +3,7 @@ import { useCartStore } from '../store/cartStore';
 import { calculateCartTotals } from '../utils/priceCalculator';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient'; // Tu cliente supabase
+import { supabase } from "../api/client";
 
 const Checkout = () => {
   const { cart, clearCart } = useCartStore();

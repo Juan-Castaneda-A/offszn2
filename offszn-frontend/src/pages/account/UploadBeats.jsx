@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Ajusta según tu estructura
+import { useAuth } from "../../store/authStore"; // Ajusta según tu estructura
 import { useBeatUpload } from '../../hooks/useBeatUpload'; // El hook que definimos antes
 import { PublishOverlay, DraftSavedModal, FirstTimeModal, ExitConfirmModal } from '../../components/UploadModals'; // Los componentes de modales
 import { Save, X, ChevronRight, ChevronLeft, UploadCloud } from 'lucide-react'; // Iconos
@@ -288,3 +288,5 @@ export default function UploadBeats() {
     </div>
   );
 }
+
+

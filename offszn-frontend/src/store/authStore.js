@@ -1,18 +1,13 @@
 import { create } from 'zustand';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../api/client'; // Importamos el cliente centralizado
 
-// AQUÍ ESTABA EL ERROR: Ahora incluimos las claves directamente como "fallback"
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://qtjpvztpgfymjhhpoouq.supabase.co";
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0anB2enRwZ2Z5bWpoaHBvb3VxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3ODA5MTUsImV4cCI6MjA3NjM1NjkxNX0.YsItTFk3hSQaVuy707-z7Z-j34mXa03O0wWGAlAzjrw";
+// --- 1. RE-EXPORTAR SUPABASE ---
+// Esto arregla los errores en AuthCallback, UpdatePassword, etc.
+// que buscan "import { supabase } from '../../store/authStore'"
+export { supabase };
 
-// Validamos que existan antes de crear el cliente para evitar el crash
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL y Key son requeridas. Revisa authStore.js");
-}
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
-export const useAuthStore = create((set) => ({
+// --- 2. DEFINIR EL STORE ---
+const authStoreDefinition = (set) => ({
   user: null,
   profile: null,
   loading: true,
@@ -23,7 +18,6 @@ export const useAuthStore = create((set) => ({
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         await fetchProfile(session.user, set);
-        // Sincronizar cookie por seguridad
         setAuthCookie(session.access_token);
       } else {
         set({ user: null, profile: null, loading: false });
@@ -47,20 +41,18 @@ export const useAuthStore = create((set) => ({
 
   // Registrarse
   signUp: async (email, password, nickname) => {
-    // 1. Crear usuario auth
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { nickname } // Guardamos nickname en metadata
+        data: { nickname }
       }
     });
-
     if (error) throw error;
     return data;
   },
 
-  // Login con Google (OAuth)
+  // Login con Google
   signInWithGoogle: async (redirectTo = '/auth/callback') => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -91,13 +83,23 @@ export const useAuthStore = create((set) => ({
   // Cerrar Sesión
   signOut: async () => {
     await supabase.auth.signOut();
-    // Limpiar cookie
     document.cookie = "sb-access-token=; path=/; max-age=0; SameSite=Strict; Secure";
     set({ user: null, profile: null });
   }
-}));
+});
 
-// Helper para buscar datos extra del usuario (avatar, nickname) en tabla 'users'
+// --- 3. EXPORTAR CON AMBOS NOMBRES ---
+// Creamos el hook de Zustand
+const useAuthBase = create(authStoreDefinition);
+
+// Para el código NUEVO (UploadBeats.jsx usa 'useAuth')
+export const useAuth = useAuthBase;
+
+// Para el código VIEJO (Login.jsx, Navbar.jsx usan 'useAuthStore')
+export const useAuthStore = useAuthBase;
+
+
+// --- HELPERS ---
 const fetchProfile = async (user, set) => {
   try {
     const { data: profile } = await supabase
@@ -106,7 +108,6 @@ const fetchProfile = async (user, set) => {
       .eq('id', user.id)
       .single();
     
-    // Si no hay perfil en tabla users, usamos el metadata o un default
     set({ user, profile: profile || { nickname: user.user_metadata?.nickname }, loading: false });
   } catch (error) {
     set({ user, profile: { nickname: user.user_metadata?.nickname }, loading: false });

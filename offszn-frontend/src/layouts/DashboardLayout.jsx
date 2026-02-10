@@ -1,23 +1,25 @@
 import React from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
+// He cambiado TODOS los iconos por versiones que SÍ existen en BoxIcons
 import { 
-  BiGridFill, 
-  BiDiscFill, 
-  BiCloudArrowUpFill, 
-  BiFileEarmarkMusicFill, 
-  BiTicketPerforatedFill, 
-  BiPeopleFill, 
-  BiMortarboardFill, 
-  BiBarChartFill, 
-  BiCameraReelsFill, 
-  BiRocketTakeoffFill 
+  BiGridAlt,          // Dashboard
+  BiDisc,             // Mis Kits
+  BiCloudUpload,      // Subir (Antes fallaba como BiCloudArrowUpFill)
+  BiFile,             // Licencias
+  BiPurchaseTag,      // Cupones
+  BiGroup,            // Colaboraciones
+  BiBook,             // Cursos
+  BiBarChartAlt2,     // Estadísticas
+  BiMoviePlay,        // Reels
+  BiRocket            // Upgrade
 } from 'react-icons/bi';
-import logo from '../assets/images/LOGO-OFFSZN.png'; // Asegúrate de tener la ruta correcta
+
+import logo from '../assets/images/LOGO-OFFSZN.png'; // Tu logo
 
 export default function DashboardLayout() {
   return (
     <div className="min-h-screen bg-black text-white font-inter flex">
-      {/* --- FONDO RADIAL GLOW (CSS original migrado) --- */}
+      {/* --- FONDO RADIAL GLOW --- */}
       <div className="fixed inset-0 z-0 pointer-events-none"
            style={{
              background: 'radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08), transparent 70%)'
@@ -29,7 +31,6 @@ export default function DashboardLayout() {
 
       {/* --- MAIN CONTENT --- */}
       <main className="flex-1 ml-[80px] p-10 relative z-10">
-        {/* Aquí se renderizarán las páginas hijas (Overview, Settings, etc.) */}
         <Outlet />
       </main>
     </div>
@@ -39,8 +40,7 @@ export default function DashboardLayout() {
 // --- SUB-COMPONENTE: SIDEBAR ---
 function Sidebar() {
   const location = useLocation();
-
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.startsWith(path);
 
   return (
     <aside className="fixed top-0 left-0 h-screen w-[80px] bg-black border-r border-[#1A1A1A] z-50 flex flex-col items-center py-5 gap-2">
@@ -52,24 +52,26 @@ function Sidebar() {
 
       {/* --- GRUPO 1: GESTIÓN --- */}
       <Divider />
-      <SidebarItem to="/dashboard" icon={<BiGridFill />} label="Dashboard" active={isActive('/dashboard')} />
-      <SidebarItem to="/dashboard/kits" icon={<BiDiscFill />} label="Mis Kits" active={isActive('/dashboard/kits')} />
-      <SidebarItem to="/dashboard/upload" icon={<BiCloudArrowUpFill />} label="Subir" active={isActive('/dashboard/upload')} />
+      <SidebarItem to="/dashboard" icon={<BiGridAlt />} label="Dashboard" active={location.pathname === '/dashboard' || location.pathname === '/dashboard/'} />
+      <SidebarItem to="/dashboard/kits" icon={<BiDisc />} label="Mis Kits" active={isActive('/dashboard/kits')} />
+      
+      {/* RUTA CORRECTA PARA TU UPLOAD */}
+      <SidebarItem to="/dashboard/upload-beat" icon={<BiCloudUpload />} label="Subir" active={isActive('/dashboard/upload-beat')} />
 
       {/* --- GRUPO 2: NEGOCIO --- */}
       <Divider />
-      <SidebarItem to="/dashboard/licencias" icon={<BiFileEarmarkMusicFill />} label="Licencias" active={isActive('/dashboard/licencias')} />
-      <SidebarItem to="/dashboard/cupones" icon={<BiTicketPerforatedFill />} label="Cupones" active={isActive('/dashboard/cupones')} />
-      <SidebarItem to="/dashboard/collab" icon={<BiPeopleFill />} label="Colaboraciones" active={isActive('/dashboard/collab')} />
+      <SidebarItem to="/dashboard/licencias" icon={<BiFile />} label="Licencias" active={isActive('/dashboard/licencias')} />
+      <SidebarItem to="/dashboard/cupones" icon={<BiPurchaseTag />} label="Cupones" active={isActive('/dashboard/cupones')} />
+      <SidebarItem to="/dashboard/collab" icon={<BiGroup />} label="Colaboraciones" active={isActive('/dashboard/collab')} />
 
       {/* --- GRUPO 3: ACADEMIA --- */}
       <Divider />
-      <SidebarItem to="/dashboard/cursos" icon={<BiMortarboardFill />} label="Cursos" active={isActive('/dashboard/cursos')} />
-      <SidebarItem to="/dashboard/analytics" icon={<BiBarChartFill />} label="Estadísticas" active={isActive('/dashboard/analytics')} />
+      <SidebarItem to="/dashboard/cursos" icon={<BiBook />} label="Cursos" active={isActive('/dashboard/cursos')} />
+      <SidebarItem to="/dashboard/analytics" icon={<BiBarChartAlt2 />} label="Estadísticas" active={isActive('/dashboard/analytics')} />
 
       {/* --- GRUPO 4: SOCIAL --- */}
       <Divider />
-      <SidebarItem to="/dashboard/reels" icon={<BiCameraReelsFill />} label="Reels" active={isActive('/dashboard/reels')} />
+      <SidebarItem to="/dashboard/reels" icon={<BiMoviePlay />} label="Reels" active={isActive('/dashboard/reels')} />
 
       {/* --- UPGRADE (ROCKET) --- */}
       <div className="mt-auto">
@@ -77,8 +79,7 @@ function Sidebar() {
           to="/dashboard/planes" 
           className="w-10 h-10 rounded-xl flex items-center justify-center text-[#FFD700] bg-[rgba(255,215,0,0.1)] border border-[rgba(255,215,0,0.2)] hover:scale-105 hover:bg-[rgba(255,215,0,0.2)] hover:shadow-[0_0_15px_rgba(255,215,0,0.2)] transition-all duration-200 relative group"
         >
-          <BiRocketTakeoffFill size={20} />
-          {/* Tooltip personalizado */}
+          <BiRocket size={20} />
           <span className="absolute left-[70px] bg-[#111] border border-[#333] text-white text-xs px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-50 font-medium">
             Mejorar Plan
           </span>
@@ -87,8 +88,6 @@ function Sidebar() {
     </aside>
   );
 }
-
-// --- HELPER COMPONENTS ---
 
 function SidebarItem({ to, icon, label, active }) {
   return (
@@ -104,7 +103,6 @@ function SidebarItem({ to, icon, label, active }) {
     >
       {icon}
       
-      {/* Tooltip flotante (CSS based logic replica) */}
       <span className="absolute left-[70px] bg-[#111] border border-[#333] text-white text-xs px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-50 font-medium">
         {label}
       </span>

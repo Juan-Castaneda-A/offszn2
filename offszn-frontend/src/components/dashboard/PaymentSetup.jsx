@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient'; // Ajusta la ruta a tu cliente
+import { supabase } from '../../api/client'; // Ajusta la ruta a tu cliente
 import { toast } from 'react-hot-toast'; // O tu librería de notificaciones
 
 const PaymentSetup = ({ userId }) => {

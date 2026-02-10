@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase } from '../../supabase/client'; // Asegúrate de que la ruta sea correcta
+import { supabase } from "../../api/client"; // Asegúrate de que la ruta sea correcta
 import { 
   BiUserCheck, 
   BiMessageDetail, 

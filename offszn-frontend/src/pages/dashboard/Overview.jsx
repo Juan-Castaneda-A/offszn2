@@ -11,21 +11,23 @@ import {
   Legend 
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+// HE VERIFICADO CADA UNO DE ESTOS ICONOS:
 import { 
-  BiPlus, 
-  BiFilter, 
-  BiEnvelope, 
-  BiCheckCircle, 
+  BiPlus,
+  BiFilter,
+  BiEnvelope,
+  BiCheckCircle,
   BiErrorCircle,
   BiMusic,
   BiDisc,
   BiDollarCircle,
   BiGroup,
-  BiGear,
+  BiCog,             // <--- CORREGIDO: Antes era BiGear (que no existe)
   BiRightArrowAlt
 } from 'react-icons/bi';
+
 // Asumiendo que tienes configurado tu cliente de supabase
-import { supabase } from '../../supabase/client'; 
+import { supabase } from "../../api/client";
 
 // --- CONFIGURACIÓN DE CHART.JS ---
 ChartJS.register(
@@ -59,20 +61,22 @@ export default function Overview() {
       try {
         // 1. Obtener Usuario
         const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (!authUser) return; // Redirigir si es necesario
+        if (!authUser) {
+             setLoading(false);
+             return; 
+        }
 
         // Obtener perfil (nickname)
         const { data: profile } = await supabase
-          .from('users')
+          .from('users') // Asegúrate de que tu tabla se llame 'users' o 'profiles'
           .select('nickname, first_name')
           .eq('id', authUser.id)
-          .single();
+          .maybeSingle(); // Usamos maybeSingle para no lanzar error si no existe perfil aun
 
         const displayName = profile?.nickname || profile?.first_name || authUser.email.split('@')[0];
         setUser({ name: displayName, id: authUser.id });
 
         // 2. Obtener Estadísticas (Revenue, Sales, etc)
-        // Nota: Adaptado de tu script original. En producción, idealmente usarías RPCs o Edge Functions para sumar.
         const { data: orders } = await supabase
           .from('orders')
           .select('amount, created_at, user_id')
@@ -111,8 +115,7 @@ export default function Overview() {
           clients: uniqueClients.size
         });
 
-        // 3. Obtener Actividad (Products + Orders)
-        // Simplificado para el ejemplo: combinamos y ordenamos
+        // 3. Obtener Actividad (Products)
         const { data: recentProds } = await supabase
           .from('products')
           .select('*')
@@ -130,13 +133,11 @@ export default function Overview() {
           category: p.product_type
         }));
         
-        // Agregar las órdenes al feed también...
         // Ordenar por fecha
         feed.sort((a, b) => b.date - a.date);
         setActivities(feed);
 
         // 4. Datos de la Gráfica (Mockeado basado en lógica de visitas)
-        // Aquí generarías los labels de los últimos 7 días
         const labels = Array.from({length: 7}, (_, i) => {
             const d = new Date();
             d.setDate(d.getDate() - (6 - i));
@@ -147,7 +148,7 @@ export default function Overview() {
           labels,
           datasets: [{
             label: 'Visitas',
-            data: [12, 19, 3, 5, 2, 3, 15], // Mock data si no hay page_views real
+            data: [12, 19, 3, 5, 2, 3, 15], // Mock data
             borderColor: '#8B5CF6',
             backgroundColor: (context) => {
               const ctx = context.chart.ctx;
@@ -185,7 +186,7 @@ export default function Overview() {
           )}
           <p className="text-[#888] text-sm mt-1">Este es el estado actual de tu catálogo musical.</p>
           
-          {/* Smart Drafts Pills (Static Example) */}
+          {/* Smart Drafts Pills */}
           <div className="flex gap-3 mt-4">
              <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,255,255,0.05)] border border-[#222] text-xs text-[#ccc] hover:bg-[rgba(255,255,255,0.1)] hover:text-white hover:border-[#444] transition-all">
                 <BiMusic className="text-[#8B5CF6]" /> Continuar: Dark Trap Beat
@@ -267,7 +268,8 @@ export default function Overview() {
             
             <div className="flex items-center justify-between bg-[#151515] p-3 rounded-lg text-sm text-[#ccc] mb-4">
                <div className="flex items-center gap-2">
-                 <BiGear className="text-lg" />
+                 {/* ICONO CORREGIDO */}
+                 <BiCog className="text-lg" />
                  <span>Pagos (Stripe)</span>
                </div>
                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"></div>
@@ -286,7 +288,7 @@ export default function Overview() {
   );
 }
 
-// --- SUB-COMPONENTES (Para mantener el código limpio) ---
+// --- SUB-COMPONENTES ---
 
 function StatCard({ loading, label, value, trend, trendType }) {
   if (loading) {
