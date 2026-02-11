@@ -5,8 +5,8 @@ import {
     Search, Save, AlertCircle, CheckCircle2,
     Package, LayoutGrid, Globe
 } from 'lucide-react';
-import { supabase } from '../api/client';
-import { useAuth } from '../store/authStore';
+import { supabase } from '../../api/client';
+import { useAuth } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 export default function CouponModal({

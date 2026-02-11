@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from '../config/config.js';
+import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from '../../shared/config/config.js';
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     console.error('❌ SUPABASE_URL or SUPABASE_SERVICE_KEY is missing');

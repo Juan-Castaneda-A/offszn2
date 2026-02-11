@@ -76,7 +76,7 @@ const AppRouter = () => {
           <Route path="settings" element={<AccountSettings />} />
           <Route path="my-purchases" element={<MyPurchases />} />
 
-          {/* 🔥 AQUÍ ESTÁ LA RUTA DEL WIZARD QUE HICIMOS HOY */}
+          {/* RUTA DEL WIZARD */}
           <Route path="upload-beat" element={<UploadBeats />} />
           <Route path="import-youtube" element={<YouTubeImport />} />
           <Route path="my-products" element={<MyProducts />} />

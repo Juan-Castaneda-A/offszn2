@@ -10,7 +10,7 @@ import {
   BiSkipNext,
   BiVolumeFull,
   BiVolumeMute,
-  BiCartPlus,
+  BiCartAdd,
   BiX,
   BiHeart,
   BiDownload
@@ -188,7 +188,7 @@ const StickyPlayer = () => {
         </div>
 
         <button className="bg-violet-600 text-white px-5 py-2.5 rounded-full text-xs font-black flex items-center gap-2 hover:bg-violet-500 transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0">
-          <BiCartPlus size={18} />
+          <BiCartAdd size={18} />
           <span>{currentTrack.is_free ? 'GRATIS' : formatPrice(currentTrack.price_basic)}</span>
         </button>
 

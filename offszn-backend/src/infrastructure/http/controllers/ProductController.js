@@ -51,6 +51,43 @@ export const getAllProducts = async (req, res) => {
     }
 };
 
+
+
+export const getProductById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Support ID or Slug
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        const isInt = /^\d+$/.test(id);
+
+        let query = supabase
+            .from('products')
+            .select(`
+                *,
+                users!producer_id (
+                    id, nickname, avatar_url, is_verified
+                )
+            `);
+
+        if (isInt || isUUID) {
+            query = query.eq('id', id);
+        } else {
+            query = query.eq('public_slug', id);
+        }
+
+        const { data, error } = await query.single();
+
+        if (error || !data) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 export const createProduct = async (req, res) => {
     try {
         const userId = req.user.userId;

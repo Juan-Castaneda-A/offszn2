@@ -25,13 +25,12 @@ export const useCartStore = create()(
             .select(`
               id,
               product_id,
-              license_id,
+              license_name,
               products (
                 id,
                 name,
                 price_basic,
                 image_url,
-                cover_url,
                 producer_id,
                 profiles:producer_id (nickname)
               )
@@ -43,7 +42,7 @@ export const useCartStore = create()(
           const formattedItems = data.map(item => ({
             id: item.id,
             productId: item.product_id,
-            licenseId: item.license_id,
+            licenseId: item.license_name,
             name: item.products.name,
             image: item.products.cover_url || item.products.image_url,
             price: item.products.price_basic,
