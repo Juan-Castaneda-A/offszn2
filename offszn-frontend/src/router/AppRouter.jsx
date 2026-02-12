@@ -12,7 +12,7 @@ import Explore from '../pages/Explore';
 import ProductDetail from '../pages/ProductDetail';
 import NotFound from '../pages/NotFound';
 import Success from '../pages/Success';
-import Checkout from '../pages/Checkout'; // Si existe
+import Checkout from '../pages/Checkout';
 import MyPurchases from '../pages/MyPurchases'; // Si existe
 import Messages from '../pages/Messages';
 import Reels from '../pages/Reels';

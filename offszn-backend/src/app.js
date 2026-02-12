@@ -107,7 +107,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/social', socialRoutes);
-app.use('/api/paypal', paypalRoutes);
+app.use('/api', paypalRoutes);
 
 checkConnection();
 
