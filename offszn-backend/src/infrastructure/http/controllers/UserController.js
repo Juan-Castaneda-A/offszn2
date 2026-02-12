@@ -29,8 +29,8 @@ export const getUserProfile = async (req, res) => {
             .from('users')
             .select(`
                 id, nickname, first_name, last_name, avatar_url, is_verified, role, bio, socials,
-                followers:followers(count),
-                products:products(count)
+                followers:followers!user_id(count),
+                products:products!producer_id(count)
             `)
             .ilike('nickname', nickname)
             .single();

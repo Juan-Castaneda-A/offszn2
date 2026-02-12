@@ -280,7 +280,7 @@ function SocialLinks({ socials }) {
   };
 
   return Object.entries(socials).map(([platform, handle]) => {
-    if (!handle) return null;
+    if (!handle || typeof handle !== 'string') return null;
     const { icon, url } = getIconAndUrl(platform, handle);
 
     return (
