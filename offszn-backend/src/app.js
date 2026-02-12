@@ -15,7 +15,10 @@ import orderRoutes from './infrastructure/http/routes/order.routes.js';
 import cartRoutes from './infrastructure/http/routes/cart.routes.js';
 import chatRoutes from './infrastructure/http/routes/chat.routes.js';
 import socialRoutes from './infrastructure/http/routes/social.routes.js';
+import chatRoutes from './infrastructure/http/routes/chat.routes.js';
+import socialRoutes from './infrastructure/http/routes/social.routes.js';
 import paypalRoutes from './infrastructure/http/routes/paypal.routes.js';
+import storageRoutes from './infrastructure/http/routes/storage.routes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -108,6 +111,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api', paypalRoutes);
+app.use('/api/storage', storageRoutes);
 
 checkConnection();
 

@@ -347,34 +347,70 @@ export const getSecureDownloadLink = async (req, res) => {
             return res.status(404).json({ error: 'Archivo no disponible para este producto.' });
         }
 
-        // 3. Generate Signed URL (Supabase Storage)
-        // Check if it is a Supabase public URL to convert it to a signed URL
+        // 3. Generate Signed URL (Supabase Storage OR Cloudflare R2)
         const SUPABASE_URL_MARKER = '/storage/v1/object/public/';
 
+        // A) Supabase Storage
         if (fileUrl.includes(SUPABASE_URL_MARKER)) {
-            // Extract bucket and path
-            // URL: https://[project].supabase.co/storage/v1/object/public/[bucket]/[folder]/[file]
-            // Split by marker to get: [bucket]/[folder]/[file]
             const pathPart = fileUrl.split(SUPABASE_URL_MARKER)[1];
-            // Split bucket from the rest
             const [bucket, ...rest] = pathPart.split('/');
-            const filePath = rest.join('/'); // The actual path inside the bucket
+            const filePath = rest.join('/');
 
             const { data: signedData, error: signError } = await supabase
                 .storage
                 .from(bucket)
-                .createSignedUrl(filePath, 3600); // Valid for 1 Hour
+                .createSignedUrl(filePath, 3600);
 
             if (signError) {
                 console.error("Signed URL Error:", signError);
-                // Fallback: return public URL if signing fails? No, simpler to fail secure.
                 return res.status(500).json({ error: 'Error generando enlace seguro.' });
             }
 
             return res.json({ downloadUrl: signedData.signedUrl });
         }
 
-        // Fallback: Return original URL (if external, e.g. Dropbox/Drive)
+        // B) Cloudflare R2 (Hybrid)
+        // Detect if it is an R2 URL or a raw key (Legacy behavior often stored raw keys or r2 domains)
+        const isR2 = fileUrl.includes('r2.cloudflarestorage.com') ||
+            !fileUrl.startsWith('http'); // Relative paths are usually R2 keys in this system
+
+        if (isR2) {
+            // Extract Key
+            let key = fileUrl;
+            if (fileUrl.startsWith('http')) {
+                const r2Base = '.r2.cloudflarestorage.com/';
+                if (fileUrl.includes(r2Base)) {
+                    key = fileUrl.split(r2Base)[1];
+                    // Remove bucket from path if present (depends on how it was stored)
+                    // Usually stored as: [bucket]/path/to/file or just path/to/file
+                    // For now, assume key is correct path relative to bucket root
+                }
+            }
+
+            // Clean key
+            if (key.startsWith('/')) key = key.substring(1);
+
+            try {
+                const { GetObjectCommand } = await import("@aws-sdk/client-s3");
+                const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+                const { s3Client } = await import("../../storage/r2Client.js");
+                const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || "offszn-storage";
+
+                const command = new GetObjectCommand({
+                    Bucket: R2_BUCKET_NAME,
+                    Key: key,
+                });
+
+                const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+                return res.json({ downloadUrl: url });
+
+            } catch (r2Error) {
+                console.error("R2 Signing Error:", r2Error);
+                return res.status(500).json({ error: 'Error generando enlace R2.' });
+            }
+        }
+
+        // Fallback: Return original URL
         res.json({ downloadUrl: fileUrl });
 
     } catch (err) {
