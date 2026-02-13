@@ -8,7 +8,7 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const { signIn, user } = useAuthStore();
   const navigate = useNavigate();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState(null);
@@ -41,13 +41,13 @@ const Login = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        
+
         {/* Email */}
         <div>
           <label className="block text-zinc-400 text-sm mb-2 font-medium">Correo electrónico</label>
-          <input 
+          <input
             {...register("email", { required: "El correo es obligatorio" })}
-            type="email" 
+            type="email"
             placeholder="tu@email.com"
             className="w-full px-4 py-3 bg-[#0f0f0f] border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-600/50 focus:ring-1 focus:ring-purple-600/50 transition-all font-sans"
           />
@@ -58,19 +58,19 @@ const Login = () => {
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-zinc-400 text-sm font-medium">Contraseña</label>
-            <Link to="/auth/forgot-password" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">
+            <Link to="/auth/forgot-password" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
 
           <div className="relative">
-            <input 
+            <input
               {...register("password", { required: "La contraseña es obligatoria" })}
-              type={showPassword ? "text" : "password"} 
+              type={showPassword ? "text" : "password"}
               placeholder="Tu contraseña"
               className="w-full px-4 py-3 bg-[#0f0f0f] border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-600/50 focus:ring-1 focus:ring-purple-600/50 transition-all pr-12 font-sans"
             />
-            <button 
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 px-4 flex items-center text-zinc-500 hover:text-white transition-colors cursor-pointer focus:outline-none"
@@ -89,8 +89,8 @@ const Login = () => {
         )}
 
         {/* Submit Button */}
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isLoading}
           className="w-full py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-colors shadow-[0_4px_20px_rgba(124,58,237,0.3)] flex items-center justify-center font-display"
         >

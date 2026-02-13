@@ -13,18 +13,16 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState(null);
 
-  // Instant Guard
-  useEffect(() => {
-    if (user) navigate('/');
-  }, [user, navigate]);
+  // Note: No auth guard here - we want to allow registration even if somehow logged in
+  // The redirect to /welcome happens in onSubmit after successful signup
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     setAuthError(null);
     try {
-      await signUp(data.email, data.password); // Asumo que signUp en el store ya maneja el nickname si lo necesitas, o podemos añadirlo luego
-      // Redirigir o mostrar mensaje de éxito
-      navigate('/auth/login'); // O mostrar un mensaje de "Revisa tu correo"
+      await signUp(data.email, data.password);
+      // Redirect to onboarding wizard
+      navigate('/welcome');
     } catch (error) {
       setAuthError("Error al crear cuenta. Intenta con otro correo.");
     } finally {
@@ -42,19 +40,19 @@ const Register = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        
+
         {/* Email */}
         <div>
           <label className="block text-zinc-400 text-sm mb-2 font-medium">Correo electrónico</label>
-          <input 
-            {...register("email", { 
+          <input
+            {...register("email", {
               required: "El correo es obligatorio",
               pattern: {
                 value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i,
                 message: "Ingresa un correo válido"
               }
             })}
-            type="email" 
+            type="email"
             placeholder="tu@email.com"
             className="w-full px-4 py-3 bg-[#0f0f0f] border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-600/50 focus:ring-1 focus:ring-purple-600/50 transition-all font-sans"
           />
@@ -65,17 +63,17 @@ const Register = () => {
         <div>
           <label className="block text-zinc-400 text-sm mb-2 font-medium">Contraseña</label>
           <div className="relative">
-            <input 
-              {...register("password", { 
+            <input
+              {...register("password", {
                 required: "La contraseña es obligatoria",
                 minLength: { value: 6, message: "La contraseña debe tener al menos 6 caracteres" },
                 maxLength: { value: 15, message: "La contraseña no puede exceder 15 caracteres" }
               })}
-              type={showPassword ? "text" : "password"} 
+              type={showPassword ? "text" : "password"}
               placeholder="Mínimo 6 caracteres"
               className="w-full px-4 py-3 bg-[#0f0f0f] border border-white/10 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-purple-600/50 focus:ring-1 focus:ring-purple-600/50 transition-all pr-12 font-sans"
             />
-            <button 
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 px-4 flex items-center text-zinc-500 hover:text-white transition-colors cursor-pointer focus:outline-none"
@@ -94,8 +92,8 @@ const Register = () => {
         )}
 
         {/* Submit Button */}
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isLoading}
           className="w-full py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-colors shadow-[0_4px_20px_rgba(124,58,237,0.3)] flex items-center justify-center font-display"
         >

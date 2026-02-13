@@ -32,3 +32,6 @@ apiClient.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// Default export for convenience
+export default apiClient;

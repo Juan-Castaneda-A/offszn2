@@ -49,6 +49,15 @@ const authStoreDefinition = (set) => ({
       }
     });
     if (error) throw error;
+
+    // Set user state immediately after signup
+    if (data.user) {
+      await fetchProfile(data.user, set);
+      if (data.session?.access_token) {
+        setAuthCookie(data.session.access_token);
+      }
+    }
+
     return data;
   },
 
@@ -107,7 +116,7 @@ const fetchProfile = async (user, set) => {
       .select('*')
       .eq('id', user.id)
       .single();
-    
+
     set({ user, profile: profile || { nickname: user.user_metadata?.nickname }, loading: false });
   } catch (error) {
     set({ user, profile: { nickname: user.user_metadata?.nickname }, loading: false });

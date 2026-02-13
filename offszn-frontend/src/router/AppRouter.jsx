@@ -27,6 +27,7 @@ import ForgotPassword from '../pages/auth/ForgotPassword';
 import UpdatePassword from '../pages/auth/UpdatePassword';
 import VerifyEmail from '../pages/auth/VerifyEmail';
 import AuthCallback from '../pages/auth/AuthCallback';
+import Welcome from '../pages/auth/Welcome';
 
 // Pages - Dashboard
 import Overview from '../pages/dashboard/Overview';
@@ -69,6 +70,9 @@ const AppRouter = () => {
           <Route path="verify-email" element={<VerifyEmail />} />
           <Route path="callback" element={<AuthCallback />} />
         </Route>
+
+        {/* --- ONBOARDING (Standalone) --- */}
+        <Route path="/welcome" element={<Welcome />} />
 
         {/* --- RUTAS DEL DASHBOARD (Protegidas) --- */}
         <Route path="/dashboard" element={<DashboardLayout />}>

@@ -31,7 +31,7 @@ const Navbar = () => {
           {/* LOGO */}
           <div className="shrink-0">
             <Link to="/" className="flex items-center">
-              <img src="../assets/images/LOGO-OFFSZN.png" alt="OFFSZN" className="h-8 w-auto scale-150 origin-left" />
+              <img src="/assets/images/LOGO-OFFSZN.png" alt="OFFSZN" className="h-8 w-auto scale-150 origin-left" />
             </Link>
           </div>
 
@@ -204,10 +204,10 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <Link to="/auth/login" className="text-sm font-semibold text-gray-300 hover:text-white px-3 py-2">
+                <Link to="/auth/login" className="text-sm font-semibold text-gray-300 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">
                   Iniciar Sesión
                 </Link>
-                <Link to="/auth/register" className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-purple-900/20">
+                <Link to="/auth/register" className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-lg shadow-purple-900/20">
                   Únete 🚀
                 </Link>
               </div>
