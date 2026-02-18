@@ -12,9 +12,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // Detectar entorno automáticamente (Vite lo hace por nosotros)
 const isProduction = import.meta.env.PROD;
 
-const API_URL = isProduction
-  ? 'https://offszn-oc7c.onrender.com/api'
-  : 'http://localhost:3000/api'; // O tu URL local
+const API_URL = import.meta.env.VITE_API_BASE_URL ||
+  (isProduction ? 'https://offszn-oc7c.onrender.com/api' : 'http://localhost:3000/api');
 
 export const apiClient = axios.create({
   baseURL: API_URL,
