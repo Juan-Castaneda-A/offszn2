@@ -11,8 +11,6 @@ C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\api
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\api\client.js
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\assets
-C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\assets\images
-C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\assets\images\LOGO-OFFSZN.png
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\assets\react.svg
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\components
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\components\dashboard
@@ -74,6 +72,7 @@ C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\pages\MyP
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\pages\NotFound.jsx
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\pages\ProductDetail.jsx
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\pages\Success.jsx
+C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\pages\UploadBeats.jsx
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\router
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\router\AppRouter.jsx
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\offszn-frontend\src\store
@@ -104,7 +103,5 @@ C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\.gitignore
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\estructura.txt
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\LICENSE
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\mapa_real_completo.txt
-C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\package-lock.json
-C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\package.json
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\proyecto_mapa.txt
 C:\Users\Ryan1\Escritorio\PERSONAL\Trabajo\offszn2\README.md

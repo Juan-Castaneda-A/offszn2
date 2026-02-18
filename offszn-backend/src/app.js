@@ -15,10 +15,11 @@ import orderRoutes from './infrastructure/http/routes/order.routes.js';
 import cartRoutes from './infrastructure/http/routes/cart.routes.js';
 import chatRoutes from './infrastructure/http/routes/chat.routes.js';
 import socialRoutes from './infrastructure/http/routes/social.routes.js';
-// import chatRoutes from './infrastructure/http/routes/chat.routes.js';
-// import socialRoutes from './infrastructure/http/routes/social.routes.js';
 import paypalRoutes from './infrastructure/http/routes/paypal.routes.js';
 import storageRoutes from './infrastructure/http/routes/storage.routes.js';
+import cloudinaryRoutes from './infrastructure/http/routes/cloudinary.routes.js';
+import reelsRoutes from './infrastructure/http/routes/reels.routes.js';
+import chatbotRoutes from './infrastructure/http/routes/chatbot.routes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -53,7 +54,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ limit: '30mb' }));
 app.use(cookieParser());
 
 // Security Headers (COOP for Google Auth)
@@ -112,6 +113,9 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api', paypalRoutes);
 app.use('/api/storage', storageRoutes);
+app.use('/api/cloudinary', cloudinaryRoutes);
+app.use('/api/reels', reelsRoutes);
+app.use('/api', chatbotRoutes);
 
 checkConnection();
 

@@ -12,18 +12,18 @@ import {
 const router = Router();
 
 // Webhook is public (sent by Mercado Pago)
-router.post('/orders/mercadopago-webhook', handleMercadoPagoWebhook);
+router.post('/mercadopago-webhook', handleMercadoPagoWebhook);
 
 // Protected routes
 router.use(authenticateTokenMiddleware);
-router.post('/orders/create-mercadopago-preference', createMercadoPagoPreference);
-router.post('/orders/free', createFreeOrder);
-router.get('/orders/status/latest', checkPaymentStatus);
+router.post('/create-mercadopago-preference', createMercadoPagoPreference);
+router.post('/free', createFreeOrder);
+router.get('/status/latest', checkPaymentStatus);
 
 // Secure Download
-router.get('/orders/:orderId/download/:productId/:type', getSecureDownloadLink);
+router.get('/:orderId/download/:productId/:type', getSecureDownloadLink);
 
 // Debug endpoint (Unprotected or restricted to admin in production)
-router.get('/orders/debug/force/:paymentId', forceCheckPayment);
+router.get('/debug/force/:paymentId', forceCheckPayment);
 
 export default router;
