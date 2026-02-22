@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     MoreVertical, Edit3, Trash2, Eye, EyeOff, Link,
-    Clock, CheckCircle, Copy, AlertCircle
+    Clock, CheckCircle, Copy, AlertCircle, Music, Disc
 } from 'lucide-react';
 
 export default function DashboardProductCard({
@@ -17,13 +17,13 @@ export default function DashboardProductCard({
     const title = item.title || item.name || 'Sin título';
     const imageUrl = item.image_url || item.signed_cover_url || '/images/portada-default.png';
 
-    const getVisibilityIcon = () => {
-        if (isDraft) return <Clock size={12} className="text-amber-500" />;
+    const getVisibilityColor = () => {
+        if (isDraft) return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
         switch (visibility) {
-            case 'public': return <CheckCircle size={12} className="text-emerald-500" />;
-            case 'private': return <EyeOff size={12} className="text-gray-500" />;
-            case 'unlisted': return <Link size={12} className="text-blue-500" />;
-            default: return <AlertCircle size={12} />;
+            case 'public': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+            case 'private': return 'text-gray-400 bg-white/5 border-white/10';
+            case 'unlisted': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+            default: return 'text-gray-500 bg-white/5 border-white/10';
         }
     };
 
@@ -33,94 +33,115 @@ export default function DashboardProductCard({
             case 'public': return 'Público';
             case 'private': return 'Privado';
             case 'unlisted': return 'Oculto';
-            default: return 'Desconocido';
+            default: return 'Unknown';
         }
     };
 
     return (
-        <div className={`group relative bg-[#0a0a0a] border ${isSelected ? 'border-violet-500/50 bg-violet-500/5' : 'border-white/5'} rounded-2xl overflow-hidden transition-all duration-300 hover:border-white/20 shadow-xl shadow-black/50`}>
+        <div className={`group relative bg-[#0A0A0A] border ${isSelected ? 'border-violet-500 ring-1 ring-violet-500/20' : 'border-white/5'} rounded-[40px] overflow-hidden transition-all duration-500 hover:border-white/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]`}>
 
-            {/* Selection Overlay (Top Left) */}
-            <div className={`absolute top-3 left-3 z-10 transition-opacity duration-300 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+            {/* Selection Checkbox */}
+            <div className={`absolute top-6 left-6 z-20 transition-all duration-500 ${isSelected ? 'opacity-100 scale-110' : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'}`}>
                 <button
                     onClick={() => onToggleSelection(item.id)}
-                    className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${isSelected ? 'bg-violet-500 border-violet-500' : 'bg-black/40 border-white/20 hover:border-white/40'}`}
+                    className={`w-8 h-8 rounded-2xl border flex items-center justify-center transition-all backdrop-blur-md ${isSelected ? 'bg-violet-500 border-violet-500 shadow-lg shadow-violet-500/40' : 'bg-black/40 border-white/20 hover:border-white/40'}`}
                 >
-                    {isSelected && <CheckCircle size={14} className="text-white fill-white" />}
+                    {isSelected && <CheckCircle size={16} className="text-white" />}
+                    {!isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white/20" />}
                 </button>
             </div>
 
-            {/* Thumbnail */}
-            <div className="aspect-square relative overflow-hidden bg-white/5">
+            {/* Thumbnail Box */}
+            <div className="aspect-square relative overflow-hidden m-2 rounded-[32px]">
                 <img
                     src={imageUrl}
                     alt={title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
                 />
 
-                {/* Actions Overlay (Hidden by default, shown on hover) */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                    <button
-                        onClick={() => onEdit(item)}
-                        className="p-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300 delay-[50ms]"
-                        title="Editar"
-                    >
-                        <Edit3 size={18} />
-                    </button>
-                    <button
-                        onClick={() => onDelete(item)}
-                        className="p-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all transform translate-y-2 group-hover:translate-y-0 duration-300 delay-[100ms]"
-                        title="Eliminar"
-                    >
-                        <Trash2 size={18} />
-                    </button>
-                    <button
-                        className="p-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300 delay-[150ms]"
-                        title="Duplicar"
-                    >
-                        <Copy size={18} />
-                    </button>
+                {/* Premium Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+
+                {/* Quick Actions Hover Box */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center gap-3 backdrop-blur-[4px]">
+                    <ActionButton icon={Edit3} onClick={() => onEdit(item)} label="Editar" variant="light" delay="delay-0" />
+                    <ActionButton icon={Trash2} onClick={() => onDelete(item)} label="Borrar" variant="danger" delay="delay-[50ms]" />
+                    <ActionButton icon={Copy} onClick={() => { }} label="Duplicar" variant="glass" delay="delay-[100ms]" />
+                </div>
+
+                {/* Type Badge (Bottom Left) */}
+                <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/60 backdrop-blur-md border border-white/10 rounded-full">
+                    {item.product_type === 'beat' ? <Music size={10} className="text-violet-500" /> : <Disc size={10} className="text-violet-500" />}
+                    <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white">
+                        {item.product_type || 'Item'}
+                    </span>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="p-4 space-y-3">
-                <div className="flex justify-between items-start gap-2">
-                    <h3 className="text-xs font-black uppercase tracking-tight text-white line-clamp-1 flex-1">
-                        {title}
-                    </h3>
-                    <div className="flex items-center gap-1 bg-white/5 px-2 py-1 rounded-md border border-white/5">
-                        {getVisibilityIcon()}
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{getVisibilityLabel()}</span>
+            {/* Content Section */}
+            <div className="p-6 space-y-5">
+                <div className="space-y-2">
+                    <div className="flex justify-between items-start gap-4">
+                        <h3 className="text-sm font-black uppercase tracking-tight text-white line-clamp-2 leading-tight flex-1">
+                            {title}
+                        </h3>
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[8px] font-black uppercase tracking-widest transition-colors ${getVisibilityColor()}`}>
+                            {getVisibilityLabel()}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    <div className="flex gap-3">
-                        {item.bpm && <span>{item.bpm} BPM</span>}
-                        {item.musicalKey && <span>{item.musicalKey}</span>}
+                <div className="grid grid-cols-2 gap-3">
+                    {/* Bento Slot: Tempo/Key */}
+                    <div className="bg-white/[0.02] border border-white/5 p-3 rounded-2xl flex flex-col justify-center">
+                        <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mb-1">Ritmo</span>
+                        <div className="flex items-center gap-2 text-[10px] font-black text-gray-400">
+                            {item.bpm || '--'} <span className="text-[8px] text-gray-700">BPM</span>
+                        </div>
                     </div>
-                    {!isDraft && (
-                        <span className="text-violet-400">
+
+                    {/* Bento Slot: Price */}
+                    <div className="bg-white/[0.02] border border-white/5 p-3 rounded-2xl flex flex-col justify-center">
+                        <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mb-1">Precio</span>
+                        <div className="text-[10px] font-black text-violet-400">
                             ${parseFloat(item.price || 0).toFixed(2)}
-                        </span>
-                    )}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Tags */}
-                {item.tags && item.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                        {item.tags.slice(0, 2).map((tag, idx) => (
-                            <span key={idx} className="bg-white/5 border border-white/5 px-2 py-0.5 rounded text-[8px] font-bold text-gray-400">
-                                #{tag}
-                            </span>
+                {/* Footer Metadata */}
+                <div className="flex items-center justify-between pt-2">
+                    <div className="flex -space-x-1">
+                        {(item.tags || []).slice(0, 3).map((tag, i) => (
+                            <div key={i} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-[7px] font-black uppercase tracking-tight text-gray-500">
+                                {tag}
+                            </div>
                         ))}
-                        {item.tags.length > 2 && (
-                            <span className="text-[8px] text-gray-600">+{item.tags.length - 2}</span>
-                        )}
                     </div>
-                )}
+                    <div className="flex items-center gap-2 text-gray-700">
+                        <Clock size={10} />
+                        <span className="text-[8px] font-bold">{new Date().toLocaleDateString()}</span>
+                    </div>
+                </div>
             </div>
         </div>
+    );
+}
+
+function ActionButton({ icon: Icon, onClick, label, variant, delay }) {
+    const variants = {
+        light: "bg-white text-black hover:bg-violet-500 hover:text-white",
+        danger: "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20",
+        glass: "bg-white/10 text-white hover:bg-white/20 border border-white/20"
+    };
+
+    return (
+        <button
+            onClick={onClick}
+            className={`p-3.5 rounded-2xl shadow-2xl transition-all transform translate-y-4 group-hover:translate-y-0 duration-500 ${delay} ${variants[variant]}`}
+            title={label}
+        >
+            <Icon size={18} />
+        </button>
     );
 }

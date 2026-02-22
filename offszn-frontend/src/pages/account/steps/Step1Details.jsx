@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useUploadStore } from '../../../store/uploadStore';
-import { Tag as TagIcon, X, ImageIcon, Info } from 'lucide-react';
+import { Tag as TagIcon, X, ImageIcon, Info, Type, FileText } from 'lucide-react';
 import ImageCropper from '../../../components/ImageCropper';
 
 export default function Step1Details() {
@@ -39,40 +39,42 @@ export default function Step1Details() {
     const onCropComplete = (croppedDataUrl) => {
         updateField('coverImage', {
             preview: croppedDataUrl,
-            url: null, // To be uploaded later
-            file: null // We'll convert dataUrl to file on publish or keep as is
+            url: null,
+            file: null
         });
         setShowCropper(false);
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
 
-            {/* Portada y Título Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8">
+            {/* --- PRIMARY INFO GRID --- */}
+            <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-12">
 
-                {/* Lado Izquierdo: Portada */}
-                <div className="flex flex-col gap-3">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Portada del Producto</label>
+                {/* Cover Section */}
+                <div className="space-y-4">
+                    <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-2 block">Visual Identity</label>
                     <div
-                        className="group relative aspect-square rounded-2xl bg-[#0a0a0a] border-2 border-dashed border-white/5 hover:border-violet-500/50 transition-all overflow-hidden cursor-pointer"
+                        className="group relative aspect-square rounded-[40px] bg-black border border-white/5 hover:border-violet-500/50 transition-all duration-700 overflow-hidden cursor-pointer shadow-2xl"
                     >
                         {coverImage?.preview ? (
                             <>
-                                <img src={coverImage.preview} alt="Cover" className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-sm">
-                                    <ImageIcon size={24} className="text-white" />
-                                    <span className="text-xs font-bold text-white uppercase">Cambiar Imagen</span>
+                                <img src={coverImage.preview} alt="Cover" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center gap-4 backdrop-blur-md">
+                                    <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                                        <ImageIcon size={28} className="text-white" />
+                                    </div>
+                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Update Artwork</span>
                                 </div>
                             </>
                         ) : (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-gray-600 transition-colors group-hover:text-gray-400">
-                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-violet-500/10 transition-colors">
-                                    <ImageIcon size={32} />
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 text-gray-800 transition-all duration-700 group-hover:text-violet-500">
+                                <div className="w-20 h-20 rounded-[32px] bg-white/[0.02] flex items-center justify-center group-hover:bg-violet-500/10 transition-all border border-white/5 group-hover:border-violet-500/20 shadow-inner">
+                                    <ImageIcon size={36} />
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-sm font-bold">Subir Portada</p>
-                                    <p className="text-[10px] uppercase mt-1 opacity-50">JPG, PNG, WEBP</p>
+                                    <p className="text-xs font-black uppercase tracking-widest">Brand Image</p>
+                                    <p className="text-[9px] uppercase mt-2 opacity-30 font-bold tracking-widest">3000 x 3000px recommended</p>
                                 </div>
                             </div>
                         )}
@@ -83,77 +85,82 @@ export default function Step1Details() {
                             onChange={handleImageChange}
                         />
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] text-gray-600 px-1">
-                        <Info size={12} />
-                        <span>Se recomienda una imagen cuadrada de alta calidad.</span>
-                    </div>
                 </div>
 
-                {/* Lado Derecho: Título y Descripción */}
-                <div className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Título del {title ? 'Beat' : 'Producto'}</label>
-                        <input
-                            type="text"
-                            placeholder="Ej: Dark Trap Banger (Prod. You)"
-                            value={title}
-                            onChange={(e) => updateField('title', e.target.value)}
-                            className="w-full bg-[#0a0a0a] border border-white/5 rounded-xl px-4 py-4 text-xl font-bold text-white placeholder-white/10 focus:outline-none focus:border-violet-500/50 transition-all"
-                        />
+                {/* Text Info Section */}
+                <div className="space-y-10">
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4 flex items-center gap-2">
+                            <Type size={12} className="text-violet-500/40" /> Product Title
+                        </label>
+                        <div className="relative group/input">
+                            <input
+                                type="text"
+                                placeholder="E.g. Lunar Echoes (Prod. You)"
+                                value={title}
+                                onChange={(e) => updateField('title', e.target.value)}
+                                className="w-full bg-black border border-white/5 rounded-[28px] px-8 py-6 text-2xl font-black text-white placeholder-white/5 focus:outline-none focus:border-violet-500 transition-all shadow-inner"
+                            />
+                            <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-0 group-focus-within/input:opacity-100 transition-opacity">
+                                <Sparkles size={20} className="text-violet-500 animate-pulse" />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Descripción</label>
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4 flex items-center gap-2">
+                            <FileText size={12} className="text-violet-500/40" /> Description & Story
+                        </label>
                         <textarea
-                            placeholder="Cuéntanos un poco sobre este beat, inspiración, equipo usado..."
-                            rows={5}
+                            placeholder="Share the inspiration behind this piece, gear used, or special terms..."
+                            rows={6}
                             value={description}
                             onChange={(e) => updateField('description', e.target.value)}
-                            className="w-full bg-[#0a0a0a] border border-white/5 rounded-xl px-4 py-3 text-sm text-gray-300 placeholder-white/10 focus:outline-none focus:border-violet-500/50 transition-all resize-none"
+                            className="w-full bg-black border border-white/5 rounded-[32px] px-8 py-6 text-sm text-gray-400 font-bold placeholder-white/5 focus:outline-none focus:border-violet-500 transition-all resize-none shadow-inner leading-relaxed"
                         />
                     </div>
                 </div>
             </div>
 
-            <hr className="border-white/5" />
+            {/* --- METADATA SECTION --- */}
+            <div className="pt-12 border-t border-white/5 space-y-6">
+                <div className="flex flex-col gap-5">
+                    <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4 flex justify-between items-center">
+                        <span className="flex items-center gap-2">
+                            <TagIcon size={12} className="text-violet-500/40" /> Discoverability Tags
+                        </span>
+                        <span className={`text-[9px] font-black tracking-widest ${tags.length >= 8 ? 'text-red-500' : 'text-gray-800'}`}>{tags.length} / 8</span>
+                    </label>
 
-            {/* Tags Section */}
-            <div className="flex flex-col gap-3">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1 flex justify-between">
-                    <span>Etiquetas (Tags)</span>
-                    <span className={`${tags.length >= 8 ? 'text-red-500' : 'text-gray-600'}`}>{tags.length}/8</span>
-                </label>
+                    <div className="flex flex-wrap items-center gap-3 p-4 bg-black border border-white/5 rounded-[32px] focus-within:border-violet-500 transition-all min-h-[80px] shadow-inner group/tags">
+                        {tags.map((tag) => (
+                            <div key={tag} className="flex items-center gap-2 bg-violet-600 text-white text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-2xl border border-violet-400/20 shadow-2xl animate-in zoom-in slide-in-from-left-2 duration-300">
+                                <span className="opacity-50">#</span>{tag}
+                                <button
+                                    onClick={() => removeTag(tag)}
+                                    className="hover:scale-110 transition-transform ml-1 p-1 bg-black/20 rounded-full"
+                                >
+                                    <X size={12} />
+                                </button>
+                            </div>
+                        ))}
 
-                <div className="flex flex-wrap items-center gap-2 p-2 bg-[#0a0a0a] border border-white/5 rounded-xl focus-within:border-violet-500/50 transition-all min-h-[60px]">
-                    <div className="pl-2 text-gray-600">
-                        <TagIcon size={18} />
+                        <input
+                            type="text"
+                            placeholder={tags.length < 8 ? "Type & Enter to add..." : ""}
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={handleTagKeyDown}
+                            disabled={tags.length >= 8}
+                            className="flex-1 bg-transparent border-none outline-none text-white text-sm font-bold px-4 min-w-[200px] disabled:opacity-0 transition-opacity"
+                        />
                     </div>
 
-                    {tags.map((tag) => (
-                        <span key={tag} className="flex items-center gap-1.5 bg-violet-500/10 text-violet-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-violet-500/20 animate-in zoom-in duration-200">
-                            #{tag}
-                            <button
-                                onClick={() => removeTag(tag)}
-                                className="hover:text-white transition-colors ml-1"
-                            >
-                                <X size={14} />
-                            </button>
-                        </span>
-                    ))}
-
-                    <input
-                        type="text"
-                        placeholder={tags.length < 8 ? "Escribe y pulsa Enter..." : ""}
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={handleTagKeyDown}
-                        disabled={tags.length >= 8}
-                        className="flex-1 bg-transparent border-none outline-none text-white text-sm px-2 min-w-[150px] disabled:opacity-0"
-                    />
+                    <div className="flex items-center gap-3 px-6 text-[9px] text-gray-600 font-bold uppercase tracking-widest">
+                        <Info size={12} className="text-violet-500/40" />
+                        <span>Tags help buyers find your content through search. Add relevant genres or moods.</span>
+                    </div>
                 </div>
-                <p className="text-[10px] text-gray-600 ml-1">
-                    Las etiquetas ayudan a que los compradores encuentren tu contenido.
-                </p>
             </div>
 
             {/* Image Cropper Modal */}

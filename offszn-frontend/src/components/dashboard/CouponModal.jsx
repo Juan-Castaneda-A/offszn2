@@ -3,7 +3,8 @@ import {
     X, Sparkles, Percent, DollarSign,
     Calendar, Target, ShoppingCart,
     Search, Save, AlertCircle, CheckCircle2,
-    Package, LayoutGrid, Globe
+    Package, LayoutGrid, Globe, ChevronRight,
+    ArrowRight, Info, Zap
 } from 'lucide-react';
 import { supabase } from '../../api/client';
 import { useAuth } from '../../store/authStore';
@@ -178,117 +179,129 @@ export default function CouponModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/90 backdrop-blur-xl animate-in fade-in duration-500" onClick={onClose} />
 
-            <div className="relative w-full max-w-4xl bg-[#0a0a0a] border border-white/5 rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row">
+            <div className="relative w-full max-w-5xl bg-[#070707] border border-white/5 rounded-[60px] shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 flex flex-col lg:flex-row">
 
                 {/* Left Side: Form */}
-                <div className="flex-1 p-8 md:p-12 space-y-8 max-h-[85vh] overflow-y-auto custom-scrollbar">
+                <div className="flex-1 p-10 lg:p-14 space-y-12 max-h-[90vh] overflow-y-auto custom-scrollbar">
 
-                    <div>
-                        <h2 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-3">
-                            <Sparkles className="text-violet-500" size={28} />
-                            {editingCoupon ? 'Editar Cupón' : 'Configurar Cupón'}
-                        </h2>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mt-1">Crea ofertas exclusivas para tus seguidores</p>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h2 className="text-4xl font-black uppercase tracking-tighter flex items-center gap-4 text-white">
+                                <Sparkles className="text-violet-500" size={32} />
+                                {editingCoupon ? 'Editar Campaña' : 'Nueva Campaña'}
+                            </h2>
+                            <p className="text-[11px] font-bold text-gray-500 uppercase tracking-[0.3em] mt-3">Configura tu estrategia de marketing para máximo impacto</p>
+                        </div>
+                        <button onClick={onClose} className="lg:hidden p-3 bg-white/5 rounded-full text-gray-400 hover:text-white transition-colors">
+                            <X size={20} />
+                        </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
 
-                        {/* Column 1: Core */}
-                        <div className="space-y-6">
+                        {/* Column 1: Core Params */}
+                        <div className="space-y-10">
                             {/* Code Input */}
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Código del Cupón</label>
-                                <div className="relative group">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-4">Código Viral</label>
+                                <div className="relative group/input">
                                     <input
                                         type="text"
-                                        className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all placeholder:text-gray-800 uppercase"
-                                        placeholder="EJ: VERANO20"
+                                        className="w-full bg-black border border-white/5 rounded-3xl p-6 text-sm font-black text-white outline-none focus:border-violet-500/50 transition-all placeholder:text-gray-900 uppercase tracking-widest"
+                                        placeholder="EJ: VERANO2024"
                                         value={formData.code}
                                         onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                         maxLength={15}
                                     />
                                     <button
                                         onClick={generateMagicCode}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-white/5 rounded-xl text-violet-500 transition-colors"
-                                        title="Generar Código Mágico"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/5 hover:bg-violet-500 hover:text-white rounded-2xl text-violet-500 transition-all group/magic"
+                                        title="Sugerir código optimizado"
                                     >
-                                        <Sparkles size={16} />
+                                        <Sparkles size={18} className="group-hover/magic:rotate-12 transition-transform" />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Discount Type & Value */}
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Descuento</label>
-                                <div className="flex gap-2 p-1 bg-black border border-white/5 rounded-2xl">
+                            {/* Discount Logic */}
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-4">Regla de Descuento</label>
+                                <div className="flex gap-2 p-1.5 bg-black border border-white/5 rounded-[26px]">
                                     <button
                                         onClick={() => setFormData({ ...formData, discount_type: 'percent' })}
-                                        className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${formData.discount_type === 'percent' ? 'bg-white text-black' : 'text-gray-500 hover:text-white'}`}
+                                        className={`flex-1 py-4 rounded-[20px] text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${formData.discount_type === 'percent' ? 'bg-white text-black shadow-xl' : 'text-gray-500 hover:text-white'}`}
                                     >
                                         Porcentaje (%)
                                     </button>
                                     <button
                                         onClick={() => setFormData({ ...formData, discount_type: 'fixed' })}
-                                        className={`flex-1 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${formData.discount_type === 'fixed' ? 'bg-white text-black' : 'text-gray-500 hover:text-white'}`}
+                                        className={`flex-1 py-4 rounded-[20px] text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${formData.discount_type === 'fixed' ? 'bg-white text-black shadow-xl' : 'text-gray-500 hover:text-white'}`}
                                     >
                                         Monto Fijo ($)
                                     </button>
                                 </div>
-                                <div className="relative">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                                        {formData.discount_type === 'percent' ? <Percent size={14} /> : <DollarSign size={14} />}
+                                <div className="relative group/input">
+                                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-violet-500">
+                                        {formData.discount_type === 'percent' ? <Percent size={18} /> : <DollarSign size={18} />}
                                     </div>
                                     <input
                                         type="number"
-                                        className="w-full bg-black border border-white/10 rounded-2xl p-4 pl-10 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all"
-                                        placeholder={formData.discount_type === 'percent' ? "20" : "5.00"}
+                                        className="w-full bg-black border border-white/5 rounded-3xl p-6 pl-14 text-sm font-black text-white outline-none focus:border-violet-500/50 transition-all"
+                                        placeholder={formData.discount_type === 'percent' ? "0 a 100" : "0.00"}
                                         value={formData.temp_amount}
                                         onChange={(e) => setFormData({ ...formData, temp_amount: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            {/* Applies To */}
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Aplica A</label>
-                                <div className="grid grid-cols-3 gap-2">
+                            {/* Targetting */}
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-4">Segmentación de Producto</label>
+                                <div className="grid grid-cols-3 gap-3">
                                     <ScopeBtn
                                         active={formData.applies_to === 'all'}
                                         onClick={() => setFormData({ ...formData, applies_to: 'all', applies_to_id: null })}
                                         icon={Globe}
-                                        label="Todo"
+                                        label="Global"
                                     />
                                     <ScopeBtn
                                         active={formData.applies_to === 'product'}
                                         onClick={() => setFormData({ ...formData, applies_to: 'product' })}
                                         icon={Package}
-                                        label="Producto"
+                                        label="Beat"
                                     />
                                     <ScopeBtn
                                         active={formData.applies_to === 'category'}
                                         onClick={() => setFormData({ ...formData, applies_to: 'category' })}
                                         icon={LayoutGrid}
-                                        label="Categoría"
+                                        label="Bundle"
                                     />
                                 </div>
 
                                 {formData.applies_to === 'product' && (
-                                    <div className="space-y-4 pt-2">
-                                        <div className="relative">
-                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={14} />
+                                    <div className="space-y-4 pt-4 animate-in slide-in-from-top-4 duration-500">
+                                        <div className="relative group">
+                                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-hover:text-violet-500 transition-colors" size={16} />
                                             <input
                                                 type="text"
-                                                className="w-full bg-black border border-white/5 rounded-2xl p-4 pl-10 text-[10px] font-bold text-white outline-none focus:border-violet-500/50 transition-all placeholder:text-gray-800"
-                                                placeholder="Buscar beat o kit..."
+                                                className="w-full bg-black border border-white/5 rounded-2xl p-5 pl-12 text-[11px] font-black text-white outline-none focus:border-violet-500/50 transition-all placeholder:text-gray-800"
+                                                placeholder="Buscar por nombre..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                             />
                                         </div>
-                                        {searching && <div className="text-[9px] font-bold text-violet-500 animate-pulse px-4 uppercase tracking-widest">Buscando...</div>}
+
+                                        {searching && (
+                                            <div className="flex items-center gap-2 px-6">
+                                                <Loader2 className="animate-spin text-violet-500" size={12} />
+                                                <span className="text-[9px] font-black text-violet-500/50 uppercase tracking-[0.3em]">Rastreando catálogo...</span>
+                                            </div>
+                                        )}
+
                                         {searchResults.length > 0 && (
-                                            <div className="bg-black border border-white/5 rounded-2xl overflow-hidden divide-y divide-white/5">
+                                            <div className="bg-black border border-white/5 rounded-[24px] overflow-hidden divide-y divide-white/5 shadow-2xl">
                                                 {searchResults.map(p => (
                                                     <button
                                                         key={p.id}
@@ -298,26 +311,37 @@ export default function CouponModal({
                                                             setSearchResults([]);
                                                             setSearchQuery('');
                                                         }}
-                                                        className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors text-left"
+                                                        className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all text-left group/item"
                                                     >
-                                                        <div className="w-8 h-8 rounded-lg bg-white/5 overflow-hidden">
-                                                            <img src={p.cover_url || p.image_url} alt="" className="w-full h-full object-cover" />
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden border border-white/5">
+                                                                <img src={p.cover_url || p.image_url} alt="" className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <span className="text-[10px] font-black uppercase tracking-tight text-white group-hover/item:text-violet-400 transition-colors">{p.name}</span>
                                                         </div>
-                                                        <span className="text-[10px] font-bold text-gray-300">{p.name}</span>
+                                                        <ChevronRight size={14} className="text-gray-800 group-hover/item:text-violet-500 transition-all group-hover/item:translate-x-1" />
                                                     </button>
                                                 ))}
                                             </div>
                                         )}
+
                                         {selectedProduct && (
-                                            <div className="flex items-center justify-between p-3 bg-violet-500/5 border border-violet-500/20 rounded-2xl animate-in slide-in-from-top-2">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden">
+                                            <div className="flex items-center justify-between p-4 bg-violet-600/5 border border-violet-500/20 rounded-[28px] animate-in slide-in-from-top-6 duration-700">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="relative w-12 h-12 rounded-xl bg-white/5 overflow-hidden border border-violet-500/30">
                                                         <img src={selectedProduct.cover_url || selectedProduct.image_url} alt="" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-violet-600/20"></div>
                                                     </div>
-                                                    <span className="text-[10px] font-black uppercase text-white truncate max-w-[120px]">{selectedProduct.name}</span>
+                                                    <div>
+                                                        <span className="text-[10px] font-black uppercase text-white tracking-widest block">{selectedProduct.name}</span>
+                                                        <span className="text-[9px] font-bold text-violet-400/50 uppercase tracking-widest mt-0.5 animate-pulse">Producto Vinculado</span>
+                                                    </div>
                                                 </div>
-                                                <button onClick={() => { setSelectedProduct(null); setFormData({ ...formData, applies_to_id: null }); }} className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors">
-                                                    <X size={14} />
+                                                <button
+                                                    onClick={() => { setSelectedProduct(null); setFormData({ ...formData, applies_to_id: null }); }}
+                                                    className="p-3 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all active:scale-90"
+                                                >
+                                                    <X size={16} />
                                                 </button>
                                             </div>
                                         )}
@@ -325,168 +349,184 @@ export default function CouponModal({
                                 )}
 
                                 {formData.applies_to === 'category' && (
-                                    <select
-                                        className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all cursor-pointer"
-                                        value={formData.applies_to_id || ''}
-                                        onChange={(e) => setFormData({ ...formData, applies_to_id: e.target.value })}
-                                    >
-                                        <option value="">Seleccionar Categoría...</option>
-                                        <option value="Beats">Beats</option>
-                                        <option value="Drum Kits">Drum Kits</option>
-                                        <option value="Loop Kits">Loop Kits</option>
-                                        <option value="Sound Kits">Sound Kits</option>
-                                    </select>
+                                    <div className="pt-4 animate-in slide-in-from-top-4 duration-500">
+                                        <select
+                                            className="w-full bg-black border border-white/10 rounded-3xl p-6 text-[11px] font-black uppercase tracking-widest text-white outline-none focus:border-violet-500/50 transition-all cursor-pointer appearance-none"
+                                            value={formData.applies_to_id || ''}
+                                            onChange={(e) => setFormData({ ...formData, applies_to_id: e.target.value })}
+                                        >
+                                            <option value="" className="bg-black">Seleccionar Categoría...</option>
+                                            <option value="Beats" className="bg-black text-white">BRITISH BEATS (MP3/WAV)</option>
+                                            <option value="Drum Kits" className="bg-black text-white">PROFESSIONAL KITS</option>
+                                            <option value="Loop Kits" className="bg-black text-white">MELODIC BUNDLES</option>
+                                            <option value="Sound Kits" className="bg-black text-white">PRESET PACKS</option>
+                                        </select>
+                                    </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Column 2: Advanced */}
-                        <div className="space-y-6">
+                        {/* Column 2: Advanced Logistics */}
+                        <div className="space-y-10">
                             {/* Start Date */}
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-2">Fecha de Inicio</label>
-                                <div className="relative">
-                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={14} />
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-4">Lanzamiento</label>
+                                <div className="relative group/input">
+                                    <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-violet-500" size={18} />
                                     <input
                                         type="date"
-                                        className="w-full bg-black border border-white/10 rounded-2xl p-4 pl-10 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all [color-scheme:dark]"
+                                        className="w-full bg-black border border-white/5 rounded-3xl p-6 pl-14 text-sm font-black text-white outline-none focus:border-violet-500/50 transition-all [color-scheme:dark]"
                                         value={formData.valid_from}
                                         onChange={(e) => setFormData({ ...formData, valid_from: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            {/* Optional Expiry */}
-                            <AdvancedOption
-                                label="¿Tiene fecha de expiración?"
-                                active={showOptions.valid_to}
-                                toggle={() => setShowOptions({ ...showOptions, valid_to: !showOptions.valid_to })}
-                            >
-                                <input
-                                    type="date"
-                                    className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all [color-scheme:dark]"
-                                    value={formData.valid_to || ''}
-                                    onChange={(e) => setFormData({ ...formData, valid_to: e.target.value })}
-                                />
-                            </AdvancedOption>
+                            {/* Optional Settings Stack */}
+                            <div className="bg-white/[0.02] border border-white/5 p-8 rounded-[40px] space-y-10">
+                                <AdvancedToggle
+                                    label="Programar Expiración"
+                                    description="Finaliza la campaña automáticamente"
+                                    active={showOptions.valid_to}
+                                    toggle={() => setShowOptions({ ...showOptions, valid_to: !showOptions.valid_to })}
+                                >
+                                    <input
+                                        type="date"
+                                        className="w-full bg-black border border-white/10 rounded-2xl p-5 text-sm font-black text-white outline-none focus:border-violet-500/50 transition-all [color-scheme:dark]"
+                                        value={formData.valid_to || ''}
+                                        onChange={(e) => setFormData({ ...formData, valid_to: e.target.value })}
+                                    />
+                                </AdvancedToggle>
 
-                            {/* Usage Limit */}
-                            <AdvancedOption
-                                label="¿Limitar redenciones totales?"
-                                active={showOptions.uses_limit}
-                                toggle={() => setShowOptions({ ...showOptions, uses_limit: !showOptions.uses_limit })}
-                            >
-                                <input
-                                    type="number"
-                                    className="w-full bg-black border border-white/10 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all"
-                                    placeholder="Ej: 100"
-                                    value={formData.uses_limit || ''}
-                                    onChange={(e) => setFormData({ ...formData, uses_limit: parseInt(e.target.value) || null })}
-                                />
-                            </AdvancedOption>
-
-                            {/* Min Purchase */}
-                            <AdvancedOption
-                                label="¿Requerir monto mínimo?"
-                                active={showOptions.min_purchase}
-                                toggle={() => setShowOptions({ ...showOptions, min_purchase: !showOptions.min_purchase })}
-                            >
-                                <div className="relative">
-                                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={14} />
+                                <AdvancedToggle
+                                    label="Límite de Redenciones"
+                                    description="Cantidad máxima de usos totales"
+                                    active={showOptions.uses_limit}
+                                    toggle={() => setShowOptions({ ...showOptions, uses_limit: !showOptions.uses_limit })}
+                                >
                                     <input
                                         type="number"
-                                        className="w-full bg-black border border-white/10 rounded-2xl p-4 pl-10 text-xs font-bold text-white outline-none focus:border-violet-500/50 transition-all"
-                                        placeholder="0.00"
-                                        value={formData.min_purchase_amount || ''}
-                                        onChange={(e) => setFormData({ ...formData, min_purchase_amount: parseFloat(e.target.value) || 0 })}
+                                        className="w-full bg-black border border-white/10 rounded-2xl p-5 text-sm font-black text-white outline-none focus:border-violet-500/50 transition-all"
+                                        placeholder="Ej: 50 cupones"
+                                        value={formData.uses_limit || ''}
+                                        onChange={(e) => setFormData({ ...formData, uses_limit: parseInt(e.target.value) || null })}
                                     />
-                                </div>
-                            </AdvancedOption>
+                                </AdvancedToggle>
+
+                                <AdvancedToggle
+                                    label="Incentivo de Carrito"
+                                    description="Requiere un monto mínimo de compra"
+                                    active={showOptions.min_purchase}
+                                    toggle={() => setShowOptions({ ...showOptions, min_purchase: !showOptions.min_purchase })}
+                                >
+                                    <div className="relative">
+                                        <DollarSign className="absolute left-5 top-1/2 -translate-y-1/2 text-violet-500" size={18} />
+                                        <input
+                                            type="number"
+                                            className="w-full bg-black border border-white/10 rounded-2xl p-5 pl-12 text-sm font-black text-white outline-none focus:border-violet-500/50 transition-all"
+                                            placeholder="Ej: 50.00"
+                                            value={formData.min_purchase_amount || ''}
+                                            onChange={(e) => setFormData({ ...formData, min_purchase_amount: parseFloat(e.target.value) || 0 })}
+                                        />
+                                    </div>
+                                </AdvancedToggle>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Side: Preview & Actions */}
-                <div className="w-full md:w-80 bg-white/[0.02] border-l border-white/5 p-8 md:p-10 flex flex-col justify-between">
-                    <div className="space-y-8">
-                        <div>
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 flex items-center gap-2 mb-6">
-                                <Target size={14} /> Vista Previa
-                            </h3>
+                {/* Right Side: Smart Preview & Checkout Logic */}
+                <div className="w-full lg:w-[400px] bg-[#0A0A0A] border-l border-white/5 p-12 flex flex-col justify-between relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 blur-[100px] pointer-events-none"></div>
 
-                            {/* Preview Card */}
-                            <div className="bg-black border border-white/5 rounded-3xl p-6 space-y-4 relative overflow-hidden group">
-                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="space-y-12 relative z-10">
+                        <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-white/5"></div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-700">Preview Hub</span>
+                            <div className="h-px flex-1 bg-white/5"></div>
+                        </div>
 
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
-                                        {selectedProduct ? (
-                                            <img src={selectedProduct.cover_url || selectedProduct.image_url} alt="" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-800">
-                                                <Package size={20} />
-                                            </div>
-                                        )}
+                        {/* Dynamic Preview Card */}
+                        <div className="bg-black border border-white/5 rounded-[40px] p-8 space-y-8 relative overflow-hidden group shadow-2xl">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-50"></div>
+
+                            <div className="flex items-center gap-5">
+                                <div className="w-16 h-16 bg-white/5 rounded-[20px] overflow-hidden border border-white/5 flex items-center justify-center p-0.5 shadow-2xl group-hover:scale-105 transition-transform duration-700">
+                                    {selectedProduct ? (
+                                        <img src={selectedProduct.cover_url || selectedProduct.image_url} alt="" className="w-full h-full object-cover rounded-[18px]" />
+                                    ) : (
+                                        <Package size={24} className="text-gray-800" />
+                                    )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-[11px] font-black uppercase tracking-widest text-white truncate">
+                                        {selectedProduct ? selectedProduct.name : 'Venta Global'}
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-black uppercase tracking-tight text-white truncate">
-                                            {selectedProduct ? selectedProduct.name : 'Tu Producto'}
-                                        </div>
-                                        <div className="text-[10px] font-bold text-gray-600 flex items-center gap-1">
-                                            <ShoppingCart size={10} /> {formData.code || 'CÓDIGO'}
-                                        </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                        <span className="text-[10px] font-black tracking-[0.2em] text-violet-500 uppercase">{formData.code || 'CODE'}</span>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="space-y-2 pt-4 border-t border-white/5">
-                                    <div className="flex justify-between text-[10px] font-bold">
-                                        <span className="text-gray-500">Precio Base</span>
-                                        <span className="text-white">${selectedProduct?.price_basic || '29.99'}</span>
+                            <div className="space-y-4 pt-6">
+                                <div className="flex justify-between items-center text-[10px] font-bold">
+                                    <span className="text-gray-600 uppercase tracking-widest">Base de Venta</span>
+                                    <span className="text-gray-400 font-mono tracking-tighter">${selectedProduct?.price_basic || '29.99'}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-[10px] font-black">
+                                    <div className="flex items-center gap-2 text-emerald-500 uppercase tracking-widest">
+                                        <Zap size={10} /> Impacto Cupón
                                     </div>
-                                    <div className="flex justify-between text-[10px] font-black">
-                                        <span className="text-emerald-500">Descuento</span>
-                                        <span className="text-emerald-500">
-                                            -{isPercent ? `${discountValue}%` : `$${discountValue.toFixed(2)}`}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-xs font-black pt-2 text-white border-t border-white/5">
-                                        <span>Total</span>
-                                        <span className="text-violet-500">
-                                            ${(Math.max(0, (selectedProduct?.price_basic || 29.99) - (isPercent ? (selectedProduct?.price_basic || 29.99) * (discountValue / 100) : discountValue))).toFixed(2)}
-                                        </span>
+                                    <span className="text-emerald-500 font-mono">
+                                        — {isPercent ? `${discountValue}%` : `$${discountValue.toFixed(2)}`}
+                                    </span>
+                                </div>
+                                <div className="pt-6 border-t border-white/5">
+                                    <div className="flex justify-between items-end">
+                                        <div>
+                                            <span className="block text-[9px] font-black text-gray-700 uppercase tracking-widest mb-1">Precio Final Cliente</span>
+                                            <span className="text-4xl font-black text-white tracking-widest">
+                                                ${(Math.max(0, (selectedProduct?.price_basic || 29.99) - (isPercent ? (selectedProduct?.price_basic || 29.99) * (discountValue / 100) : discountValue))).toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <ArrowRight size={24} className="text-violet-500/50 mb-2" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <ul className="space-y-3">
-                            <li className="flex items-start gap-2 text-[9px] font-black uppercase tracking-widest text-gray-500">
-                                <CheckCircle2 className="text-violet-500 mt-0.5" size={12} />
-                                <span>Código único e irrepetible</span>
-                            </li>
-                            <li className="flex items-start gap-2 text-[9px] font-black uppercase tracking-widest text-gray-500">
-                                <CheckCircle2 className="text-violet-500 mt-0.5" size={12} />
-                                <span>Activación instantánea</span>
-                            </li>
-                        </ul>
+                        {/* Feature Badges */}
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-4 p-4 rounded-3xl bg-white/[0.01] border border-white/5">
+                                <ShieldAlert size={16} className="text-violet-500 shrink-0" />
+                                <div className="space-y-1">
+                                    <span className="block text-[10px] font-black text-white uppercase tracking-widest">Integridad de Campaña</span>
+                                    <span className="block text-[9px] font-bold text-gray-700 uppercase tracking-wider leading-relaxed">Protección anti-spam y validación en checkout en tiempo real.</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4 mt-12 relative z-10">
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="w-full px-8 py-5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-[10px] hover:bg-violet-500 hover:text-white transition-all shadow-xl shadow-white/5 disabled:opacity-30 active:scale-95 flex items-center justify-center gap-2"
+                            className="group w-full px-8 py-6 bg-white text-black rounded-full font-black uppercase tracking-[0.3em] text-[10px] hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_40px_rgba(255,255,255,0.05)] disabled:opacity-30 active:scale-95 flex items-center justify-center gap-3"
                         >
-                            <Save size={16} />
-                            {saving ? 'Guardando...' : (editingCoupon ? 'Actualizar' : 'Crear Cupón')}
+                            {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} className="group-hover:scale-110 transition-transform" />}
+                            {saving ? 'PROCESANDO...' : (editingCoupon ? 'ACTUALIZAR' : 'ACTIVAR CUPÓN')}
                         </button>
                         <button
                             onClick={onClose}
-                            className="w-full px-8 py-5 bg-white/5 border border-white/10 text-white rounded-full font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 transition-all active:scale-95"
+                            className="w-full px-8 py-6 bg-transparent border border-white/5 text-gray-600 hover:text-white hover:border-white/10 rounded-full font-black uppercase tracking-[0.3em] text-[10px] transition-all active:scale-95"
                         >
-                            Cerrar
+                            DESCARTAR
                         </button>
                     </div>
+
+                    {/* Background Detail */}
+                    <Info size={250} className="absolute -left-20 -bottom-20 text-white opacity-[0.01] rotate-12 pointer-events-none" />
                 </div>
 
             </div>
@@ -494,17 +534,58 @@ export default function CouponModal({
     );
 }
 
+// --- SUB-COMPONENTS ---
+
 function ScopeBtn({ active, onClick, icon: Icon, label }) {
     return (
         <button
             onClick={onClick}
-            className={`flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all ${active ? 'bg-violet-500/10 border-violet-500/30 text-violet-500' : 'bg-black border-white/5 text-gray-600 hover:text-white hover:border-white/10'}`}
+            className={`flex flex-col items-center justify-center gap-3 p-5 rounded-[28px] border transition-all duration-500 group ${active
+                ? 'bg-white border-white text-black shadow-2xl'
+                : 'bg-black border-white/5 text-gray-700 hover:text-gray-400 hover:border-white/10'
+                }`}
         >
-            <Icon size={16} />
-            <span className="text-[8px] font-black uppercase tracking-widest">{label}</span>
+            <Icon size={20} className={`transition-transform duration-500 ${active ? 'scale-110' : 'group-hover:scale-110 group-hover:rotate-6'}`} />
+            <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
         </button>
     );
 }
+
+function AdvancedToggle({ label, description, active, toggle, children }) {
+    return (
+        <div className="space-y-4">
+            <button
+                onClick={toggle}
+                className="w-full flex items-center justify-between group"
+            >
+                <div className="text-left">
+                    <span className={`block text-[11px] font-black uppercase tracking-widest transition-colors ${active ? 'text-violet-400' : 'text-gray-500 group-hover:text-gray-300'}`}>{label}</span>
+                    <span className="block text-[9px] font-bold text-gray-700 uppercase tracking-widest mt-1">{description}</span>
+                </div>
+                <div className={`w-12 h-6 rounded-full transition-all flex items-center p-1 ${active ? 'bg-violet-500' : 'bg-white/5 border border-white/10'}`}>
+                    <div className={`w-4 h-4 rounded-full bg-white transition-all transform ${active ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                </div>
+            </button>
+            {active && (
+                <div className="animate-in slide-in-from-top-4 duration-500 pt-2 pb-2">
+                    {children}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// function ScopeBtn({ active, onClick, icon: Icon, label }) {
+//     return (
+//         <button
+//             onClick={onClick}
+//             className={`flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all ${active ? 'bg-violet-500/10 border-violet-500/30 text-violet-500' : 'bg-black border-white/5 text-gray-600 hover:text-white hover:border-white/10'}`}
+//         >
+//             <Icon size={16} />
+//             <span className="text-[8px] font-black uppercase tracking-widest">{label}</span>
+//         </button>
+//     );
+// }
 
 function AdvancedOption({ label, active, toggle, children }) {
     return (

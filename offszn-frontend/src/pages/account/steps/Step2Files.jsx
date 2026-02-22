@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUploadStore } from '../../../store/uploadStore';
-import { Music, FileAudio, Package, Hash, Zap, Eye, Calendar } from 'lucide-react';
+import { Music, FileAudio, Package, Hash, Zap, Eye, Calendar, Shield, Cpu, Activity } from 'lucide-react';
 
 export default function Step2Files() {
     const {
@@ -19,104 +19,113 @@ export default function Step2Files() {
     ];
 
     return (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
 
-            {/* 1. Zonas de Carga de Audio */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* --- AUDIO ASSETS PIPELINE --- */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <UploadZone
-                    label="MP3 con Tags (Gratis / Preescucha)"
+                    label="MP3 Preview (Tagged)"
+                    description="Gratis / Preescucha con marcas de agua"
                     file={files.mp3_tagged}
                     accept=".mp3"
-                    icon={<Music size={24} />}
+                    icon={<Music size={28} />}
                     onChange={(f) => handleFileChange('mp3_tagged', f)}
                 />
                 <UploadZone
-                    label="WAV Sin Tags (Producto Final)"
+                    label="High-Res WAV (Master)"
+                    description="Producto final sin marcas de agua"
                     file={files.wav_untagged}
                     accept=".wav"
-                    icon={<FileAudio size={24} />}
+                    icon={<FileAudio size={28} />}
                     onChange={(f) => handleFileChange('wav_untagged', f)}
                 />
             </div>
 
             <UploadZone
-                label="Stems / Trackout (Opcional .ZIP)"
+                label="Stems / Trackout Container"
+                description="Opcional: Archivo .ZIP con canales separados"
                 file={files.stems}
                 accept=".zip,.rar"
-                icon={<Package size={24} />}
+                icon={<Package size={28} />}
                 onChange={(f) => handleFileChange('stems', f)}
             />
 
-            <hr className="border-white/5" />
+            {/* --- TECHNICAL METADATA --- */}
+            <div className="pt-12 border-t border-white/5 space-y-10">
+                <div className="flex items-center gap-4 text-[10px] font-black text-gray-700 uppercase tracking-[0.4em]">
+                    <Cpu size={14} className="text-violet-500/40" /> Technical Data
+                </div>
 
-            {/* 2. Metadata Técnica e Información */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-                {/* BPM & Key */}
-                <div className="space-y-6">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Tempo (BPM)</label>
-                        <div className="relative">
+                    {/* BPM */}
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4">Tempo (BPM)</label>
+                        <div className="relative group">
                             <input
                                 type="number"
-                                placeholder="Ej: 140"
+                                placeholder="140"
                                 value={bpm}
                                 onChange={(e) => updateField('bpm', e.target.value)}
-                                className="w-full bg-[#0a0a0a] border border-white/5 rounded-xl px-4 py-3 pl-10 text-white font-bold focus:outline-none focus:border-violet-500/50 transition-all"
+                                className="w-full bg-black border border-white/5 rounded-3xl px-6 py-5 pl-12 text-white font-black text-lg focus:outline-none focus:border-violet-500 transition-all shadow-inner placeholder:text-white/5"
                             />
-                            <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" />
+                            <Hash size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-800 group-focus-within:text-violet-500 transition-colors" />
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Tonalidad (Key)</label>
-                        <div className="relative">
+                    {/* Scale / Key */}
+                    <div className="space-y-4">
+                        <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4">Root Key</label>
+                        <div className="relative group">
                             <select
                                 value={musicalKey}
                                 onChange={(e) => updateField('musicalKey', e.target.value)}
-                                className="w-full bg-[#0a0a0a] border border-white/5 rounded-xl px-4 py-3 pl-10 text-white font-bold focus:outline-none focus:border-violet-500/50 transition-all appearance-none"
+                                className="w-full bg-black border border-white/5 rounded-3xl px-6 py-5 pl-12 text-white font-black text-lg focus:outline-none focus:border-violet-500 transition-all appearance-none cursor-pointer shadow-inner"
                             >
-                                <option value="">Seleccionar Tonalidad...</option>
-                                {MUSIC_KEYS.map(k => <option key={k} value={k}>{k}</option>)}
+                                <option value="" className="bg-[#0A0A0A]">Select...</option>
+                                {MUSIC_KEYS.map(k => <option key={k} value={k} className="bg-[#0A0A0A]">{k}</option>)}
                             </select>
-                            <Zap size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" />
+                            <Zap size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-800 group-focus-within:text-violet-500 transition-colors" />
+                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-800 group-focus-within:text-violet-500 transition-colors">
+                                <Activity size={16} className="rotate-90" />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Visibilidad y Fecha */}
-                <div className="space-y-6">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Visibilidad</label>
-                        <div className="grid grid-cols-3 gap-2 bg-[#0a0a0a] p-1 border border-white/5 rounded-xl">
+                    {/* Visibility */}
+                    <div className="md:col-span-2 space-y-4">
+                        <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4">Access Protocol</label>
+                        <div className="grid grid-cols-3 gap-2 bg-black border border-white/5 p-1.5 rounded-3xl shadow-inner">
                             {[
-                                { id: 'public', label: 'Público', icon: <Eye size={12} /> },
-                                { id: 'private', label: 'Privado', icon: <Eye size={12} /> },
-                                { id: 'unlisted', label: 'Oculto', icon: <Eye size={12} /> }
+                                { id: 'public', label: 'Public', icon: <Eye size={12} /> },
+                                { id: 'private', label: 'Private (Draft)', icon: <Shield size={12} /> },
+                                { id: 'unlisted', label: 'Unlisted', icon: <Activity size={12} /> }
                             ].map(v => (
                                 <button
                                     key={v.id}
                                     type="button"
                                     onClick={() => updateField('visibility', v.id)}
-                                    className={`py-2 text-[10px] font-bold uppercase rounded-lg transition-all ${visibility === v.id ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/20' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'}`}
+                                    className={`flex items-center justify-center gap-2 py-4 text-[9px] font-black uppercase tracking-widest rounded-2xl transition-all duration-500 ${visibility === v.id ? 'bg-white text-black shadow-2xl scale-[1.02]' : 'text-gray-700 hover:text-white hover:bg-white/5'}`}
                                 >
+                                    {v.icon}
                                     {v.label}
                                 </button>
                             ))}
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex flex-col gap-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Fecha de Lanzamiento</label>
-                        <div className="relative">
-                            <input
-                                type="date"
-                                value={date}
-                                onChange={(e) => updateField('date', e.target.value)}
-                                className="w-full bg-[#0a0a0a] border border-white/5 rounded-xl px-4 py-3 pl-10 text-white font-bold focus:outline-none focus:border-violet-500/50 transition-all [color-scheme:dark]"
-                            />
-                            <Calendar size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" />
-                        </div>
+                {/* Release Schedule */}
+                <div className="space-y-4 max-w-sm">
+                    <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4">Release Schedule</label>
+                    <div className="relative group">
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => updateField('date', e.target.value)}
+                            className="w-full bg-black border border-white/5 rounded-[28px] px-8 py-5 pl-14 text-white font-black uppercase tracking-[0.2em] text-[11px] focus:outline-none focus:border-violet-500 transition-all [color-scheme:dark] shadow-inner"
+                        />
+                        <Calendar size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-800 group-focus-within:text-violet-500 transition-colors" />
                     </div>
                 </div>
             </div>
@@ -124,11 +133,16 @@ export default function Step2Files() {
     );
 }
 
-function UploadZone({ label, file, onChange, accept, icon }) {
+function UploadZone({ label, description, file, onChange, accept, icon }) {
     return (
-        <div className="flex flex-col gap-2">
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">{label}</label>
-            <div className={`relative group border-2 border-dashed rounded-2xl p-6 transition-all h-[120px] flex flex-col items-center justify-center text-center gap-2 ${file ? 'border-violet-500/50 bg-violet-500/5' : 'border-white/5 bg-[#0a0a0a] hover:border-white/10'}`}>
+        <div className="space-y-4">
+            <div>
+                <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4 block">{label}</label>
+                <span className="text-[9px] font-bold text-gray-800 uppercase tracking-widest ml-4">{description}</span>
+            </div>
+            <div className={`relative group border border-white/5 rounded-[40px] p-10 transition-all duration-700 min-h-[160px] flex flex-col items-center justify-center text-center gap-4 overflow-hidden shadow-2xl ${file ? 'bg-violet-500/[0.03] border-violet-500/30' : 'bg-black hover:bg-white/[0.01] hover:border-white/10'}`}>
+                <div className={`absolute inset-0 bg-violet-500/5 transition-opacity duration-1000 ${file ? 'opacity-100' : 'opacity-0'}`} />
+
                 <input
                     type="file"
                     accept={accept}
@@ -137,18 +151,27 @@ function UploadZone({ label, file, onChange, accept, icon }) {
                 />
 
                 {file ? (
-                    <>
-                        <div className="text-violet-400 group-hover:scale-110 transition-transform">{icon}</div>
-                        <span className="text-sm font-bold text-white max-w-[80%] truncate">{file.name}</span>
-                        <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] text-violet-500 uppercase font-black tracking-widest">Listo para Procesar</span>
+                    <div className="relative z-10 flex flex-col items-center gap-4 animate-in zoom-in duration-500">
+                        <div className="w-16 h-16 rounded-[22px] bg-violet-500/20 flex items-center justify-center text-violet-500 shadow-2xl border border-violet-500/20 group-hover:scale-110 transition-transform duration-700">
+                            {icon}
                         </div>
-                    </>
+                        <div className="space-y-1">
+                            <span className="text-sm font-black text-white max-w-[280px] truncate block px-4">{file.name}</span>
+                            <span className="text-[9px] text-emerald-500 uppercase font-black tracking-[0.3em] flex items-center justify-center gap-2">
+                                <Shield size={10} /> Verified & Ready
+                            </span>
+                        </div>
+                    </div>
                 ) : (
-                    <>
-                        <div className="text-gray-700 group-hover:text-gray-500 group-hover:scale-110 transition-all">{icon}</div>
-                        <div className="text-xs font-bold text-gray-600 group-hover:text-gray-400 transition-colors">Arrastra o haz clic para subir</div>
-                    </>
+                    <div className="relative z-10 flex flex-col items-center gap-6 transition-all duration-700 group-hover:translate-y-[-4px]">
+                        <div className="w-16 h-16 rounded-[22px] bg-white/[0.02] flex items-center justify-center text-gray-800 group-hover:text-violet-500 transition-all border border-white/5 group-hover:border-violet-500/20 shadow-inner group-hover:scale-110">
+                            {icon}
+                        </div>
+                        <div className="space-y-2">
+                            <div className="text-[10px] font-black text-gray-600 group-hover:text-gray-300 transition-colors uppercase tracking-[0.2em]">Secure Upload Pipeline</div>
+                            <div className="text-[9px] font-bold text-gray-800 uppercase tracking-widest">Supports {accept.toUpperCase()} formats</div>
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

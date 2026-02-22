@@ -1,52 +1,57 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { supabase } from '../../supabase/client';
+import { supabase } from '../../api/client';
 import { Link } from 'react-router-dom';
-import { 
-  BiTimeFive, 
-  BiSearch, 
-  BiPlay, 
-  BiPause, 
-  BiTrash, 
-  BiCart, 
-  BiDownload, 
-  BiUser,
-  BiShield,
-  BiExclamationCircle
-} from 'react-icons/bi';
+import {
+   History as HistoryIcon,
+   Search,
+   Play,
+   Pause,
+   Trash2,
+   ShoppingCart,
+   Download,
+   User,
+   Shield,
+   AlertCircle,
+   Calendar,
+   Music,
+   ListFilter,
+   Loader2,
+   ChevronRight,
+   Disc,
+   Sparkles,
+   ArrowUpRight,
+   Clock
+} from 'lucide-react';
 
 export default function History() {
-  const [loading, setLoading] = useState(true);
-  const [history, setHistory] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all'); // all, beat, preset, etc.
-  
-  // Estado para el modal de confirmar borrado
-  const [showClearModal, setShowClearModal] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
+   const [loading, setLoading] = useState(true);
+   const [history, setHistory] = useState([]);
+   const [searchQuery, setSearchQuery] = useState('');
+   const [filterType, setFilterType] = useState('all');
 
-  // Audio Player State
-  const [playingId, setPlayingId] = useState(null);
-  const audioRef = useRef(new Audio());
+   const [showClearModal, setShowClearModal] = useState(false);
+   const [isClearing, setIsClearing] = useState(false);
 
-  useEffect(() => {
-    fetchHistory();
-    return () => {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-    };
-  }, []);
+   const [playingId, setPlayingId] = useState(null);
+   const audioRef = useRef(new Audio());
 
-  const fetchHistory = async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) return;
+   useEffect(() => {
+      fetchHistory();
+      return () => {
+         audioRef.current.pause();
+         audioRef.current.src = '';
+      };
+   }, []);
 
-      // Asumimos tabla 'play_history' que registra cada reproducción
-      const { data, error } = await supabase
-        .from('play_history')
-        .select(`
+   const fetchHistory = async () => {
+      try {
+         setLoading(true);
+         const { data: { user } } = await supabase.auth.getUser();
+         if (!user) return;
+
+         const { data, error } = await supabase
+            .from('play_history')
+            .select(`
           id,
           played_at,
           product:products (
@@ -61,268 +66,317 @@ export default function History() {
             users ( nickname )
           )
         `)
-        .eq('user_id', user.id)
-        .order('played_at', { ascending: false })
-        .limit(50); // Limitamos a los últimos 50 para rendimiento
+            .eq('user_id', user.id)
+            .order('played_at', { ascending: false })
+            .limit(50);
 
-      if (error) throw error;
+         if (error) throw error;
 
-      // Aplanar datos
-      const formattedHistory = data.map(item => ({
-        history_id: item.id, // ID del registro de historial
-        played_at: item.played_at,
-        ...item.product,
-        producer_name: item.product?.users?.nickname || 'Productor'
-      }));
+         const formattedHistory = data.map(item => ({
+            history_id: item.id,
+            played_at: item.played_at,
+            ...item.product,
+            producer_name: item.product?.users?.nickname || 'Productor'
+         }));
 
-      setHistory(formattedHistory);
+         setHistory(formattedHistory);
 
-    } catch (error) {
-      console.error('Error cargando historial:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      } catch (error) {
+         console.error('Error cargando historial:', error);
+      } finally {
+         setLoading(false);
+      }
+   };
 
-  const handleClearHistory = async () => {
-    setIsClearing(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { error } = await supabase
-        .from('play_history')
-        .delete()
-        .eq('user_id', user.id);
+   const handleClearHistory = async () => {
+      setIsClearing(true);
+      try {
+         const { data: { user } } = await supabase.auth.getUser();
+         const { error } = await supabase
+            .from('play_history')
+            .delete()
+            .eq('user_id', user.id);
 
-      if (error) throw error;
+         if (error) throw error;
 
-      setHistory([]); // Limpiar estado local
-      setShowClearModal(false);
-    } catch (error) {
-      console.error('Error borrando historial:', error);
-      alert('Hubo un error al borrar el historial.');
-    } finally {
-      setIsClearing(false);
-    }
-  };
+         setHistory([]);
+         setShowClearModal(false);
+      } catch (error) {
+         console.error('Error borrando historial:', error);
+      } finally {
+         setIsClearing(false);
+      }
+   };
 
-  // --- AUDIO PLAYER LOGIC ---
-  const handlePlay = (track) => {
-    const url = track.download_url_mp3;
-    if (!url) return;
+   const handlePlay = (track) => {
+      const url = track.download_url_mp3;
+      if (!url) return;
 
-    if (playingId === track.history_id) {
-      audioRef.current.pause();
-      setPlayingId(null);
-    } else {
-      audioRef.current.src = url;
-      audioRef.current.play().catch(e => console.error("Play error", e));
-      setPlayingId(track.history_id);
-      audioRef.current.onended = () => setPlayingId(null);
-    }
-  };
+      if (playingId === track.history_id) {
+         audioRef.current.pause();
+         setPlayingId(null);
+      } else {
+         audioRef.current.src = url;
+         audioRef.current.play().catch(e => console.error("Play error", e));
+         setPlayingId(track.history_id);
+         audioRef.current.onended = () => setPlayingId(null);
+      }
+   };
 
-  // --- FILTERING & DATE GROUPING ---
-  const filteredHistory = useMemo(() => {
-    return history.filter(item => {
-      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            item.producer_name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesType = filterType === 'all' || item.product_type === filterType;
-      return matchesSearch && matchesType;
-    });
-  }, [history, searchQuery, filterType]);
+   const filteredHistory = useMemo(() => {
+      return history.filter(item => {
+         const nameMatches = (item.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+         const producerMatches = (item.producer_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+         const matchesType = filterType === 'all' || item.product_type === filterType;
+         return (nameMatches || producerMatches) && matchesType;
+      });
+   }, [history, searchQuery, filterType]);
 
-  // Helper para agrupar por fechas
-  const getGroupLabel = (dateString) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
+   const getGroupLabel = (dateString) => {
+      const date = new Date(dateString);
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) return 'Hoy';
-    if (date.toDateString() === yesterday.toDateString()) return 'Ayer';
-    
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
-  };
+      if (date.toDateString() === today.toDateString()) return 'Hoy';
+      if (date.toDateString() === yesterday.toDateString()) return 'Ayer';
+      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+   };
 
-  return (
-    <div className="w-full min-h-screen relative pb-20">
-       {/* Background */}
-       <div className="fixed top-0 left-0 w-full h-full bg-[#050505] -z-10"></div>
+   if (loading) {
+      return (
+         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
+            <Loader2 className="animate-spin text-violet-500" size={48} />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500 animate-pulse">Sincronizando cronología...</span>
+         </div>
+      );
+   }
 
-       {/* --- HEADER --- */}
-       <div className="mb-8 mt-4">
-          <h1 className="text-4xl font-extrabold text-white mb-6 font-['Plus_Jakarta_Sans']">Tu Historial</h1>
-          
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 pb-4 border-b border-[rgba(255,255,255,0.05)]">
-             
-             {/* Search & Filters */}
-             <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                <div className="relative w-full md:w-[300px]">
-                   <BiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666]" />
-                   <input 
-                      type="text" 
-                      placeholder="Buscar en tu historial..." 
-                      className="w-full bg-[#111] border border-[rgba(255,255,255,0.1)] rounded-lg py-2.5 pl-9 pr-4 text-sm text-white focus:border-purple-500/50 outline-none transition-colors"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                   />
-                </div>
+   return (
+      <div className="w-full max-w-[1400px] mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000">
 
-                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 max-w-full no-scrollbar">
-                   {['all', 'beat', 'preset', 'drumkit'].map(type => (
-                      <button 
+         {/* --- HEADER --- */}
+         <div className="mb-16">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+               <div>
+                  <div className="flex items-center gap-3 mb-6">
+                     <div className="px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-full">
+                        <span className="text-[9px] font-black text-violet-500 uppercase tracking-widest">Playback</span>
+                     </div>
+                     <div className="h-px w-8 bg-white/5"></div>
+                  </div>
+                  <h1 className="text-6xl font-black uppercase tracking-tighter text-white leading-none">Mi <span className="text-violet-500">Historial</span></h1>
+                  <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
+                     <Clock size={12} className="text-violet-500" /> Registro de tus últimas 50 reproducciones en la plataforma
+                  </p>
+               </div>
+
+               <div className="flex items-center gap-4">
+                  {history.length > 0 && (
+                     <button
+                        onClick={() => setShowClearModal(true)}
+                        className="flex items-center gap-2 text-white/50 hover:text-white bg-white/5 hover:bg-red-500/10 px-6 py-3 rounded-2xl transition-all border border-white/5 hover:border-red-500/20 text-[10px] font-black uppercase tracking-widest active:scale-95"
+                     >
+                        <Trash2 size={14} /> Limpiar Todo
+                     </button>
+                  )}
+               </div>
+            </div>
+
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-6 p-4 bg-[#0A0A0A] border border-white/5 rounded-[32px] backdrop-blur-xl">
+               {/* Search */}
+               <div className="relative w-full lg:w-[450px] group">
+                  <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-violet-500 transition-colors" size={18} />
+                  <input
+                     type="text"
+                     placeholder="Buscar en el historial..."
+                     className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-16 pr-8 text-xs font-bold text-white focus:outline-none focus:border-violet-500/50 transition-all placeholder-gray-800"
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+               </div>
+
+               {/* Filters */}
+               <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto no-scrollbar justify-center">
+                  {['all', 'beat', 'preset', 'drumkit'].map(type => (
+                     <button
                         key={type}
                         onClick={() => setFilterType(type)}
-                        className={`px-3 py-1 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${filterType === type ? 'bg-[rgba(255,255,255,0.1)] text-white' : 'text-[#666] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'}`}
-                      >
-                        {type === 'all' ? 'Todos' : type.charAt(0).toUpperCase() + type.slice(1) + 's'}
-                      </button>
-                   ))}
-                </div>
-             </div>
+                        className={`px-8 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all whitespace-nowrap border ${filterType === type
+                           ? 'bg-white text-black border-white shadow-2xl shadow-white/10'
+                           : 'bg-black/40 text-gray-600 border-white/5 hover:border-white/10 hover:text-white'
+                           }`}
+                     >
+                        {type === 'all' ? 'Todos' : type + 's'}
+                     </button>
+                  ))}
+               </div>
+            </div>
+         </div>
 
-             {/* Clear Button */}
-             {history.length > 0 && (
-                <button 
-                  onClick={() => setShowClearModal(true)}
-                  className="flex items-center gap-2 text-red-500 hover:bg-red-500/10 px-4 py-2 rounded-lg transition-colors border border-red-500/20 text-sm font-semibold whitespace-nowrap"
-                >
-                   <BiTrash /> Borrar historial
-                </button>
-             )}
-          </div>
-       </div>
+         {/* --- CONTENT --- */}
+         <div className="space-y-12 mb-20">
+            {filteredHistory.length === 0 ? (
+               <EmptyState />
+            ) : (
+               <HistoryList
+                  items={filteredHistory}
+                  getGroupLabel={getGroupLabel}
+                  playingId={playingId}
+                  onTogglePlay={handlePlay}
+               />
+            )}
+         </div>
 
-       {/* --- CONTENT --- */}
-       <div className="flex flex-col gap-0">
-          {loading ? (
-             // Skeletons
-             [1, 2, 3].map(i => (
-                <div key={i} className="flex items-center gap-4 p-4 border-b border-[rgba(255,255,255,0.05)]">
-                   <div className="w-14 h-14 bg-[#222] rounded-lg animate-pulse"></div>
-                   <div className="flex-1 space-y-2">
-                      <div className="w-40 h-4 bg-[#222] rounded animate-pulse"></div>
-                      <div className="w-24 h-3 bg-[#222] rounded animate-pulse"></div>
-                   </div>
-                </div>
-             ))
-          ) : filteredHistory.length === 0 ? (
-             <EmptyState />
-          ) : (
-             <HistoryList 
-                items={filteredHistory} 
-                getGroupLabel={getGroupLabel} 
-                playingId={playingId} 
-                onTogglePlay={handlePlay} 
-             />
-          )}
-       </div>
+         {/* --- CLEAR CONFIRMATION MODAL --- */}
+         {showClearModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl px-4 animate-in fade-in duration-500">
+               <div className="bg-[#0A0A0A] border border-white/10 p-12 rounded-[60px] w-full max-w-lg text-center shadow-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-red-500 rounded-b-full"></div>
 
-       {/* --- CLEAR CONFIRMATION MODAL --- */}
-       {showClearModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-             <div className="bg-[#111] border border-[rgba(255,255,255,0.1)] p-8 rounded-2xl w-full max-w-sm text-center shadow-2xl transform transition-all scale-100">
-                <div className="text-4xl text-red-500 mb-4 flex justify-center"><BiExclamationCircle /></div>
-                <h3 className="text-white text-xl font-bold mb-2">¿Borrar todo el historial?</h3>
-                <p className="text-[#888] text-sm mb-6">Esta acción eliminará permanentemente tu registro de reproducciones. No podrás deshacerlo.</p>
-                
-                <div className="flex justify-center gap-3">
-                   <button 
-                     onClick={() => setShowClearModal(false)}
-                     className="px-5 py-2.5 rounded-lg border border-[rgba(255,255,255,0.1)] text-white hover:bg-[rgba(255,255,255,0.05)] transition-colors font-medium"
-                   >
-                     Cancelar
-                   </button>
-                   <button 
-                     onClick={handleClearHistory}
-                     disabled={isClearing}
-                     className="px-5 py-2.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-bold disabled:opacity-50"
-                   >
-                     {isClearing ? 'Borrando...' : 'Confirmar'}
-                   </button>
-                </div>
-             </div>
-          </div>
-       )}
-    </div>
-  );
+                  <div className="w-24 h-24 bg-red-500/10 rounded-[32px] flex items-center justify-center mx-auto mb-8 rotate-12 group-hover:rotate-0 transition-transform">
+                     <AlertCircle className="text-red-500" size={48} />
+                  </div>
+
+                  <h3 className="text-3xl font-black uppercase tracking-tighter text-white mb-4">¿Borrar Historial?</h3>
+                  <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-12 leading-relaxed max-w-xs mx-auto">
+                     Esta acción eliminará permanentemente tu registro de reproducciones. Esta acción no se puede deshacer.
+                  </p>
+
+                  <div className="flex flex-col gap-4">
+                     <button
+                        onClick={handleClearHistory}
+                        disabled={isClearing}
+                        className="w-full py-5 rounded-[24px] bg-red-500 text-white font-black uppercase tracking-widest text-xs hover:bg-red-600 transition-all active:scale-95 disabled:opacity-50 shadow-2xl shadow-red-500/20"
+                     >
+                        {isClearing ? 'Borrando...' : 'Sí, confirmar borrado'}
+                     </button>
+                     <button
+                        onClick={() => setShowClearModal(false)}
+                        className="w-full py-5 rounded-[24px] bg-white/5 text-gray-500 font-black uppercase tracking-widest text-xs hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                     >
+                        Volver al Historial
+                     </button>
+                  </div>
+               </div>
+            </div>
+         )}
+      </div>
+   );
 }
 
-// --- SUB-COMPONENT: HISTORY LIST (Handles Date Headers) ---
 function HistoryList({ items, getGroupLabel, playingId, onTogglePlay }) {
-  let lastGroup = '';
+   let lastGroup = '';
 
-  return items.map((item) => {
-    const currentGroup = getGroupLabel(item.played_at);
-    const showHeader = currentGroup !== lastGroup;
-    lastGroup = currentGroup;
+   return items.map((item) => {
+      const currentGroup = getGroupLabel(item.played_at);
+      const showHeader = currentGroup !== lastGroup;
+      lastGroup = currentGroup;
 
-    return (
-       <React.Fragment key={item.history_id}>
-          {showHeader && (
-             <h3 className="text-white text-lg font-bold mt-8 mb-4 font-['Plus_Jakarta_Sans']">{currentGroup}</h3>
-          )}
-          
-          <div className="group grid grid-cols-[60px_1fr_auto] md:grid-cols-[60px_200px_1fr_auto_auto] gap-4 items-center p-4 border-b border-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.02)] transition-colors rounded-lg">
-             
-             {/* Cover */}
-             <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-[#222]">
-                <img src={item.image_url || 'https://via.placeholder.com/150'} alt={item.name} className="w-full h-full object-cover" />
-                <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${playingId === item.history_id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                    <button onClick={() => onTogglePlay(item)} className="text-white hover:scale-110 transition-transform">
-                       {playingId === item.history_id ? <BiPause size={24} /> : <BiPlay size={24} />}
-                    </button>
-                </div>
-             </div>
+      return (
+         <React.Fragment key={item.history_id}>
+            {showHeader && (
+               <div className="flex items-center gap-6 mb-8 mt-16 first:mt-0">
+                  <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{currentGroup}</h3>
+                  <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
+               </div>
+            )}
 
-             {/* Info */}
-             <div className="min-w-0">
-                <h4 className="text-white font-bold text-sm truncate">{item.name}</h4>
-                <div className="flex items-center gap-1 text-[#666] text-xs">
-                   <BiUser /> {item.producer_name}
-                </div>
-             </div>
+            <div className="group flex flex-col md:flex-row items-center gap-8 p-6 bg-[#0A0A0A] border border-white/5 hover:border-white/10 hover:bg-white/[0.02] transition-all duration-500 rounded-[40px] relative overflow-hidden mb-4 last:mb-0">
 
-             {/* Waveform Placeholder (Hidden on Mobile) */}
-             <div className="hidden md:flex items-center h-8 bg-[rgba(255,255,255,0.05)] rounded px-2 w-full max-w-[300px]">
-                {/* Visual Fake Waveform bars */}
-                <div className="flex gap-1 items-end h-full w-full justify-center opacity-30">
-                   {[...Array(20)].map((_, i) => (
-                      <div key={i} className="w-1 bg-white rounded-t" style={{height: `${Math.random() * 80 + 20}%`}}></div>
-                   ))}
-                </div>
-             </div>
+               {/* Artwork / Play */}
+               <div className="relative w-24 h-24 lg:w-28 lg:h-28 flex-shrink-0">
+                  <img
+                     src={item.image_url || 'https://via.placeholder.com/150'}
+                     alt={item.name}
+                     className="w-full h-full object-cover rounded-[28px] bg-black border border-white/5 group-hover:scale-105 transition-transform duration-700 shadow-2xl"
+                  />
+                  <div className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-all duration-500 rounded-[28px] backdrop-blur-[2px] ${playingId === item.history_id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                     <button
+                        onClick={() => onTogglePlay(item)}
+                        className="w-14 h-14 flex items-center justify-center bg-white text-black rounded-full hover:scale-110 transition-transform shadow-2xl active:scale-90"
+                     >
+                        {playingId === item.history_id ? <Pause size={24} fill="black" /> : <Play size={24} fill="black" className="ml-1" />}
+                     </button>
+                  </div>
 
-             {/* Badge */}
-             <div className="hidden md:block">
-                <span className="border border-[#333] text-[#888] text-[10px] font-bold px-2 py-0.5 rounded uppercase">{item.product_type}</span>
-             </div>
+                  {/* Status Indicator */}
+                  {playingId === item.history_id && (
+                     <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center animate-bounce shadow-xl border-4 border-black">
+                        <Music size={12} className="text-white" />
+                     </div>
+                  )}
+               </div>
 
-             {/* Actions */}
-             <div className="flex items-center gap-3">
-                 <span className={`font-bold text-sm ${item.is_free ? 'text-green-500' : 'text-white'}`}>
-                    {item.is_free ? 'FREE' : `$${item.price_basic}`}
-                 </span>
-                 <button className="w-8 h-8 flex items-center justify-center rounded-full bg-[rgba(255,255,255,0.05)] text-[#888] hover:text-white hover:bg-[rgba(255,255,255,0.1)] transition-colors">
-                    <BiCart />
-                 </button>
-             </div>
-          </div>
-       </React.Fragment>
-    );
-  });
+               {/* Info */}
+               <div className="flex-1 min-w-0 text-center md:text-left">
+                  <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-violet-500 bg-violet-500/10 px-3 py-1 rounded-full">
+                        {item.product_type}
+                     </span>
+                     <span className="text-[9px] font-black text-gray-700 uppercase tracking-widest">
+                        {new Date(item.played_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                     </span>
+                  </div>
+                  <h4 className="text-white font-black uppercase tracking-tighter text-2xl lg:text-3xl group-hover:text-violet-400 transition-colors truncate mb-1">{item.name}</h4>
+                  <div className="flex items-center justify-center md:justify-start gap-2 text-gray-500 font-bold text-[10px] uppercase tracking-widest">
+                     <User size={12} className="text-violet-500/50" /> <span className="text-gray-400 group-hover:text-white transition-colors">{item.producer_name}</span>
+                  </div>
+               </div>
+
+               {/* Waveform Mockup */}
+               <div className="hidden xl:flex items-center justify-center gap-[4px] h-10 flex-1 max-w-[250px] opacity-20 group-hover:opacity-50 transition-all duration-1000">
+                  {[...Array(32)].map((_, i) => (
+                     <div
+                        key={i}
+                        className={`w-[3px] rounded-full transition-all duration-700 ${playingId === item.history_id ? 'bg-violet-500 animate-pulse' : 'bg-white'}`}
+                        style={{ height: `${Math.random() * 80 + 20}%`, animationDelay: `${i * 0.05}s` }}
+                     ></div>
+                  ))}
+               </div>
+
+               {/* Actions */}
+               <div className="flex items-center gap-8 pr-4">
+                  <div className="hidden md:flex flex-col items-end">
+                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-700 mb-1">Desde</span>
+                     <span className={`font-black text-xl tracking-tighter uppercase ${item.is_free ? 'text-emerald-500' : 'text-white'}`}>
+                        {item.is_free ? 'GRATIS' : `$${item.price_basic}`}
+                     </span>
+                  </div>
+
+                  <div className="h-12 w-px bg-white/5 hidden md:block"></div>
+
+                  <button className="flex items-center gap-3 h-14 px-8 rounded-[24px] bg-white text-black font-black uppercase tracking-widest text-[10px] hover:bg-violet-500 hover:text-white transition-all active:scale-95 group/cart shadow-2xl">
+                     <ShoppingCart size={18} className="group-hover/cart:scale-110 transition-transform" />
+                     <span className="hidden lg:inline">Adquirir</span>
+                  </button>
+               </div>
+            </div>
+         </React.Fragment>
+      );
+   });
 }
 
 function EmptyState() {
-  return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-       <div className="text-5xl text-[#222] mb-4"><BiTimeFive /></div>
-       <h4 className="text-white font-bold text-lg mb-2">Tu historial está vacío</h4>
-       <p className="text-[#666] text-sm mb-6">Empieza a explorar y reproducir beats para verlos aquí.</p>
-       <Link to="/explorar" className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm transition-colors">
-          Explorar Música
-       </Link>
-    </div>
-  );
+   return (
+      <div className="flex flex-col items-center justify-center py-32 text-center bg-[#070707] border border-white/5 rounded-[60px] relative overflow-hidden group">
+         <div className="absolute top-0 right-0 p-32 opacity-[0.02] group-hover:scale-110 group-hover:rotate-12 transition-all duration-1000 pointer-events-none">
+            <HistoryIcon size={400} />
+         </div>
+
+         <div className="w-24 h-24 bg-white/[0.02] border border-white/5 rounded-[32px] flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-700">
+            <HistoryIcon className="text-gray-800" size={48} />
+         </div>
+
+         <h4 className="text-3xl font-black uppercase tracking-tighter text-white mb-4">Cronología Desierta</h4>
+         <p className="text-[11px] font-bold text-gray-600 uppercase tracking-[0.3em] mb-12 max-w-sm leading-relaxed">
+            Explora el marketplace y dale play a tus tracks favoritos para comenzar a construir tu historial.
+         </p>
+
+         <Link to="/explorar" className="group flex items-center gap-3 px-12 py-5 bg-white text-black font-black uppercase tracking-widest text-xs rounded-full hover:bg-violet-500 hover:text-white transition-all shadow-2xl active:scale-95">
+            Explorar Catálogo
+            <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+         </Link>
+      </div>
+   );
 }

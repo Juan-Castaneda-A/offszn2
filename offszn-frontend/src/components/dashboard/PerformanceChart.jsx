@@ -33,41 +33,45 @@ export default function PerformanceChart({ labels, viewsData, salesData }) {
                 label: 'Visitas',
                 data: viewsData,
                 borderColor: '#8B5CF6',
+                borderWidth: 3,
                 backgroundColor: (context) => {
                     const ctx = context.chart.ctx;
                     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(139, 92, 246, 0.4)');
+                    gradient.addColorStop(0, 'rgba(139, 92, 246, 0.25)');
                     gradient.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
                     return gradient;
                 },
                 fill: true,
-                tension: 0.4,
+                tension: 0.45,
                 yAxisID: 'y',
                 pointRadius: 0,
-                pointHoverRadius: 6,
+                pointHoverRadius: 8,
                 pointBackgroundColor: '#8B5CF6',
                 pointBorderColor: '#fff',
-                pointBorderWidth: 2,
+                pointBorderWidth: 3,
+                hoverBorderWidth: 4,
             },
             {
                 label: 'Ventas',
                 data: salesData,
                 borderColor: '#10B981',
+                borderWidth: 3,
                 backgroundColor: (context) => {
                     const ctx = context.chart.ctx;
                     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+                    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
                     gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
                     return gradient;
                 },
                 fill: true,
-                tension: 0.4,
+                tension: 0.45,
                 yAxisID: 'y1',
                 pointRadius: 0,
-                pointHoverRadius: 6,
+                pointHoverRadius: 8,
                 pointBackgroundColor: '#10B981',
                 pointBorderColor: '#fff',
-                pointBorderWidth: 2,
+                pointBorderWidth: 3,
+                hoverBorderWidth: 4,
             }
         ]
     }), [labels, viewsData, salesData]);
@@ -85,16 +89,21 @@ export default function PerformanceChart({ labels, viewsData, salesData }) {
                 display: false,
             },
             tooltip: {
-                backgroundColor: '#0a0a0a',
-                titleColor: '#888',
+                backgroundColor: 'rgba(10, 10, 10, 0.8)',
+                backdropBlur: 10,
+                titleColor: 'rgba(255, 255, 255, 0.5)',
+                titleFont: { size: 10, weight: 'black', family: 'Inter', textTransform: 'uppercase' },
                 bodyColor: '#fff',
-                bodyFont: { weight: 'bold', family: 'Inter' },
-                padding: 12,
-                borderRadius: 12,
-                borderColor: 'rgba(255,255,255,0.05)',
+                bodyFont: { size: 13, weight: 'black', family: 'Inter' },
+                padding: 16,
+                borderRadius: 24,
+                borderColor: 'rgba(255,255,255,0.1)',
                 borderWidth: 1,
                 displayColors: true,
                 usePointStyle: true,
+                boxWidth: 8,
+                boxHeight: 8,
+                boxPadding: 6,
                 callbacks: {
                     label: function (context) {
                         let label = context.dataset.label || '';
@@ -102,7 +111,7 @@ export default function PerformanceChart({ labels, viewsData, salesData }) {
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            label += context.parsed.y;
+                            label += context.parsed.y.toLocaleString();
                         }
                         return label;
                     }
@@ -115,8 +124,9 @@ export default function PerformanceChart({ labels, viewsData, salesData }) {
                     display: false,
                 },
                 ticks: {
-                    color: '#4a4a4a',
-                    font: { size: 10, weight: 'bold' }
+                    color: '#333',
+                    font: { size: 10, weight: 'black', family: 'Inter' },
+                    padding: 10
                 }
             },
             y: {
@@ -125,16 +135,16 @@ export default function PerformanceChart({ labels, viewsData, salesData }) {
                 position: 'left',
                 grid: {
                     color: 'rgba(255,255,255,0.02)',
+                    drawBorder: false
                 },
                 ticks: {
-                    color: '#4a4a4a',
-                    font: { size: 10, weight: 'bold' }
+                    color: '#333',
+                    font: { size: 10, weight: 'black', family: 'Inter' },
+                    callback: (value) => value.toLocaleString(),
+                    padding: 10
                 },
                 title: {
-                    display: true,
-                    text: 'Visitas',
-                    color: '#8B5CF6',
-                    font: { size: 10, weight: 'black', family: 'Inter' }
+                    display: false
                 }
             },
             y1: {
@@ -143,16 +153,16 @@ export default function PerformanceChart({ labels, viewsData, salesData }) {
                 position: 'right',
                 grid: {
                     drawOnChartArea: false,
+                    drawBorder: false
                 },
                 ticks: {
-                    color: '#4a4a4a',
-                    font: { size: 10, weight: 'bold' }
+                    color: '#333',
+                    font: { size: 10, weight: 'black', family: 'Inter' },
+                    callback: (value) => value.toLocaleString(),
+                    padding: 10
                 },
                 title: {
-                    display: true,
-                    text: 'Ventas',
-                    color: '#10B981',
-                    font: { size: 10, weight: 'black', family: 'Inter' }
+                    display: false
                 }
             },
         },
