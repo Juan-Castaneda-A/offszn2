@@ -1,10 +1,8 @@
-
 import React from 'react';
-import { useSecureUrl } from '../hooks/useSecureUrl';
 import { useCartStore } from '../store/cartStore';
+import SecureImage from './ui/SecureImage';
 
 const ProductCard = ({ product, isPlaying, onPlay, formatPrice }) => {
-    const { url: imageUrl, loading } = useSecureUrl(product.image_url);
     const { addItem } = useCartStore();
 
     const handleAddToCart = (e) => {
@@ -16,15 +14,11 @@ const ProductCard = ({ product, isPlaying, onPlay, formatPrice }) => {
     return (
         <div className="group relative bg-[#1a1a1a] rounded-xl overflow-hidden border border-white/5 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1">
             <div className="relative aspect-square">
-                {loading ? (
-                    <div className="w-full h-full bg-zinc-800 animate-pulse" />
-                ) : (
-                    <img
-                        src={imageUrl || '/placeholder.jpg'}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                    />
-                )}
+                <SecureImage
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                />
 
                 <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                     <button

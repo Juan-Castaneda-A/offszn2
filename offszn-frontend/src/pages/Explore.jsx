@@ -4,6 +4,7 @@ import { useSearchStore } from '../store/searchStore';
 import { apiClient } from '../api/client';
 import { useCurrencyStore } from '../store/currencyStore';
 import ProductCard from '../components/ProductCard';
+import SecureImage from '../components/ui/SecureImage';
 import { Play, TrendingUp, Sparkles, ChevronLeft, ChevronRight, Info, Award, Music } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -113,24 +114,24 @@ const Explore = () => {
     <div className="pb-32 pt-6 min-h-screen bg-black">
       {/* Hero Section (Carousel) */}
       <div className="max-w-[1400px] mx-auto px-6 mb-8">
-        <div className="relative h-[480px] rounded-[40px] bg-[#0a0a0a] border border-white/5 flex items-center p-8 md:p-20 overflow-hidden shadow-2xl">
+        <div className="relative h-auto min-h-[500px] rounded-[40px] bg-[#0a0a0a] border border-white/5 flex items-center p-12 md:p-20 overflow-hidden shadow-2xl">
           {currentHero && (
-            <div className="w-full h-full flex items-center gap-12 relative animate-fadeIn">
-              <div className="relative z-10 max-w-2xl flex-1">
-                <span className="bg-violet-600 border border-violet-400/30 text-white text-[10px] font-black tracking-[0.3em] uppercase px-5 py-2 rounded-full mb-8 inline-block shadow-[0_5px_15px_rgba(139,92,246,0.3)]">
+            <div className="w-full h-full flex flex-col md:flex-row items-center gap-12 relative animate-fadeIn">
+              <div className="relative z-10 max-w-2xl flex-1 flex flex-col justify-center h-full">
+                <span className="bg-violet-600 border border-violet-400/30 text-white text-[10px] font-black tracking-[0.3em] uppercase px-5 py-2 rounded-full mb-6 inline-block shadow-[0_5px_15px_rgba(139,92,246,0.3)] w-fit">
                   {query ? `Búsqueda: ${query}` : 'Lo más destacado de hoy'}
                 </span>
-                <h1 className="text-5xl md:text-[5rem] font-black text-white mb-6 tracking-tighter uppercase leading-[0.85] drop-shadow-2xl">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tighter uppercase leading-[1] drop-shadow-2xl line-clamp-2">
                   {currentHero.name}
                 </h1>
-                <p className="text-zinc-400 mb-10 max-w-md text-xl font-semibold leading-relaxed">
+                <p className="text-zinc-400 mb-8 max-w-md text-lg md:text-xl font-semibold leading-relaxed">
                   De <span className="text-white">@{currentHero.producer_nickname || 'OFFSZN'}</span>.
                   Potencia tus producciones con este sonido legendario.
                 </p>
-                <div className="flex flex-wrap gap-5">
+                <div className="flex flex-wrap gap-5 mb-8">
                   <button
                     onClick={() => handlePlay(currentHero)}
-                    className="px-10 py-5 bg-white text-black rounded-full font-black uppercase text-sm tracking-widest hover:bg-violet-500 hover:text-white transition-all flex items-center gap-3 shadow-2xl active:scale-95 translate-y-0 hover:-translate-y-1"
+                    className="px-10 py-5 bg-white text-black rounded-full font-black uppercase text-sm tracking-widest hover:bg-violet-500 hover:text-white transition-all flex items-center gap-3 shadow-2xl active:scale-95 transition-transform"
                   >
                     <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
                       <Play size={14} fill="currentColor" className="ml-1 text-white" />
@@ -139,32 +140,34 @@ const Explore = () => {
                   </button>
                   <Link
                     to={`/product/${currentHero.id}`}
-                    className="px-10 py-5 bg-[#111] text-white border border-white/10 rounded-full font-black uppercase text-sm tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95 translate-y-0 hover:-translate-y-1"
+                    className="px-10 py-5 bg-[#111] text-white border border-white/10 rounded-full font-black uppercase text-sm tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95 transition-transform"
                   >
                     <Info size={18} /> Detalles
                   </Link>
                 </div>
-              </div>
 
-              {/* Hero Indicators */}
-              <div className="absolute bottom-4 left-0 flex gap-3 z-20">
-                {featuredProducts.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentHeroIndex(i)}
-                    className={`h-2 rounded-full transition-all duration-500 ${i === currentHeroIndex ? 'w-12 bg-violet-600' : 'w-3 bg-white/20 hover:bg-white/40'}`}
-                  />
-                ))}
+                {/* Hero Indicators - Repositioned and stylized */}
+                <div className="flex gap-3 z-20">
+                  {featuredProducts.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentHeroIndex(i)}
+                      className={`h-1.5 rounded-full transition-all duration-500 ${i === currentHeroIndex ? 'w-10 bg-violet-600' : 'w-4 bg-white/10 hover:bg-white/30'}`}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* Hero Image Container */}
               <div className="hidden lg:flex flex-1 justify-center relative">
                 <div className="absolute inset-0 bg-violet-600/20 blur-[150px] rounded-full" />
                 <div className="relative group">
-                  <img
+                  <SecureImage
                     src={currentHero.image_url}
                     alt={currentHero.name}
                     className="w-[380px] h-[380px] object-cover rounded-[32px] shadow-[0_40px_80px_rgba(0,0,0,1)] border border-white/10 group-hover:scale-105 transition-transform duration-1000 ease-out"
+                    skeletonClassName="w-[380px] h-[380px] bg-zinc-800 rounded-[32px] animate-pulse"
                   />
                   <div className="absolute -bottom-6 -right-6 bg-gradient-to-tr from-violet-600 to-fuchsia-600 p-6 rounded-[24px] shadow-2xl animate-float border border-white/20">
                     <Sparkles className="text-white" size={32} />
@@ -208,7 +211,7 @@ const Explore = () => {
               <Link key={p.id} to={`/user/${p.nickname}`} className="group flex flex-col items-center p-8 rounded-[35px] hover:bg-white/[0.03] transition-all duration-500 border border-transparent hover:border-white/5">
                 <div className="relative mb-8">
                   <div className="w-[120px] h-[120px] rounded-[35px] overflow-hidden border-2 border-white/10 group-hover:border-violet-500 transition-all duration-500 shadow-2xl transform group-hover:rotate-6">
-                    <img src={p.avatar_url} alt={p.nickname} className="w-full h-full object-cover" />
+                    <SecureImage src={p.avatar_url} alt={p.nickname} className="w-full h-full object-cover" />
                   </div>
                   <div className={`absolute -top-4 -right-4 w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm font-black shadow-2xl border border-white/10 ${i === 0 ? 'bg-yellow-500' : 'bg-[#181818]'}`}>
                     {i + 1}
@@ -256,7 +259,7 @@ const ListView = ({ title, subtitle, items, onPlay, currentTrack, isPlaying }) =
           <div key={item.id} className={`group flex items-center gap-5 p-4 rounded-[28px] transition-all duration-300 border border-transparent ${isCurrent ? 'bg-violet-600/10 border-violet-500/20 shadow-2xl' : 'hover:bg-white/[0.04] hover:border-white/5'}`}>
             <span className="w-6 text-sm font-black text-zinc-900 group-hover:text-violet-600 transition-colors">0{i + 1}</span>
             <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-white/5 relative bg-zinc-900">
-              <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <SecureImage src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
               <div className={`absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 ${isCurrent ? 'opacity-100 backdrop-blur-[2px]' : ''}`}>
                 <button onClick={() => onPlay(item)} className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center text-white transform hover:scale-110 active:scale-90 transition-all shadow-xl">
                   {isCurrent && isPlaying ? <i className="bi bi-pause-fill text-xl"></i> : <i className="bi bi-play-fill text-xl ml-1"></i>}

@@ -4,7 +4,7 @@ import { authMiddleware } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-// Protected route: Only authenticated users can request signed URLs
-router.post('/sign-url', authMiddleware, getSignedUrl);
+// Public route: Guest users need to sign URLs for covers/avatars
+router.post('/sign-url', getSignedUrl);
 
 export default router;
