@@ -9,11 +9,13 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 // 🔥 IMPORTANTE: Exportación nombrada (con la palabra 'const' y sin 'default')
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Detectar entorno automáticamente (Vite lo hace por nosotros)
+// Detectar entorno automáticamente
 const isProduction = import.meta.env.PROD;
 
-const API_URL = import.meta.env.VITE_API_BASE_URL ||
-  (isProduction ? 'https://offszn2.onrender.com/api' : 'http://localhost:3000/api');
+// Priorizar variables de entorno, luego fallback a localhost en desarrollo
+const API_URL = import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  (isProduction ? '' : 'http://localhost:3000/api');
 
 export const apiClient = axios.create({
   baseURL: API_URL,

@@ -29,16 +29,15 @@ const rootPath = path.join(__dirname, '../../'); // Assumes offszn2 root
 const allowedOrigins = [
     'https://offszn.com',
     'https://www.offszn.com',
+    'https://offszn2.onrender.com',
     'https://offszn-oc7c.onrender.com',
     'https://offszn.onrender.com',
     'https://offszn1.onrender.com',
-    'https://offszn2.onrender.com',
+    'https://offszn2.vercel.app',
     'https://offszn-academy.onrender.com',
     'http://localhost:5173',
-    'http://localhost:5500',
     'http://localhost:3000',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:5500'
+    'http://127.0.0.1:5173'
 ];
 
 const corsOptions = {
