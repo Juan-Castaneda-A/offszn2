@@ -135,7 +135,7 @@ const StickyPlayer = () => {
 
       {/* LEFT: INFO */}
       <div className="flex items-center gap-4 w-[25%] min-w-[180px]">
-        <Link to={`/producto/${currentTrack.id}`} className="relative w-14 h-14 rounded-lg overflow-hidden shrink-0 group">
+        <Link to={`/${currentTrack.product_type || 'beat'}/${currentTrack.public_slug || currentTrack.id}`} className="relative w-14 h-14 rounded-lg overflow-hidden shrink-0 group">
           <img
             src={secureCover || '/placeholder.jpg'}
             alt="Cover"
@@ -146,10 +146,10 @@ const StickyPlayer = () => {
           </div>
         </Link>
         <div className="flex flex-col overflow-hidden">
-          <Link to={`/producto/${currentTrack.id}`} className="text-white text-sm font-bold truncate hover:text-violet-400 transition-colors">
+          <Link to={`/${currentTrack.product_type || 'beat'}/${currentTrack.public_slug || currentTrack.id}`} className="text-white text-sm font-bold truncate hover:text-violet-400 transition-colors">
             {currentTrack.name}
           </Link>
-          <Link to={`/u/${currentTrack.users?.nickname || currentTrack.producer_nickname}`} className="text-[11px] text-zinc-500 truncate hover:text-zinc-300">
+          <Link to={`/@${currentTrack.users?.nickname || currentTrack.producer_nickname}`} className="text-[11px] text-zinc-500 truncate hover:text-zinc-300">
             {currentTrack.users?.nickname || currentTrack.producer_nickname || 'Productor'}
           </Link>
         </div>

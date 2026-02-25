@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className="mt-24 border-t border-[#111] bg-[#080808] pt-20 text-white font-sans">
       <div className="container mx-auto max-w-7xl px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10 mb-16">
-        
+
         {/* COLUMNA 1: IDENTIDAD */}
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
           <div className="text-2xl font-extrabold tracking-tight text-white mb-4 font-montserrat">
@@ -14,7 +14,7 @@ const Footer = () => {
           </div>
           <p className="text-[#888] text-sm leading-relaxed mb-6 max-w-[250px]">
             El primer marketplace musical <br />
-            hecho en Perú 
+            hecho en Perú
             <span className="ml-1.5 text-[0.65rem] font-bold text-[#666] uppercase border border-[#333] px-1.5 py-0.5 rounded">PE</span>
           </p>
           <div className="flex gap-3">
@@ -32,7 +32,7 @@ const Footer = () => {
           <FooterLink to="/presets">Presets</FooterLink>
           <FooterLink to="/one-shots">One-Shots</FooterLink>
           <li>
-            <Link to="/free" className="text-sm text-sky-400 font-semibold hover:text-white transition-all hover:pl-1 block">
+            <Link to="/gratis" className="text-sm text-sky-400 font-semibold hover:text-white transition-all hover:pl-1 block">
               Descargas Gratis
             </Link>
           </li>
@@ -62,7 +62,7 @@ const Footer = () => {
       {/* BOTTOM BAR */}
       <div className="border-t border-[#141414] bg-[#080808]">
         <div className="container mx-auto max-w-7xl px-10 py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#555]">
-          
+
           <div className="order-2 md:order-1">
             &copy; {new Date().getFullYear()} OFFSZN. Todos los derechos reservados.
           </div>
@@ -89,9 +89,9 @@ const Footer = () => {
 /* --- Componentes Helper para mantener el código limpio --- */
 
 const SocialIcon = ({ href, icon: Icon, title }) => (
-  <a 
-    href={href} 
-    target="_blank" 
+  <a
+    href={href}
+    target="_blank"
     rel="noreferrer"
     title={title}
     className="w-9 h-9 rounded-full bg-[#111] border border-[#222] flex items-center justify-center text-[#999] text-base transition-all duration-300 hover:bg-primary hover:border-primary hover:text-white hover:-translate-y-1 hover:shadow-[0_5px_15px_rgba(139,92,246,0.3)]"

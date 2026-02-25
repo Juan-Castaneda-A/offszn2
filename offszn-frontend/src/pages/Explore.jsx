@@ -6,11 +6,13 @@ import { useCurrencyStore } from '../store/currencyStore';
 import ProductCard from '../components/ProductCard';
 import SecureImage from '../components/ui/SecureImage';
 import { Play, TrendingUp, Sparkles, ChevronLeft, ChevronRight, Info, Award, Music } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 
-const CATEGORIES = ['Todo', 'Beats', 'Drum Kits', 'Loops & Samples', 'Presets', 'Plantillas'];
+const CATEGORIES = ['Todo', 'Beats', 'Drum Kits', 'Loops & Samples', 'Presets', 'One-Shots', 'Plantillas', 'Gratis'];
 
 const Explore = () => {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,12 +68,67 @@ const Explore = () => {
     }
   }, [products, query]);
 
+  // Path-based initial filter
+  useEffect(() => {
+    const path = location.pathname;
+    const pathMap = {
+      '/beats': 'Beats',
+      '/drum-kits': 'Drum Kits',
+      '/loops': 'Loops & Samples',
+      '/presets': 'Presets',
+      '/one-shots': 'One-Shots',
+      '/gratis': 'Gratis'
+    };
+    if (pathMap[path]) {
+      setActiveCategory(pathMap[path]);
+    }
+  }, [location.pathname]);
+
+  const activeGenre = useMemo(() => {
+    const path = location.pathname;
+    const genreMap = {
+      '/hip-hop': 'hip-hop',
+      '/trap': 'trap',
+      '/reggaeton': 'reggaetón',
+      '/drill': 'drill',
+      '/rnb': 'r&b'
+    };
+    return genreMap[path] || searchParams.get('genre');
+  }, [location.pathname, searchParams]);
+
   // Grouping & Filtering
   const filteredProducts = useMemo(() => {
-    if (activeCategory === 'Todo') return products;
-    const map = { 'Beats': 'beat', 'Drum Kits': 'drumkit', 'Loops & Samples': 'loopkit', 'Presets': 'preset', 'Plantillas': 'plantilla' };
-    return products.filter(p => p.product_type?.toLowerCase() === map[activeCategory]);
-  }, [products, activeCategory]);
+    let filtered = products;
+
+    // 1. Category Filter
+    if (activeCategory !== 'Todo') {
+      const typeMap = {
+        'Beats': 'beat',
+        'Drum Kits': 'drumkit',
+        'Loops & Samples': 'loopkit',
+        'Presets': 'preset',
+        'One-Shots': 'oneshot',
+        'Plantillas': 'plantilla'
+      };
+
+      if (activeCategory === 'Gratis') {
+        filtered = filtered.filter(p => p.is_free);
+      } else {
+        const type = typeMap[activeCategory];
+        if (type) filtered = filtered.filter(p => p.product_type?.toLowerCase() === type);
+      }
+    }
+
+    // 2. Genre Filter
+    if (activeGenre) {
+      filtered = filtered.filter(p =>
+        (p.genre?.toLowerCase() === activeGenre.toLowerCase()) ||
+        (p.tags?.some(t => t.toLowerCase() === activeGenre.toLowerCase()))
+      );
+    }
+
+    return filtered;
+  }, [products, activeCategory, activeGenre]);
 
   const trending = useMemo(() => {
     return [...filteredProducts]
@@ -139,7 +196,7 @@ const Explore = () => {
                     Escuchar Ahora
                   </button>
                   <Link
-                    to={`/product/${currentHero.id}`}
+                    to={`/${currentHero.product_type || 'beat'}/${currentHero.public_slug || currentHero.id}`}
                     className="px-10 py-5 bg-[#111] text-white border border-white/10 rounded-full font-black uppercase text-sm tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95 transition-transform"
                   >
                     <Info size={18} /> Detalles

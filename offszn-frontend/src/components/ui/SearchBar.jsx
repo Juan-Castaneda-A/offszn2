@@ -187,7 +187,8 @@ const SearchBar = () => {
                     onClick={() => {
                       addToHistory(query);
                       setIsFocused(false);
-                      navigate(`/producto/${item.id}`);
+                      const productUrl = `/${item.product_type || 'beat'}/${item.public_slug || item.id}`;
+                      navigate(productUrl);
                     }}
                   >
                     <img src={item.image_url} alt={item.name} className="w-10 h-10 rounded object-cover" />

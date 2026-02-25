@@ -33,7 +33,6 @@ const allowedOrigins = [
     'https://offszn-oc7c.onrender.com',
     'https://offszn.onrender.com',
     'https://offszn1.onrender.com',
-    'https://offszn2.vercel.app',
     'https://offszn-academy.onrender.com',
     'http://localhost:5173',
     'http://localhost:3000',
@@ -42,11 +41,21 @@ const allowedOrigins = [
 
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+        // Permitir peticiones sin origen (como Postman o apps móviles)
+        if (!origin) return callback(null, true);
+
+        // Verificar si el origen está en la lista blanca
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
         }
+
+        // Permitir subdominios de Vercel (para previews y producción dinámica)
+        if (origin.endsWith('.vercel.app') || origin.includes('vercel.app')) {
+            return callback(null, true);
+        }
+
+        console.warn(`[CORS] Bloqueado origin no permitido: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

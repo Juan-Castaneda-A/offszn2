@@ -21,6 +21,7 @@ import { useAuth } from '../store/authStore';
 
 // Pages - Public (AQUÍ FALTABA ESTE IMPORT)
 import Profile from '../pages/public/Profile';
+import CommunityPage from '../pages/public/CommunityPage';
 
 // Pages - Auth
 import Login from '../pages/auth/Login';
@@ -60,11 +61,39 @@ const AppRouter = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/explorar" element={<Explore />} />
+
+          {/* SEO Product Routes */}
+          <Route path="/beat/:slug" element={<ProductDetail />} />
+          <Route path="/loopkit/:slug" element={<ProductDetail />} />
+          <Route path="/drumkit/:slug" element={<ProductDetail />} />
+          <Route path="/preset/:slug" element={<ProductDetail />} />
           <Route path="/producto/:id" element={<ProductDetail />} />
+
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/success" element={<Success />} />
           <Route path="/mensajes" element={<Messages />} />
           <Route path="/reels" element={<Reels />} />
+
+          {/* SEO Resource Routes */}
+          <Route path="/beats" element={<Explore />} />
+          <Route path="/drum-kits" element={<Explore />} />
+          <Route path="/loops" element={<Explore />} />
+          <Route path="/presets" element={<Explore />} />
+          <Route path="/one-shots" element={<Explore />} />
+          <Route path="/gratis" element={<Explore />} />
+
+          {/* Genre Routes */}
+          <Route path="/hip-hop" element={<Explore />} />
+          <Route path="/trap" element={<Explore />} />
+          <Route path="/reggaeton" element={<Explore />} />
+          <Route path="/drill" element={<Explore />} />
+          <Route path="/rnb" element={<Explore />} />
+
+          {/* Community Routes */}
+          <Route path="/productores" element={<CommunityPage />} />
+          <Route path="/collabs" element={<CommunityPage />} />
+          <Route path="/feed" element={<CommunityPage />} />
+          <Route path="/eventos" element={<CommunityPage />} />
 
           {/* Rutas de Usuario Público */}
           <Route path="/u/:username" element={<Profile />} />

@@ -61,11 +61,12 @@ const Navbar = () => {
                   <div className="bg-white/5 rounded-xl p-3 border border-white/5">
                     <span className="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Sonidos</span>
                     <div className="flex flex-col gap-1">
-                      <MegaLink to="/recursos/drum-kits" icon={Disc} label="Drum Kits" />
-                      <MegaLink to="/recursos/presets" icon={Sliders} label="Presets" />
-                      <MegaLink to="/recursos/samples" icon={Music} label="Loops" />
-                      <MegaLink to="/recursos/one-shots" icon={Target} label="One-Shots" />
-                      <MegaLink to="/recursos/free" icon={CheckCircle} label="Gratis" />
+                      <MegaLink to="/beats" icon={Music} label="Beats" />
+                      <MegaLink to="/drum-kits" icon={Disc} label="Drum Kits" />
+                      <MegaLink to="/presets" icon={Sliders} label="Presets" />
+                      <MegaLink to="/loops" icon={Music} label="Loops" />
+                      <MegaLink to="/one-shots" icon={Target} label="One-Shots" />
+                      <MegaLink to="/gratis" icon={CheckCircle} label="Gratis" />
                     </div>
                   </div>
 
@@ -90,9 +91,11 @@ const Navbar = () => {
                   <div className="bg-white/5 rounded-xl p-3 border border-white/5">
                     <span className="block text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Géneros</span>
                     <div className="flex flex-col gap-1">
-                      <Link to="/beats/hiphop" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Hip-Hop</Link>
-                      <Link to="/beats/trap" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Trap</Link>
-                      <Link to="/beats/reggaeton" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Reggaetón</Link>
+                      <Link to="/hip-hop" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Hip-Hop</Link>
+                      <Link to="/trap" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Trap</Link>
+                      <Link to="/reggaeton" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Reggaetón</Link>
+                      <Link to="/drill" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">Drill</Link>
+                      <Link to="/rnb" className="text-sm text-gray-400 hover:text-white hover:translate-x-1 transition-transform px-2 py-1">R&B</Link>
                       <Link to="/explorar" className="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest mt-2 px-2 py-1 border-t border-white/5 pt-2 flex items-center gap-1 transition-colors">Ver todos <span className="text-sm ml-1">→</span></Link>
                     </div>
                   </div>
@@ -258,8 +261,8 @@ const Navbar = () => {
                 <Link to="/auth/login" className="text-sm font-semibold text-gray-300 hover:text-white px-4 py-2 rounded-lg hover:bg-white/5 transition-colors">
                   Iniciar Sesión
                 </Link>
-                <Link to="/auth/register" className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-lg shadow-purple-900/20">
-                  Únete 🚀
+                <Link to="/auth/register" className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-lg shadow-purple-900/20 flex items-center gap-2">
+                  Únete <Rocket className="w-4 h-4" />
                 </Link>
               </div>
             )}
