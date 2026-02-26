@@ -41,7 +41,7 @@ const AuthCallback = () => {
       } else if (!hasCompletedOnboarding) {
         navigate('/welcome');
       } else {
-        navigate('/');
+        navigate(`/@${profile.nickname}`);
       }
     };
 

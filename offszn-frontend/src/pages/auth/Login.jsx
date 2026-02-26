@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Loader2 } from 'lucide-react'; // Usamos iconos limpios para el ojo
-import { useAuthStore } from '../../store/authStore';
+import { useAuthStore, supabase } from '../../store/authStore';
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const { signIn, signInWithGoogle, user } = useAuthStore();
+  const { signIn, signInWithGoogle, user: storeUser } = useAuthStore();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/';
+  const redirectTo = searchParams.get('redirect');
 
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -17,8 +17,11 @@ const Login = () => {
 
   // Instant Guard: Si ya hay usuario, redirigir
   useEffect(() => {
-    if (user) navigate('/');
-  }, [user, navigate]);
+    if (storeUser) {
+      if (redirectTo) navigate(redirectTo);
+      else navigate('/');
+    }
+  }, [storeUser, navigate, redirectTo]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -36,7 +39,8 @@ const Login = () => {
       if (!profile || !profile.nickname) {
         navigate('/welcome');
       } else {
-        navigate(redirectTo);
+        // Redirigir al perfil público o al parámetro redirect
+        navigate(redirectTo || `/@${profile.nickname}`);
       }
     } catch (error) {
       setAuthError("Credenciales incorrectas o error en el servidor.");

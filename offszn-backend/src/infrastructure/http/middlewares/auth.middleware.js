@@ -43,3 +43,22 @@ export const authMiddleware = async (req, res, next) => {
         return res.status(500).json({ error: 'Error interno de autenticación' });
     }
 };
+
+export const optionalAuthMiddleware = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return next();
+    }
+
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        if (user && !error) {
+            req.user = { userId: user.id, email: user.email };
+        }
+    } catch (error) {
+        console.warn('[OptionalAuth] Token check failed', error.message);
+    }
+    next();
+};

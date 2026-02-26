@@ -6,7 +6,7 @@ export const getUserByNickname = async (req, res) => {
         const { data, error } = await supabase
             .from('users')
             .select(`
-                id, nickname, first_name, last_name, avatar_url, is_verified, role, bio, socials
+                id, nickname, first_name, last_name, avatar_url, banner_url, is_verified, role, bio, socials
             `)
             .eq('nickname', nickname)
             .single();
@@ -15,7 +15,17 @@ export const getUserByNickname = async (req, res) => {
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
 
-        res.status(200).json(data);
+        let isFollowing = false;
+        if (req.user?.userId) {
+            const { data: follow } = await supabase
+                .from('followers')
+                .select('id')
+                .match({ user_id: data.id, follower_id: req.user.userId })
+                .maybeSingle();
+            isFollowing = !!follow;
+        }
+
+        res.status(200).json({ ...data, is_following: isFollowing });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -28,8 +38,9 @@ export const getUserProfile = async (req, res) => {
         const { data, error } = await supabase
             .from('users')
             .select(`
-                id, nickname, first_name, last_name, avatar_url, is_verified, role, bio, socials,
+                id, nickname, first_name, last_name, avatar_url, banner_url, is_verified, role, bio, socials,
                 followers:followers!user_id(count),
+                following:followers!follower_id(count),
                 products:products!producer_id(count)
             `)
             .ilike('nickname', nickname)
@@ -43,12 +54,24 @@ export const getUserProfile = async (req, res) => {
         const user = {
             ...data,
             followers_count: data.followers?.[0]?.count || 0,
+            following_count: data.following?.[0]?.count || 0,
             products_count: data.products?.[0]?.count || 0
         };
         delete user.followers;
+        delete user.following;
         delete user.products;
 
-        res.status(200).json(user);
+        let isFollowing = false;
+        if (req.user?.userId) {
+            const { data: follow } = await supabase
+                .from('followers')
+                .select('id')
+                .match({ user_id: user.id, follower_id: req.user.userId })
+                .maybeSingle();
+            isFollowing = !!follow;
+        }
+
+        res.status(200).json({ ...user, is_following: isFollowing });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

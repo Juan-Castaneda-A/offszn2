@@ -3,14 +3,22 @@ import { supabase } from '../../database/connection.js';
 export const getAllProducts = async (req, res) => {
     try {
         const { nickname, type, sort } = req.query;
+        // En ProductController.js -> getAllProducts
         let query = supabase
             .from('products')
             .select(`
-                *,
-                users!producer_id (
-                    id, nickname, avatar_url, is_verified
-                )
-            `);
+        *,
+        users!producer_id (
+            id, nickname, avatar_url, is_verified
+        ),
+        collaborations:collab_invitations!product_id (
+            royalty_percent,
+            status,
+            collaborator:users!collaborator_id (
+                id, nickname, avatar_url, is_verified
+            )
+        )
+    `);
 
         // Filtrado por Nickname de Productor
         if (nickname) {
@@ -47,6 +55,7 @@ export const getAllProducts = async (req, res) => {
 
         res.status(200).json(data);
     } catch (err) {
+        console.error("❌ ERROR EN GET_ALL_PRODUCTS:", err); // <-- AGREGA ESTO
         res.status(500).json({ error: err.message });
     }
 };

@@ -28,7 +28,7 @@ const Welcome = () => {
     useEffect(() => {
         checkSession();
         if (profile?.onboarding_completed) {
-            navigate('/');
+            navigate(`/@${profile.nickname}`);
         }
     }, [profile, navigate, checkSession]);
 
@@ -79,8 +79,8 @@ const Welcome = () => {
             // Refresh session to get updated profile
             await checkSession();
 
-            // Redirect to home
-            navigate('/');
+            // Redirect to public profile
+            navigate(`/@${completeData.nickname}`);
         } catch (error) {
             console.error('Error completing profile:', error);
             alert('Hubo un error al completar tu perfil. Por favor intenta de nuevo.');
@@ -96,7 +96,7 @@ const Welcome = () => {
             <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
                 <img src={logoImg} alt="OFFSZN" className="h-8 w-auto" />
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate(profile?.nickname ? `/@${profile.nickname}` : '/')}
                     className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
                 >
                     Saltar por ahora

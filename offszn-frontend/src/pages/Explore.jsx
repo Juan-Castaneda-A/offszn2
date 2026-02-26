@@ -265,7 +265,7 @@ const Explore = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-10 relative z-10">
             {leaderboard.slice(0, 5).map((p, i) => (
-              <Link key={p.id} to={`/user/${p.nickname}`} className="group flex flex-col items-center p-8 rounded-[35px] hover:bg-white/[0.03] transition-all duration-500 border border-transparent hover:border-white/5">
+              <Link key={p.id} to={`/@${p.nickname}`} className="group flex flex-col items-center p-8 rounded-[35px] hover:bg-white/[0.03] transition-all duration-500 border border-transparent hover:border-white/5">
                 <div className="relative mb-8">
                   <div className="w-[120px] h-[120px] rounded-[35px] overflow-hidden border-2 border-white/10 group-hover:border-violet-500 transition-all duration-500 shadow-2xl transform group-hover:rotate-6">
                     <SecureImage src={p.avatar_url} alt={p.nickname} className="w-full h-full object-cover" />

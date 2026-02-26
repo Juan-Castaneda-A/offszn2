@@ -97,7 +97,7 @@ const AppRouter = () => {
 
           {/* Rutas de Usuario Público */}
           <Route path="/u/:username" element={<Profile />} />
-          <Route path="/@:username" element={<Profile />} />
+          <Route path="/:username" element={<Profile />} />
         </Route>
 
         {/* --- RUTAS DE AUTENTICACIÓN --- */}
