@@ -2,7 +2,8 @@ import express from 'express';
 import {
     registerUser,
     loginUser,
-    checkNicknameAvailability
+    checkNicknameAvailability,
+    changePassword
 } from '../controllers/AuthController.js';
 import { completeProfile } from '../controllers/UserController.js';
 import { authenticateTokenMiddleware } from '../middlewares/authenticateTokenMiddleware.js';
@@ -15,5 +16,6 @@ router.post('/check-nickname', checkNicknameAvailability);
 
 // Protected: Complete onboarding
 router.put('/complete-profile', authenticateTokenMiddleware, completeProfile);
+router.post('/change-password', authenticateTokenMiddleware, changePassword);
 
 export default router;

@@ -21,6 +21,8 @@ import cloudinaryRoutes from './infrastructure/http/routes/cloudinary.routes.js'
 import reelsRoutes from './infrastructure/http/routes/reels.routes.js';
 import chatbotRoutes from './infrastructure/http/routes/chatbot.routes.js';
 import notificationRoutes from './infrastructure/http/routes/notification.routes.js';
+import negotiationRoutes from './infrastructure/http/routes/negotiation.routes.js';
+import activityRoutes from './infrastructure/http/routes/activity.routes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -127,6 +129,8 @@ app.use('/api/cloudinary', cloudinaryRoutes);
 app.use('/api/reels', reelsRoutes);
 app.use('/api', chatbotRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/negotiations', negotiationRoutes);
+app.use('/api/activity', activityRoutes);
 
 checkConnection();
 

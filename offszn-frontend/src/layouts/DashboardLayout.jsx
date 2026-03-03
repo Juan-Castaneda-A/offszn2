@@ -12,7 +12,8 @@ import {
   BiBook,             // Cursos
   BiBarChartAlt2,     // Estadísticas
   BiMoviePlay,        // Reels
-  BiRocket            // Upgrade
+  BiRocket,           // Upgrade
+  BiDollar            // Negociar
 } from 'react-icons/bi';
 
 import logo from '../assets/images/LOGO-OFFSZN.png'; // Tu logo
@@ -79,9 +80,10 @@ function Sidebar() {
 
       {/* --- GRUPO 2: NEGOCIO --- */}
       <Divider />
-      <SidebarItem to="/dashboard/licenses" icon={<BiFile />} label="Licencias" active={isActive('/dashboard/licenses')} />
+<SidebarItem to="/dashboard/licenses" icon={<BiFile />} label="Licencias" active={isActive('/dashboard/licenses')} />
       <SidebarItem to="/dashboard/coupons" icon={<BiPurchaseTag />} label="Cupones" active={isActive('/dashboard/coupons')} />
       <SidebarItem to="/dashboard/collaborations" icon={<BiGroup />} label="Colaboraciones" active={isActive('/dashboard/collaborations')} />
+      <SidebarItem to="/dashboard/negotiations" icon={<BiDollar />} label="Negociar" active={isActive('/dashboard/negotiations')} />
 
       {/* --- GRUPO 3: ACADEMIA --- */}
       <Divider />

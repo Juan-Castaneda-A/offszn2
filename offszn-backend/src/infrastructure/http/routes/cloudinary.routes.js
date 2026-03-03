@@ -141,4 +141,28 @@ router.post('/avatar', authMiddleware, async (req, res) => {
     }
 });
 
+router.post('/upload', authMiddleware, async (req, res) => {
+    try {
+        const { image, folder = 'general' } = req.body;
+
+        if (!image) {
+            return res.status(400).json({ error: 'No se proporcionó imagen' });
+        }
+
+        const uploadResult = await cloudinary.uploader.upload(image, {
+            folder: folder,
+            resource_type: 'auto',
+        });
+
+        res.json({
+            success: true,
+            url: uploadResult.secure_url,
+            public_id: uploadResult.public_id
+        });
+    } catch (error) {
+        console.error('❌ Cloudinary Upload Error:', error);
+        res.status(500).json({ error: 'Error al subir a Cloudinary' });
+    }
+});
+
 export default router;

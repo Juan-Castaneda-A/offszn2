@@ -93,6 +93,15 @@ export default function Profile() {
   }, [username, setPlaylist]);
 
   useEffect(() => {
+    if (currentUser && profile?.username) {
+      apiClient.post('/activity/record', {
+        entity_id: profile.username,
+        entity_type: 'profile'
+      }).catch(() => { });
+    }
+  }, [profile?.username, currentUser]);
+
+  useEffect(() => {
     const layout = document.querySelector('.min-h-screen.flex.flex-col.bg-secondary');
     if (layout) {
       layout.style.backgroundColor = 'transparent';

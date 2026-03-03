@@ -44,6 +44,7 @@ import Collaborations from '../pages/dashboard/producer/Collaborations';
 import Analytics from '../pages/dashboard/producer/Analytics';
 import Coupons from '../pages/dashboard/producer/Coupons';
 import SubscriptionPlans from '../pages/dashboard/producer/SubscriptionPlans';
+import Negotiations from '../pages/dashboard/producer/Negotiations';
 import Favorites from '../pages/dashboard/Favorites';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
@@ -125,8 +126,9 @@ const AppRouter = () => {
           <Route path="edit-beat/:id" element={<EditBeat />} />
           <Route path="import-youtube" element={<YouTubeImport />} />
           <Route path="my-products" element={<MyProducts />} />
-          <Route path="licenses" element={<LicenseManager />} />
+<Route path="licenses" element={<LicenseManager />} />
           <Route path="collaborations" element={<Collaborations />} />
+          <Route path="negotiations" element={<Negotiations />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="coupons" element={<Coupons />} />
           <Route path="plans" element={<SubscriptionPlans />} />

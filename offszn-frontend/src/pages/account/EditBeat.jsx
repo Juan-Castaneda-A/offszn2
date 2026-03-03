@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../../api/client';
+import { supabase, apiClient } from '../../api/client';
 import { useAuth } from '../../store/authStore';
 import ImageCropper from '../../components/ImageCropper';
 import {
@@ -137,22 +137,11 @@ export default function EditBeat() {
 
             // Upload new cover if changed
             if (newCoverFile && newCoverFile.startsWith('data:')) {
-                const arr = newCoverFile.split(',');
-                const mime = arr[0].match(/:(.*?);/)[1];
-                const bstr = atob(arr[1]);
-                let n = bstr.length;
-                const u8arr = new Uint8Array(n);
-                while (n--) { u8arr[n] = bstr.charCodeAt(n); }
-                const blob = new Blob([u8arr], { type: mime });
-
-                const path = `${user.id}/covers/${Date.now()}_cover_edit.jpg`;
-                const { error: uploadErr } = await supabase.storage
-                    .from('products')
-                    .upload(path, blob, { contentType: 'image/jpeg' });
-                if (uploadErr) throw uploadErr;
-
-                const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(path);
-                updateData.image_url = publicUrl.publicUrl;
+                const { data: cloudRes } = await apiClient.post('/cloudinary/upload', {
+                    image: newCoverFile,
+                    folder: 'products'
+                });
+                updateData.image_url = cloudRes.url;
             }
 
             const { error: updateErr } = await supabase

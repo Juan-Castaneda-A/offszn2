@@ -4,7 +4,7 @@ import { BiPalette, BiChevronRight, BiImage, BiCheckCircle } from 'react-icons/b
 import { BsArrowLeft, BsFiletypeGif, BsPersonCircle } from 'react-icons/bs';
 import { RiLayoutBottom2Fill } from "react-icons/ri";
 import { FaSpotify, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
-import { supabase } from '../../api/client';
+import { supabase, apiClient } from '../../api/client';
 import toast from 'react-hot-toast';
 import Cropper from 'react-easy-crop';
 
@@ -180,22 +180,20 @@ export default function ProfilePersonalizerModal({ isOpen, onClose, profile, onU
 
         setIsUploading(true);
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
-            const filePath = `${fileName}`;
+            // Convert file to base64 for Cloudinary upload
+            const reader = new FileReader();
+            const base64Promise = new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+            const base64Image = await base64Promise;
 
-            const { error: uploadError } = await supabase.storage
-                .from(bucket)
-                .upload(filePath, file, { upsert: true });
+            const { data: cloudRes } = await apiClient.post('/cloudinary/upload', {
+                image: base64Image,
+                folder: bucket === 'banners' ? 'banners' : 'avatars'
+            });
 
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-                .from(bucket)
-                .getPublicUrl(filePath);
-
-            const typePrefix = file.type === 'image/gif' ? 'gif:' : 'url:';
-            const finalUrl = `${typePrefix}${publicUrl}`;
+            const finalUrl = cloudRes.url;
 
             if (bucket === 'banners') {
                 setSelectedBanner(finalUrl);
@@ -204,7 +202,7 @@ export default function ProfilePersonalizerModal({ isOpen, onClose, profile, onU
                 // GIF Avatar update
                 const { error: updateError } = await supabase
                     .from('users')
-                    .update({ avatar_url: publicUrl })
+                    .update({ avatar_url: finalUrl })
                     .eq('id', profile.id);
 
                 if (updateError) throw updateError;
@@ -228,29 +226,30 @@ export default function ProfilePersonalizerModal({ isOpen, onClose, profile, onU
         if (!avatarFile || !croppedAreaPixels) return;
         setIsUploading(true);
         try {
-            // Simplificado para este paso: subimos la original por ahora
-            // En una implementación real usaríamos canvas para recortar
-            const fileExt = avatarFile.name.split('.').pop();
-            const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
-            const { error: uploadError } = await supabase.storage
-                .from('avatars')
-                .upload(fileName, avatarFile);
+            // For now, simpler: we use the existing /cloudinary/avatar endpoint which handles cropping
+            // We need to send the crop data
+            const reader = new FileReader();
+            const base64Promise = new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(avatarFile);
+            });
+            const base64Image = await base64Promise;
 
-            if (uploadError) throw uploadError;
+            const { data: cloudRes } = await apiClient.post('/cloudinary/avatar', {
+                image: base64Image,
+                crop: {
+                    x: croppedAreaPixels.x,
+                    y: croppedAreaPixels.y,
+                    width: croppedAreaPixels.width,
+                    height: croppedAreaPixels.height
+                }
+            });
 
-            const { data: { publicUrl } } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(fileName);
-
-            const { error: updateError } = await supabase
-                .from('users')
-                .update({ avatar_url: publicUrl })
-                .eq('id', profile.id);
-
-            if (updateError) throw updateError;
-            toast.success("Avatar actualizado");
-            onUpdate();
-            setView('main');
+            if (cloudRes.success) {
+                toast.success("Avatar actualizado");
+                onUpdate();
+                setView('main');
+            }
         } catch (err) {
             console.error(err);
             toast.error("Error al guardar avatar");

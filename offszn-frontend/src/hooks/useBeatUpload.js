@@ -67,66 +67,65 @@ export const useBeatUpload = () => {
 
       // 2. File Uploads (Supabase Storage)
 
-      // A) Cover Image (Handle both File and Cropped DataURL)
+      // A) Cover Image (Cloudinary via Backend)
       if (formState.coverImage?.preview) {
         setUploadProgress({ message: 'Subiendo portada...', progress: 20 });
-        const isDataUrl = formState.coverImage.preview.startsWith('data:');
-        const blob = isDataUrl ? dataURLtoBlob(formState.coverImage.preview) : formState.coverImage.file;
-        const ext = isDataUrl ? 'jpg' : (formState.coverImage.file?.name.split('.').pop() || 'jpg');
-        const path = `${user.id}/covers/${Date.now()}_cover.${ext}`;
-
-        const { error } = await supabase.storage.from('products').upload(path, blob, { contentType: isDataUrl ? 'image/jpeg' : undefined });
-        if (error) throw error;
-
-        const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(path);
-        productData.image_url = publicUrl.publicUrl;
+        const { data: cloudRes } = await apiClient.post('/cloudinary/upload', {
+          image: formState.coverImage.preview,
+          folder: 'products'
+        });
+        productData.image_url = cloudRes.url;
         console.log("DEBUG: Final Product Image URL ->", productData.image_url);
       }
 
-      // B) Primary Audio (Tagged MP3)
+      // B) Primary Audio (Tagged MP3) - Upload to R2 via Backend
       if (fileObjects.mp3File) {
         setUploadProgress({ message: 'Subiendo preescucha...', progress: 40 });
-        const name = sanitize(fileObjects.mp3File.name);
-        const path = `${user.id}/mp3_tagged/${Date.now()}_${name}`;
+        const formData = new FormData();
+        formData.append('file', fileObjects.mp3File);
+        formData.append('folder', 'mp3_tagged');
 
-        const { error } = await supabase.storage.from('products').upload(path, fileObjects.mp3File);
-        if (error) throw error;
+        const { data: r2Res } = await apiClient.post('/storage/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
 
-        const { data: publicUrl } = supabase.storage.from('products').getPublicUrl(path);
-        productData.mp3_url = publicUrl.publicUrl;
-        productData.audio_url = publicUrl.publicUrl; // Used by players
+        productData.mp3_url = r2Res.key;
+        productData.audio_url = r2Res.key; // Used by players - R2 keys are signed on request
       }
 
-      // C) Main Product File (WAV / ZIP / Preset) - Secure Storage
+      // C) Main Product File (WAV / ZIP / Preset) - Upload to R2 via Backend
       if (fileObjects.wavFile || fileObjects.zipFile) {
         setUploadProgress({ message: 'Subiendo archivo principal...', progress: 70 });
         const mainFile = fileObjects.wavFile || fileObjects.zipFile;
         const folder = fileObjects.wavFile ? 'wav_untagged' : (productData.product_type === 'preset' ? 'presets' : 'kits');
-        const name = sanitize(mainFile.name);
-        const path = `${user.id}/${folder}/${Date.now()}_${name}`;
 
-        const { data, error } = await supabase.storage.from('secure-products').upload(path, mainFile);
-        if (error) throw error;
+        const formData = new FormData();
+        formData.append('file', mainFile);
+        formData.append('folder', folder);
 
-        // For secure products, we only store the internal path
-        if (fileObjects.wavFile) productData.wav_url = data.path;
+        const { data: r2Res } = await apiClient.post('/storage/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        if (fileObjects.wavFile) productData.wav_url = r2Res.key;
         if (fileObjects.zipFile) {
-          // Kits and Presets store their main download in a dedicated field or reuse stems/wav if needed by existing cards
-          productData.stems_url = data.path; // Keep stems_url for compatibility with download logic if it expects it
-          productData.audio_url = null; // Kits don't have a preview player url unless we add an mp3_tagged for them
+          productData.stems_url = r2Res.key;
+          productData.audio_url = null;
         }
       }
 
-      // D) Optional Stems (for beats)
+      // D) Optional Stems (for beats) - Upload to R2 via Backend
       if (fileObjects.stemsFile) {
         setUploadProgress({ message: 'Subiendo stems...', progress: 85 });
-        const name = sanitize(fileObjects.stemsFile.name);
-        const path = `${user.id}/stems/${Date.now()}_${name}`;
+        const formData = new FormData();
+        formData.append('file', fileObjects.stemsFile);
+        formData.append('folder', 'stems');
 
-        const { data, error } = await supabase.storage.from('secure-products').upload(path, fileObjects.stemsFile);
-        if (error) throw error;
+        const { data: r2Res } = await apiClient.post('/storage/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
 
-        productData.stems_url = data.path;
+        productData.stems_url = r2Res.key;
       }
 
       // 3. Database Insertion

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
 import Cropper from 'react-easy-crop';
-import { supabase } from '../../api/client';
+import { supabase, apiClient } from '../../api/client';
 import { useAuthStore } from '../../store/authStore';
 
 const Step4Avatar = ({ onNext, onBack, initialData, isSubmitting }) => {
@@ -72,23 +72,20 @@ const Step4Avatar = ({ onNext, onBack, initialData, isSubmitting }) => {
         if (imageSrc && croppedAreaPixels) {
             setIsUploading(true);
             try {
-                const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
-                const fileName = `${user.id}-${Date.now()}.jpg`;
+                // Simplified: use /cloudinary/avatar which handles cropping in backend
+                const { data: cloudRes } = await apiClient.post('/cloudinary/avatar', {
+                    image: imageSrc,
+                    crop: {
+                        x: croppedAreaPixels.x,
+                        y: croppedAreaPixels.y,
+                        width: croppedAreaPixels.width,
+                        height: croppedAreaPixels.height
+                    }
+                });
 
-                const { data, error } = await supabase.storage
-                    .from('avatars')
-                    .upload(fileName, croppedBlob, {
-                        contentType: 'image/jpeg',
-                        upsert: true
-                    });
-
-                if (error) throw error;
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('avatars')
-                    .getPublicUrl(fileName);
-
-                avatarUrl = publicUrl;
+                if (cloudRes.success) {
+                    avatarUrl = cloudRes.url;
+                }
             } catch (error) {
                 console.error('Error uploading avatar:', error);
                 alert('Error al subir la imagen. Continuaremos sin avatar.');

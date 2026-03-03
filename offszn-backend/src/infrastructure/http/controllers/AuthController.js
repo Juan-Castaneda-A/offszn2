@@ -132,3 +132,42 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ error: err.message || 'Error en el servidor durante el login.' });
     }
 };
+
+export const changePassword = async (req, res) => {
+    try {
+        const userId = req.user?.userId;
+        const { currentPassword, newPassword } = req.body;
+
+        if (!userId || !currentPassword || !newPassword) {
+            return res.status(400).json({ error: 'Faltan datos requeridos' });
+        }
+
+        const { data: user, error: fetchError } = await supabase
+            .from('users')
+            .select('password')
+            .eq('id', userId)
+            .single();
+
+        if (fetchError || !user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        const isPasswordValid = await comparePassword(currentPassword, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'La contraseña actual es incorrecta' });
+        }
+
+        const hashedPassword = await hashPassword(newPassword);
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ password: hashedPassword, updated_at: new Date() })
+            .eq('id', userId);
+
+        if (updateError) throw updateError;
+
+        res.status(200).json({ message: 'Contraseña actualizada con éxito' });
+    } catch (err) {
+        console.error("Error in changePassword:", err.message);
+        res.status(500).json({ error: 'Error al cambiar la contraseña' });
+    }
+};

@@ -1,5 +1,5 @@
 
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl as getPresignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3Client } from "../../storage/r2Client.js";
 
@@ -49,5 +49,36 @@ export const getSignedUrl = async (req, res) => {
     } catch (error) {
         console.error("Error signing R2 URL:", error);
         res.status(500).json({ error: "Failed to sign URL" });
+    }
+};
+
+export const uploadToR2 = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file provided" });
+        }
+
+        const { folder } = req.body;
+        const userId = req.user.userId;
+        const fileName = `${Date.now()}_${req.file.originalname.replace(/\s+/g, '_')}`;
+        const key = folder ? `${userId}/${folder}/${fileName}` : `${userId}/${fileName}`;
+
+        const command = new PutObjectCommand({
+            Bucket: R2_BUCKET_NAME,
+            Key: key,
+            Body: req.file.buffer,
+            ContentType: req.file.mimetype,
+        });
+
+        await s3Client.send(command);
+
+        res.json({
+            success: true,
+            key: key,
+            message: "File uploaded to R2 successfully"
+        });
+    } catch (error) {
+        console.error("Error uploading to R2:", error);
+        res.status(500).json({ error: "Failed to upload to R2" });
     }
 };

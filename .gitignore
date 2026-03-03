@@ -137,3 +137,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+supabase_negotiations_schema.sql
+offszn-backend/migrate_to_external_storage.js
+offszn-backend/cleanup_supabase_storage.js

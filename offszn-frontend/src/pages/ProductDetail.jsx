@@ -7,15 +7,15 @@ import { useCartStore } from '../store/cartStore';
 import { useCurrencyStore } from '../store/currencyStore';
 import { useAuth } from '../store/authStore';
 import { useFavorites } from '../hooks/useFavorites';
-import { useChatStore } from '../store/useChatStore';
 import WaveSurfer from 'wavesurfer.js';
 import ShareModal from '../components/modals/ShareModal';
 import ExclusivityModal from '../components/modals/ExclusivityModal';
 import ComparisonModal from '../components/modals/ComparisonModal';
 import ProducerHoverCard from '../components/profile/ProducerHoverCard';
 import { Music2, ShoppingCart } from 'lucide-react';
-import { BiPlay, BiPause, BiCartAdd, BiHeart, BiShareAlt, BiCheck, BiChevronDown, BiPlus, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import { BiPlay, BiPause, BiHeart, BiShareAlt, BiCheck, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { BsPatchCheckFill } from 'react-icons/bs';
+import { toast } from 'react-hot-toast';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -26,14 +26,19 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLicense, setSelectedLicense] = useState('basic');
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [isDescOpen, setIsDescOpen] = useState(true);
-  const [isInfoOpen, setIsInfoOpen] = useState(true);
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isExclusivityModalOpen, setIsExclusivityModalOpen] = useState(false);
   const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+
+  // Negotiation State
+  const { user } = useAuth();
+  const [negotiateAmount, setNegotiateAmount] = useState('');
+  const [negotiateEmail, setNegotiateEmail] = useState(user?.email || '');
+  const [negotiateMessage, setNegotiateMessage] = useState('');
+  const [isSubmittingNegotiation, setIsSubmittingNegotiation] = useState(false);
+
   const { toggleFavorite } = useFavorites();
   const tabsNavRef = useRef(null);
   const tabIndicatorRef = useRef(null);
@@ -43,12 +48,12 @@ const ProductDetail = () => {
   const [hoveredProducer, setHoveredProducer] = useState(null);
   const [hoverRect, setHoverRect] = useState(null);
   const hoverTimeoutRef = useRef(null);
+
   // Stores
   const { addItem } = useCartStore();
   const { formatPrice } = useCurrencyStore();
   const { playTrack, currentTrack, isPlaying, togglePlay } = usePlayerStore();
-  const { user } = useAuth();
-  const { url: secureAudioUrl, loading: audioUrlLoading } = useSecureUrl(product?.audio_url || product?.demo_url);
+  const { url: secureAudioUrl } = useSecureUrl(product?.audio_url || product?.demo_url);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,10 +74,12 @@ const ProductDetail = () => {
           });
           setIsLiked(!!found.is_liked);
 
-          // Fetch related products (same producer or same type)
+          // Update email if user is logged in
+          if (user?.email) setNegotiateEmail(user.email);
+
+          // Fetch related products
           apiClient.get(`/products?limit=10&product_type=${found.product_type}`)
             .then(res => {
-              // Priority: Same category + producer first
               const filtered = res.data.filter(p => p.id !== found.id);
               setRelatedProducts(filtered.slice(0, 6));
             });
@@ -87,7 +94,7 @@ const ProductDetail = () => {
 
     fetchProduct();
     window.scrollTo(0, 0);
-  }, [identifier]);
+  }, [identifier, user]);
 
   useEffect(() => {
     // Update tab indicator position
@@ -97,6 +104,15 @@ const ProductDetail = () => {
       tabIndicatorRef.current.style.left = `${activeTabEl.offsetLeft}px`;
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (user && product?.id) {
+      apiClient.post('/activity/record', {
+        entity_id: product.id,
+        entity_type: 'product'
+      }).catch(() => { });
+    }
+  }, [product?.id, user]);
 
   if (loading) return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center">
@@ -120,6 +136,12 @@ const ProductDetail = () => {
       togglePlay();
     } else {
       playTrack({ ...product, secureAudio: secureAudioUrl });
+      if (user) {
+        apiClient.post('/activity/record', {
+          entity_id: product.id,
+          entity_type: 'listen'
+        }).catch(() => { });
+      }
     }
   };
 
@@ -132,7 +154,6 @@ const ProductDetail = () => {
     const result = await toggleFavorite(product.id);
     if (result !== null) {
       setIsLiked(result);
-      // Sync with local state to show updated count immediately
       setProduct(prev => ({
         ...prev,
         likes_count: result ? (Number(prev.likes_count || 0) + 1) : Math.max(0, Number(prev.likes_count || 0) - 1)
@@ -164,30 +185,52 @@ const ProductDetail = () => {
     setIsShareModalOpen(true);
   };
 
+  const handleSubmitNegotiation = async (e) => {
+    e.preventDefault();
+    if (!negotiateAmount || !negotiateEmail) {
+      toast.error("Por favor completa los campos obligatorios");
+      return;
+    }
+
+    try {
+      setIsSubmittingNegotiation(true);
+      await apiClient.post('/negotiations', {
+        product_id: product.id,
+        buyer_email: negotiateEmail,
+        offered_amount: parseFloat(negotiateAmount),
+        message: negotiateMessage
+      });
+      toast.success("¡Oferta enviada con éxito! El productor revisará tu propuesta pronto.");
+      setNegotiateAmount('');
+      setNegotiateMessage('');
+    } catch (err) {
+      console.error("Error submitting negotiation:", err);
+      toast.error("No se pudo enviar la oferta. Reintenta más tarde.");
+    } finally {
+      setIsSubmittingNegotiation(false);
+    }
+  };
+
   return (
     <div className="product-detail-page selection:bg-violet-500/30">
       <div className="product-split-layout">
 
         {/* --- LEFT COL: SIDEBAR --- */}
         <aside className="product-sidebar">
-          {/* Cover Art */}
           <div className="product-cover-art" style={{ position: 'relative' }}>
             <img
               src={product.image_url || '/images/portada-default.png'}
               alt={product.name}
               id="product-main-art"
             />
-            {/* Play Overlay */}
             <div className="product-cover-play-btn" onClick={handlePlay}>
               {isCurrent && isPlaying ? <BiPause /> : <BiPlay />}
             </div>
-            {/* Plays Badge */}
             <div className="product-cover-badge desktop-only-flex">
               <Music2 size={14} /> {product.plays_count || 0}
             </div>
           </div>
 
-          {/* Sidebar Actions Area (PC ONLY) */}
           <div className="social-actions-wrapper">
             <button
               onClick={handleLike}
@@ -213,7 +256,6 @@ const ProductDetail = () => {
             </button>
           </div>
 
-          {/* Information List */}
           <div className="info-list-container">
             <div className="info-list" id="content-info">
               <div className="info-title-desktop" style={{ fontSize: '0.8rem', color: '#666', marginBottom: '5px', fontWeight: 700, textTransform: 'uppercase' }}>Información</div>
@@ -229,7 +271,6 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Tags */}
           <div className="tags-section" style={{ marginTop: '20px' }}>
             <div className="tags-row" id="tags-container">
               {product.tags && (Array.isArray(product.tags) ? product.tags : product.tags.split(',')).map((tag, i) => (
@@ -243,12 +284,8 @@ const ProductDetail = () => {
 
         {/* --- RIGHT COL: MAIN CONTENT --- */}
         <main className="product-main-content">
-
-          {/* Header Title & Producer */}
           <div className="product-header-wrapper">
-            <h1 className="product-title">
-              {product.name}
-            </h1>
+            <h1 className="product-title">{product.name}</h1>
             <div className="producer-info flex items-center gap-2 text-sm font-bold">
               <span>Por</span>
               <Link
@@ -263,7 +300,6 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Buying Section & Footer */}
           <div className="buying-section-wrapper" style={{ marginTop: '-10px', marginBottom: '10px' }}>
             <div className="section-headline" id="licenses-header">
               <span>Licencias</span>
@@ -308,106 +344,103 @@ const ProductDetail = () => {
             </button>
           </div>
 
-          {/* Integrated Tabs System */}
           <div className="product-tabs-container">
             <div className="product-tabs-nav" ref={tabsNavRef}>
-              <button
-                className={`tab-btn ${activeTab === 'info' ? 'active' : ''}`}
-                onClick={() => setActiveTab('info')}
-              >
-                Información
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'promos' ? 'active' : ''}`}
-                onClick={() => setActiveTab('promos')}
-              >
-                Promociones
-              </button>
-              <button
-                className={`tab-btn ${activeTab === 'negotiate' ? 'active' : ''}`}
-                onClick={() => setActiveTab('negotiate')}
-              >
-                Negociar
-              </button>
+              <button className={`tab-btn ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>Información</button>
+              <button className={`tab-btn ${activeTab === 'promos' ? 'active' : ''}`} onClick={() => setActiveTab('promos')}>Promociones</button>
+              <button className={`tab-btn ${activeTab === 'negotiate' ? 'active' : ''}`} onClick={() => setActiveTab('negotiate')}>Negociar</button>
               <div ref={tabIndicatorRef} className="tab-indicator"></div>
             </div>
 
             <div className="product-tab-panes">
-              {/* Pane: Información */}
               {activeTab === 'info' && (
                 <div className="tab-pane active">
                   <div id="dynamic-lic-terms" style={{ marginTop: '0', borderTop: 'none', paddingBottom: '20px' }}>
                     <div className="terms-content-v2" style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>{activeLicense.name}</span>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-[0.85rem] font-extrabold text-white uppercase">{activeLicense.name}</span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-2 gap-x-4 gap-y-2 text-[0.82rem] text-gray-400 font-bold">
-                        <div className="flex items-center gap-2">
-                          <i className="bi bi-check-circle-fill text-violet-500"></i>
-                          {activeLicense.features?.[0] || 'MP3 + WAV'}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <i className="bi bi-check-circle-fill text-violet-500"></i>
-                          Streams: {activeLicense.features?.[1]?.replace(' Streams', '') || '50,000'}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <i className="bi bi-check-circle-fill text-violet-500"></i>
-                          Ventas: {activeLicense.features?.[2]?.replace(' Ventas', '') || '2,000'}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <i className="bi bi-check-circle-fill text-violet-500"></i>
-                          PDF Oficial
-                        </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[0.82rem] text-gray-400 font-bold">
+                        <div className="flex items-center gap-2"><i className="bi bi-check-circle-fill text-violet-500"></i>{activeLicense.features?.[0] || 'MP3 + WAV'}</div>
+                        <div className="flex items-center gap-2"><i className="bi bi-check-circle-fill text-violet-500"></i>Streams: {activeLicense.features?.[1]?.replace(' Streams', '') || '50,000'}</div>
+                        <div className="flex items-center gap-2"><i className="bi bi-check-circle-fill text-violet-500"></i>Ventas: {activeLicense.features?.[2]?.replace(' Ventas', '') || '2,000'}</div>
+                        <div className="flex items-center gap-2"><i className="bi bi-check-circle-fill text-violet-500"></i>PDF Oficial</div>
                       </div>
                     </div>
                   </div>
-
-                  <div className="about-section" style={{ marginTop: '10px' }}>
-                    <div className="text-[#888] text-[0.95rem] leading-relaxed whitespace-pre-line">
-                      {product.description || "Sin descripción disponible."}
-                    </div>
+                  <div className="about-section mt-2">
+                    <div className="text-[#888] text-[0.95rem] leading-relaxed whitespace-pre-line">{product.description || "Sin descripción disponible."}</div>
                   </div>
                 </div>
               )}
 
-              {/* Pane: Promociones */}
               {activeTab === 'promos' && (
                 <div className="tab-pane active">
-                  <div className="promos-container" style={{ padding: '20px 0' }}>
+                  <div className="promos-container py-5">
                     <div className="promo-card-v2">
-                      <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff', letterSpacing: '2px', marginBottom: '12px', textTransform: 'uppercase' }}>Oferta de Bienvenida</div>
-                      <div style={{ color: '#888', fontSize: '1rem', marginBottom: '25px', lineHeight: 1.5 }}>Obtén un <b style={{ color: '#fff' }}>10% OFF</b> inmediato en tu primera compra al unirte a la plataforma.</div>
-                      <button className="w-full max-w-[280px] bg-white text-black font-bold py-3 rounded-lg mx-auto block text-sm">
-                        OBTENER MI DESCUENTO
-                      </button>
+                      <div className="text-[0.85rem] font-extrabold text-white tracking-[2px] mb-3 uppercase">Oferta de Bienvenida</div>
+                      <div className="text-[#888] text-base mb-6 leading-normal">Obtén un <b className="text-white">10% OFF</b> inmediato en tu primera compra al unirte a la plataforma.</div>
+                      <button className="w-full max-w-[280px] bg-white text-black font-bold py-3 rounded-lg mx-auto block text-sm">OBTENER MI DESCUENTO</button>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Pane: Negociar */}
               {activeTab === 'negotiate' && (
                 <div className="tab-pane active">
-                  <div className="negotiate-pane-content" style={{ padding: '20px 0' }}>
-                    <div style={{ fontWeight: 800, color: '#fff', fontSize: '1.2rem', marginBottom: '5px' }}>¿Tienes un presupuesto diferente?</div>
-                    <div style={{ color: '#888', fontSize: '1rem', marginBottom: '25px', lineHeight: 1.4 }}>Envía tu oferta directamente al productor y recibe una respuesta en menos de 24h.</div>
+                  <div className="negotiate-pane-content py-5">
+                    <div className="font-extrabold text-white text-xl mb-1">¿Tienes un presupuesto diferente?</div>
+                    <div className="text-[#888] text-base mb-6 leading-tight">Envía tu oferta directamente al productor y recibe una respuesta en menos de 24h.</div>
 
-                    <div className="negotiate-form-inline">
+                    <form onSubmit={handleSubmitNegotiation} className="negotiate-form-inline">
                       <div className="flex flex-col gap-2">
-                        <div className="floating-group has-prefix">
-                          <span className="prefix">$</span>
-                          <input type="text" id="offer-amount-inline" placeholder=" " />
-                          <label htmlFor="offer-amount-inline">TU OFERTA (USD)</label>
+                        <div className="flex flex-col md:flex-row gap-4">
+                          <div className="floating-group has-prefix flex-1">
+                            <span className="prefix">$</span>
+                            <input
+                              type="number"
+                              id="offer-amount-inline"
+                              placeholder=" "
+                              required
+                              value={negotiateAmount}
+                              onChange={(e) => setNegotiateAmount(e.target.value)}
+                            />
+                            <label htmlFor="offer-amount-inline">TU OFERTA (USD)</label>
+                          </div>
+                          <div className="floating-group flex-1">
+                            <input
+                              type="email"
+                              id="offer-email-inline"
+                              placeholder=" "
+                              required
+                              value={negotiateEmail}
+                              onChange={(e) => setNegotiateEmail(e.target.value)}
+                            />
+                            <label htmlFor="offer-email-inline">TU EMAIL</label>
+                          </div>
                         </div>
+
                         <div className="floating-group">
-                          <input type="email" id="offer-email-inline" placeholder=" " />
-                          <label htmlFor="offer-email-inline">TU EMAIL</label>
+                          <textarea
+                            id="offer-message-inline"
+                            placeholder=" "
+                            rows="3"
+                            value={negotiateMessage}
+                            onChange={(e) => setNegotiateMessage(e.target.value)}
+                            className="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 pt-6 text-white text-sm outline-none focus:border-violet-500 transition-all resize-none"
+                          ></textarea>
+                          <label htmlFor="offer-message-inline" style={{ top: '24px' }}>MENSAJE (OPCIONAL)</label>
                         </div>
-                        <button className="w-full bg-white text-black font-bold py-4 rounded-xl mt-2">
-                          ENVIAR PROPUESTA
+
+                        <button
+                          type="submit"
+                          disabled={isSubmittingNegotiation}
+                          className="w-full bg-white hover:bg-gray-200 disabled:opacity-50 text-black font-black py-4 rounded-xl mt-2 transition-all shadow-lg active:scale-[0.985]"
+                        >
+                          {isSubmittingNegotiation ? 'ENVIANDO...' : 'ENVIAR PROPUESTA'}
                         </button>
                       </div>
-                    </div>
+                    </form>
                   </div>
                 </div>
               )}
@@ -416,17 +449,12 @@ const ProductDetail = () => {
         </main>
       </div>
 
-      {/* Share Modal */}
       <div className="related-products-section">
         <div className="section-header">
           <h3>Recomendado para ti</h3>
           <div className="nav-arrows">
-            <button className="nav-arrow-btn" onClick={() => scrollRelated('left')} title="Anterior">
-              <BiChevronLeft size={24} />
-            </button>
-            <button className="nav-arrow-btn" onClick={() => scrollRelated('right')} title="Siguiente">
-              <BiChevronRight size={24} />
-            </button>
+            <button className="nav-arrow-btn" onClick={() => scrollRelated('left')} title="Anterior"><BiChevronLeft size={24} /></button>
+            <button className="nav-arrow-btn" onClick={() => scrollRelated('right')} title="Siguiente"><BiChevronRight size={24} /></button>
           </div>
         </div>
         <div className="trending-grid" ref={trendingGridRef}>
@@ -446,18 +474,8 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        product={product}
-      />
-
-      <ExclusivityModal
-        isOpen={isExclusivityModalOpen}
-        onClose={() => setIsExclusivityModalOpen(false)}
-        product={product}
-      />
-
+      <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} product={product} />
+      <ExclusivityModal isOpen={isExclusivityModalOpen} onClose={() => setIsExclusivityModalOpen(false)} product={product} />
       <ComparisonModal
         isOpen={isComparisonModalOpen}
         onClose={() => setIsComparisonModalOpen(false)}
@@ -483,8 +501,6 @@ const ProductDetail = () => {
   );
 };
 
-// --- SMALL HELPER COMPONENTS ---
-
 const RecommendedCard = ({ item, onPlay, onProducerHover, onProducerLeave }) => {
   const { url: secureImage } = useSecureUrl(item.image_url);
   const navigate = useNavigate();
@@ -493,29 +509,13 @@ const RecommendedCard = ({ item, onPlay, onProducerHover, onProducerLeave }) => 
   return (
     <div className="trending-card">
       <div className="t-card-cover">
-        <img
-          src={secureImage || '/images/portada-default.png'}
-          alt={item.name}
-          onClick={() => navigate(`/product/${item.slug || item.id}`)}
-        />
-        <button className="t-play-btn" onClick={(e) => { e.stopPropagation(); onPlay(); }} title="Reproducir">
-          <i className="bi bi-play-fill" style={{ marginLeft: '3px' }}></i>
-        </button>
-        <div className="t-overlay-badge" title="Reproducciones" onClick={() => navigate(`/product/${item.slug || item.id}`)}>
-          <Music2 size={12} /> {plays}
-        </div>
+        <img src={secureImage || '/images/portada-default.png'} alt={item.name} onClick={() => navigate(`/product/${item.slug || item.id}`)} />
+        <button className="t-play-btn" onClick={(e) => { e.stopPropagation(); onPlay(); }} title="Reproducir"><i className="bi bi-play-fill"></i></button>
+        <div className="t-overlay-badge" title="Reproducciones" onClick={() => navigate(`/product/${item.slug || item.id}`)}><Music2 size={12} /> {plays}</div>
       </div>
       <div className="t-card-info">
         <h4 title={item.name} onClick={() => navigate(`/product/${item.slug || item.id}`)}>{item.name}</h4>
-        <p
-          className="t-card-author"
-          onClick={() => navigate(`/@${item.users?.nickname}`)}
-          style={{ cursor: 'pointer' }}
-          onMouseEnter={(e) => onProducerHover(e, item.users?.nickname, item.users?.is_verified)}
-          onMouseLeave={onProducerLeave}
-        >
-          {item.users?.nickname || 'Unknown'}
-        </p>
+        <p className="t-card-author" onClick={() => navigate(`/@${item.users?.nickname}`)} style={{ cursor: 'pointer' }} onMouseEnter={(e) => onProducerHover(e, item.users?.nickname, item.users?.is_verified)} onMouseLeave={onProducerLeave}>{item.users?.nickname || 'Unknown'}</p>
       </div>
       <div className="t-meta-row">
         <span style={{ textTransform: 'capitalize' }}>{item.product_type || 'Beat'}</span>
