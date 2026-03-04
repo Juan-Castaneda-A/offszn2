@@ -140,3 +140,4 @@ vite.config.ts.timestamp-*
 supabase_negotiations_schema.sql
 offszn-backend/migrate_to_external_storage.js
 offszn-backend/cleanup_supabase_storage.js
+offszn-frontend/git_diff_output.txt

@@ -18,7 +18,7 @@
     --glass-blur: blur(20px);
 }
 
-#app-main {
+#app-main:has(.chat-wrapper) {
     height: calc(100vh - 80px) !important;
     display: flex;
     flex-direction: column;
