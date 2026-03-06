@@ -38,6 +38,12 @@
     font-family: 'Inter', sans-serif;
 }
 
+@media (max-width: 991px) {
+    .chat-wrapper {
+        position: relative;
+    }
+}
+
 /* SIDEBAR RESTORATION */
 .chat-sidebar {
     width: var(--chat-sidebar-width);
@@ -48,6 +54,21 @@
     display: flex;
     flex-direction: column;
     z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 991px) {
+    .chat-sidebar {
+        width: 100%;
+        min-width: 100%;
+        position: absolute;
+        inset: 0;
+    }
+
+    .is-viewing-chat .chat-sidebar {
+        transform: translateX(-100%);
+        pointer-events: none;
+    }
 }
 
 .chat-sidebar-header {
@@ -207,6 +228,14 @@
     border-color: rgba(139, 92, 246, 0.2);
 }
 
+@media (max-width: 768px) {
+    .offszn-v3-chat-row {
+        margin: 4px 0;
+        border-radius: 0;
+        padding: 14px 16px;
+    }
+}
+
 .oz-chat-avatar {
     width: 54px;
     height: 54px;
@@ -266,6 +295,20 @@
     flex-direction: column;
     background: #000;
     min-width: 0;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 991px) {
+    .chat-main {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        transform: translateX(100%);
+    }
+
+    .is-viewing-chat .chat-main {
+        transform: translateX(0);
+    }
 }
 
 .chat-header {
@@ -325,6 +368,12 @@
     flex-direction: column;
 }
 
+@media (max-width: 768px) {
+    .oz-msg-body {
+        max-width: 92%;
+    }
+}
+
 .oz-message-row.sent .oz-msg-body {
     align-items: flex-end;
 }
@@ -348,6 +397,14 @@
     vertical-align: top;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@media (max-width: 768px) {
+    .oz-bubble {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border-radius: 16px;
+    }
 }
 
 .oz-bubble:hover {
@@ -380,6 +437,12 @@
 .chat-input-area {
     padding: 24px 32px;
     background: #000;
+}
+
+@media (max-width: 768px) {
+    .chat-input-area {
+        padding: 16px;
+    }
 }
 
 .input-container {

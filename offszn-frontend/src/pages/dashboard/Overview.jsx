@@ -210,26 +210,26 @@ export default function Overview() {
   }
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+    <div className="w-full max-w-[1440px] mx-auto flex flex-col gap-8 sm:gap-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
 
       {/* --- HERO HEADER --- */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 sm:gap-10">
         <div>
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
             <div className="px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-full">
               <span className="text-[9px] font-black text-violet-500 uppercase tracking-widest">Hub</span>
             </div>
             <div className="h-px w-8 bg-white/5"></div>
           </div>
-          <h1 className="text-6xl font-black uppercase tracking-tighter text-white leading-none">
+          <h1 className="text-4xl sm:text-5xl lg:text-8xl font-black uppercase tracking-tighter text-white leading-none">
             HQ <span className="text-violet-500">Center</span>
           </h1>
-          <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-            <Sparkles size={12} className="text-violet-500" /> Monitoreo en tiempo real para <span className="text-white">{user.name}</span>
+          <p className="text-gray-500 font-bold uppercase tracking-widest text-[9px] sm:text-[10px] mt-3 sm:mt-4 flex items-center gap-2">
+            <Sparkles size={12} className="text-violet-500" /> Monitoreo para <span className="text-white">{user.name}</span>
           </p>
         </div>
 
-        <button className="flex items-center gap-4 px-10 py-5 bg-white text-black text-xs font-black uppercase tracking-[0.2em] rounded-full hover:bg-violet-500 hover:text-white transition-all shadow-2xl active:scale-95 group">
+        <button className="w-full lg:w-auto flex items-center justify-center gap-4 px-8 py-4 sm:px-10 sm:py-5 bg-white text-black text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] rounded-full hover:bg-violet-500 hover:text-white transition-all shadow-2xl active:scale-95 group">
           <Plus size={20} className="group-hover:rotate-180 transition-transform duration-500" />
           Subir Proyecto
         </button>
@@ -272,21 +272,21 @@ export default function Overview() {
 
         {/* --- PERFORMANCE CHART --- */}
         <div className="xl:col-span-2 group">
-          <div className="bg-[#0A0A0A] border border-white/5 p-10 rounded-[60px] hover:border-white/10 transition-all duration-700 h-[500px] flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-12 opacity-[0.02] group-hover:scale-110 group-hover:rotate-12 transition-all duration-1000">
+          <div className="bg-[#0A0A0A] border border-white/5 p-6 sm:p-10 rounded-[40px] sm:rounded-[60px] hover:border-white/10 transition-all duration-700 h-[350px] sm:h-[500px] flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 sm:p-12 opacity-[0.02] group-hover:scale-110 group-hover:rotate-12 transition-all duration-1000">
               <Zap size={200} />
             </div>
 
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
               <div>
-                <h4 className="text-xl font-black uppercase tracking-tighter text-white mb-1">Actividad de Red</h4>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 flex items-center gap-2">
-                  <Activity size={14} className="text-violet-500" /> Rendimiento de visitas y clics
+                <h4 className="text-lg sm:text-xl font-black uppercase tracking-tighter text-white mb-1">Actividad de Red</h4>
+                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 flex items-center gap-2">
+                  <Activity size={14} className="text-violet-500" /> Rendimiento global
                 </p>
               </div>
-              <div className="flex p-1 bg-black/40 border border-white/5 rounded-2xl">
-                <button className="px-6 py-2.5 bg-white text-black text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-xl">LAST 7D</button>
-                <button className="px-6 py-2.5 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-600 hover:text-white transition-all">MONTHLY</button>
+              <div className="flex p-1 bg-black/40 border border-white/5 rounded-2xl w-full sm:w-auto overflow-hidden">
+                <button className="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-white text-black text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-xl">7D</button>
+                <button className="flex-1 sm:flex-none px-4 sm:px-6 py-2 text-[9px] font-black uppercase tracking-widest rounded-xl text-gray-600 hover:text-white transition-all">MONTH</button>
               </div>
             </div>
 
@@ -302,20 +302,20 @@ export default function Overview() {
         <div className="space-y-10">
 
           {/* Quick Connect & Licenses */}
-          <div className="bg-[#0A0A0A] border border-white/5 p-10 rounded-[60px] hover:border-white/10 transition-all duration-700">
-            <div className="flex justify-between items-center mb-10">
-              <h4 className="text-xs font-black uppercase tracking-[0.3em] text-gray-500">Marketplace Stats</h4>
+          <div className="bg-[#0A0A0A] border border-white/5 p-6 sm:p-10 rounded-[40px] sm:rounded-[60px] hover:border-white/10 transition-all duration-700">
+            <div className="flex justify-between items-center mb-8 sm:mb-10">
+              <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] text-gray-500">Marketplace Stats</h4>
               <ShieldCheck size={20} className="text-violet-500" />
             </div>
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               <LicenseRow name="MP3 LEASE" price={20} active />
               <LicenseRow name="WAV LEASE" price={50} active />
               <LicenseRow name="UNLIMITED" price={300} active />
               <LicenseRow name="DRUM KITS" price={30} active />
             </div>
 
-            <div className="mt-12 pt-10 border-t border-white/5">
-              <button className="w-full py-5 bg-white/5 hover:bg-violet-500 text-white font-black uppercase tracking-widest text-[10px] rounded-[24px] transition-all active:scale-95 flex items-center justify-center gap-3 group/btn">
+            <div className="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-white/5">
+              <button className="w-full py-4 sm:py-5 bg-white/5 hover:bg-violet-500 text-white font-black uppercase tracking-widest text-[9px] sm:text-[10px] rounded-[24px] transition-all active:scale-95 flex items-center justify-center gap-3 group/btn">
                 Configurar Precios
                 <ChevronRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
               </button>
@@ -350,27 +350,27 @@ export default function Overview() {
       </div>
 
       {/* --- FEED AREA --- */}
-      <section className="bg-[#0A0A0A] border border-white/5 p-12 rounded-[60px] relative overflow-hidden group">
+      <section className="bg-[#0A0A0A] border border-white/5 p-6 sm:p-12 rounded-[40px] sm:rounded-[60px] relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-12 opacity-[0.02] group-hover:scale-110 transition-all duration-1000">
           <Clock size={160} />
         </div>
 
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-10 sm:mb-12">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-[20px] bg-violet-500/10 flex items-center justify-center text-violet-500 border border-violet-500/20">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[16px] sm:rounded-[20px] bg-violet-500/10 flex items-center justify-center text-violet-500 border border-violet-500/20">
               <Zap size={20} />
             </div>
             <div>
-              <h3 className="text-xl font-black uppercase tracking-tighter text-white">Últimas Acciones</h3>
-              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Línea de tiempo de eventos críticos</p>
+              <h3 className="text-lg sm:text-xl font-black uppercase tracking-tighter text-white">Últimas Acciones</h3>
+              <p className="text-[9px] sm:text-[10px] font-black text-gray-600 uppercase tracking-widest">Línea de tiempo de eventos</p>
             </div>
           </div>
-          <button className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/5 rounded-2xl text-gray-500 hover:text-white hover:bg-white/10 transition-all">
+          <button className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/5 border border-white/5 rounded-2xl text-gray-500 hover:text-white hover:bg-white/10 transition-all">
             <ListFilter size={18} />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
           {activities.length > 0 ? (
             activities.map((item, idx) => <ActivityItem key={idx} data={item} />)
           ) : (
@@ -390,22 +390,22 @@ export default function Overview() {
 
 function StatCard({ label, value, trend, trendType, icon: Icon, color }) {
   return (
-    <div className="group relative h-[180px] p-10 bg-[#0A0A0A] border border-white/5 rounded-[40px] flex flex-col justify-between hover:border-white/10 hover:bg-white/[0.02] transition-all duration-500 overflow-hidden cursor-default shadow-2xl">
+    <div className="group relative h-[160px] sm:h-[180px] p-6 sm:p-10 bg-[#0A0A0A] border border-white/5 rounded-[30px] sm:rounded-[40px] flex flex-col justify-between hover:border-white/10 hover:bg-white/[0.02] transition-all duration-500 overflow-hidden cursor-default shadow-2xl">
       <div className="absolute -right-8 -top-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rotate-12 group-hover:rotate-0 duration-1000">
         <Icon size={140} />
       </div>
 
       <div className="flex items-center gap-4">
-        <div className={`p-4 rounded-[20px] bg-white/5 ${color || 'text-violet-500'} group-hover:scale-110 transition-transform duration-500`}>
+        <div className={`p-3 sm:p-4 rounded-[16px] sm:rounded-[20px] bg-white/5 ${color || 'text-violet-500'} group-hover:scale-110 transition-transform duration-500`}>
           <Icon size={20} />
         </div>
-        <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">{label}</span>
+        <span className="text-[9px] sm:text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">{label}</span>
       </div>
 
       <div>
-        <span className="block text-4xl lg:text-5xl font-black text-white tracking-tighter mb-2 leading-none">{value}</span>
+        <span className="block text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tighter mb-2 leading-none">{value}</span>
         {trend && (
-          <div className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${trendType === 'up' ? 'text-emerald-500' : 'text-gray-700'}`}>
+          <div className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${trendType === 'up' ? 'text-emerald-500' : 'text-gray-700'}`}>
             {trendType === 'up' && <TrendingUp size={12} />}
             {trend}
           </div>

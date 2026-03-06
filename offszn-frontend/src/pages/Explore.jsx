@@ -170,36 +170,36 @@ const Explore = () => {
   return (
     <div className="pb-32 pt-6 min-h-screen bg-black">
       {/* Hero Section (Carousel) */}
-      <div className="max-w-[1400px] mx-auto px-6 mb-8">
-        <div className="relative h-auto min-h-[500px] rounded-[40px] bg-[#0a0a0a] border border-white/5 flex items-center p-12 md:p-20 overflow-hidden shadow-2xl">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 mb-8 mt-4 sm:mt-0">
+        <div className="relative h-auto min-h-[400px] sm:min-h-[500px] rounded-[30px] sm:rounded-[40px] bg-[#0a0a0a] border border-white/5 flex items-center p-6 sm:p-12 md:p-20 overflow-hidden shadow-2xl">
           {currentHero && (
             <div className="w-full h-full flex flex-col md:flex-row items-center gap-12 relative animate-fadeIn">
               <div className="relative z-10 max-w-2xl flex-1 flex flex-col justify-center h-full">
-                <span className="bg-violet-600 border border-violet-400/30 text-white text-[10px] font-black tracking-[0.3em] uppercase px-5 py-2 rounded-full mb-6 inline-block shadow-[0_5px_15px_rgba(139,92,246,0.3)] w-fit">
-                  {query ? `Búsqueda: ${query}` : 'Lo más destacado de hoy'}
+                <span className="bg-violet-600 border border-violet-400/30 text-white text-[9px] sm:text-[10px] font-black tracking-[0.3em] uppercase px-4 py-1.5 sm:px-5 sm:py-2 rounded-full mb-4 sm:mb-6 inline-block shadow-[0_5px_15px_rgba(139,92,246,0.3)] w-fit">
+                  {query ? `Búsqueda: ${query}` : 'Lo más destacado'}
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tighter uppercase leading-[1] drop-shadow-2xl line-clamp-2">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 sm:mb-6 tracking-tighter uppercase leading-[1.1] sm:leading-[1] drop-shadow-2xl line-clamp-2">
                   {currentHero.name}
                 </h1>
                 <p className="text-zinc-400 mb-8 max-w-md text-lg md:text-xl font-semibold leading-relaxed">
                   De <span className="text-white">@{currentHero.producer_nickname || 'OFFSZN'}</span>.
                   Potencia tus producciones con este sonido legendario.
                 </p>
-                <div className="flex flex-wrap gap-5 mb-8">
+                <div className="flex flex-wrap gap-3 sm:gap-5 mb-8">
                   <button
                     onClick={() => handlePlay(currentHero)}
-                    className="px-10 py-5 bg-white text-black rounded-full font-black uppercase text-sm tracking-widest hover:bg-violet-500 hover:text-white transition-all flex items-center gap-3 shadow-2xl active:scale-95 transition-transform"
+                    className="px-6 py-3 sm:px-10 sm:py-5 bg-white text-black rounded-full font-black uppercase text-[12px] sm:text-sm tracking-widest hover:bg-violet-500 hover:text-white transition-all flex items-center gap-3 shadow-2xl active:scale-95 transition-transform"
                   >
-                    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                      <Play size={14} fill="currentColor" className="ml-1 text-white" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-black flex items-center justify-center">
+                      <Play size={12} fill="currentColor" className="ml-1 text-white" />
                     </div>
-                    Escuchar Ahora
+                    Escuchar
                   </button>
                   <Link
                     to={`/${currentHero.product_type || 'beat'}/${currentHero.public_slug || currentHero.id}`}
-                    className="px-10 py-5 bg-[#111] text-white border border-white/10 rounded-full font-black uppercase text-sm tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95 transition-transform"
+                    className="px-6 py-3 sm:px-10 sm:py-5 bg-[#111] text-white border border-white/10 rounded-full font-black uppercase text-[12px] sm:text-sm tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95 transition-transform"
                   >
-                    <Info size={18} /> Detalles
+                    <Info size={16} /> Detalles
                   </Link>
                 </div>
 
@@ -237,12 +237,12 @@ const Explore = () => {
       </div>
 
       {/* Categorías */}
-      <div className="max-w-[1400px] mx-auto px-6 mb-12 flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 mb-8 sm:mb-12 flex gap-2 sm:gap-3 overflow-x-auto pb-4 scrollbar-hide">
         {CATEGORIES.map(cat => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`px-8 py-4 rounded-full text-xs font-black uppercase tracking-widest transition-all border ${activeCategory === cat ? 'bg-white text-black border-white shadow-[0_10px_20px_rgba(255,255,255,0.1)]' : 'bg-[#111] text-zinc-500 border-white/5 hover:border-white/20 hover:text-white'}`}
+            className={`px-5 py-3 sm:px-8 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all border whitespace-nowrap ${activeCategory === cat ? 'bg-white text-black border-white shadow-[0_10px_20px_rgba(255,255,255,0.1)]' : 'bg-[#111] text-zinc-500 border-white/5 hover:border-white/20 hover:text-white'}`}
           >
             {cat}
           </button>
@@ -250,7 +250,7 @@ const Explore = () => {
       </div>
 
       {/* Trending & Fresh Section */}
-      <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-24">
         <ListView title="Tendencias" subtitle="Lo más reproducido" items={trending} onPlay={handlePlay} currentTrack={currentTrack} isPlaying={isPlaying} />
         <ListView title="Super Fresh" subtitle="Nuevos en la tienda" items={fresh} onPlay={handlePlay} currentTrack={currentTrack} isPlaying={isPlaying} />
       </div>

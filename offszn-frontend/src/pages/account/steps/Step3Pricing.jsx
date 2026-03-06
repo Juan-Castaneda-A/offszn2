@@ -97,22 +97,22 @@ export default function Step3Pricing() {
                             <div className="space-y-3">
                                 {collaborators.map(c => (
                                     <div key={c.id} className="flex items-center gap-4 bg-[#111] border border-white/5 px-6 py-4 rounded-2xl group transition-all hover:border-white/10 shadow-xl">
-                                        <div className="w-10 h-10 rounded-full bg-violet-600/20 flex items-center justify-center text-violet-500 font-bold text-xs">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-600/20 flex items-center justify-center text-violet-500 font-bold text-xs">
                                             {c.nickname[0].toUpperCase()}
                                         </div>
-                                        <div className="flex-1">
-                                            <p className="text-[11px] font-bold text-white uppercase tracking-widest">{c.nickname}</p>
-                                            <p className="text-[9px] text-gray-600 uppercase tracking-widest">Split de Ganancias</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[10px] sm:text-[11px] font-bold text-white uppercase tracking-widest truncate">{c.nickname}</p>
+                                            <p className="text-[8px] sm:text-[9px] text-gray-600 uppercase tracking-widest">Split</p>
                                         </div>
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex items-center gap-2 sm:gap-4">
                                             <div className="relative">
                                                 <input
                                                     type="number"
                                                     value={c.split}
                                                     onChange={(e) => updateCollaboratorSplit(c.id, e.target.value)}
-                                                    className="w-20 bg-black border border-white/5 rounded-lg py-2 pl-3 pr-8 text-right text-xs text-violet-500 font-bold focus:border-violet-500 outline-none"
+                                                    className="w-16 sm:w-20 bg-black border border-white/5 rounded-lg py-1.5 sm:py-2 pl-2 sm:pl-3 pr-6 sm:pr-8 text-right text-[10px] sm:text-xs text-violet-500 font-bold focus:border-violet-500 outline-none"
                                                 />
-                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-700 font-bold">%</span>
+                                                <span className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-[9px] sm:text-[10px] text-gray-700 font-bold">%</span>
                                             </div>
                                             <button
                                                 onClick={() => removeCollaborator(c.id)}

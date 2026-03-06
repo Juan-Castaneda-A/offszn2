@@ -218,27 +218,27 @@ export default function Profile() {
         `}
       </style>
 
-      <header className="relative pt-[100px] px-10 pb-16 min-h-[380px] overflow-hidden" style={getBannerStyle()}>
+      <header className="relative pt-[80px] md:pt-[100px] px-6 md:px-10 pb-12 md:pb-16 min-h-[350px] md:min-h-[380px] overflow-hidden" style={getBannerStyle()}>
         <div className="absolute inset-0 pointer-events-none z-1 overflow-hidden">
           <div className="absolute inset-0 transition-opacity duration-1000" style={{ opacity: isDynamicTheme ? 0.14 : 0, background: `radial-gradient(circle at 50% -10%, ${themeColor} 0%, transparent 100%)` }} />
           <div className="absolute inset-0 z-2" style={{ background: 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 15%, rgba(0,0,0,0.3) 30%, transparent 50%)' }} />
         </div>
 
-        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-end gap-8 relative z-10 w-full">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 relative z-10 w-full text-center md:text-left">
           <div className="profile-avatar-container shrink-0">
-            <div className="w-[175px] h-[175px] rounded-full bg-[#1a1a1a] overflow-hidden border-[4px] border-[#1a1a1a] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+            <div className="w-[140px] h-[140px] md:w-[175px] md:h-[175px] rounded-full bg-[#1a1a1a] overflow-hidden border-[4px] border-[#1a1a1a] shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
               <SecureImage src={profile?.avatar_url} alt={profile?.nickname} className="w-full h-full object-cover" />
             </div>
           </div>
 
           <div className="profile-details flex-1 flex flex-col gap-2 pb-2">
-            <div className="flex items-center gap-3">
-              <h1 className="text-[3rem] font-black text-white leading-none tracking-[-1.2px] drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)] font-['Plus_Jakarta_Sans',sans-serif]">
+            <div className="flex items-center justify-center md:justify-start gap-3">
+              <h1 className="text-[2.25rem] md:text-[3rem] font-black text-white leading-none tracking-[-1.2px] drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)] font-['Plus_Jakarta_Sans',sans-serif]">
                 {profile?.nickname}
               </h1>
               {profile?.is_verified && (
                 <div className="relative group flex items-center mt-1">
-                  <div className="text-[#3b82f6] text-[1.5rem] cursor-help">
+                  <div className="text-[#3b82f6] text-[1.2rem] md:text-[1.5rem] cursor-help">
                     <BiCheckCircle />
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 hidden group-hover:flex flex-col w-[200px] bg-[#1a1a1a] border border-[#333] rounded-[10px] p-0 z-50 shadow-[0_10px_25px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in duration-200">
@@ -252,22 +252,22 @@ export default function Profile() {
               )}
             </div>
 
-            <div className="flex items-center gap-2 text-[#b3b3b3] text-[0.85rem] font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-[#b3b3b3] text-[0.85rem] font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
               <span>{profile?.role || 'Productor Musical'}</span>
               <span className="text-[0.5rem]">•</span>
               <span>{profile?.location || 'Mundo'}</span>
             </div>
-            <div className="text-[#ccc] text-[1rem] leading-[1.5] max-w-[600px] mt-1 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)] whitespace-pre-line break-words">
+            <div className="text-[#ccc] text-[0.95rem] md:text-[1rem] leading-[1.5] max-w-[600px] mt-1 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)] whitespace-pre-line break-words mx-auto md:mx-0">
               {profile?.bio || "Aún no ha añadido información."}
             </div>
 
-            <div className="flex items-center gap-10 mt-2">
-              <div className="flex items-center gap-5 text-[#b3b3b3] text-[0.9rem]">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 mt-4 md:mt-2">
+              <div className="flex items-center gap-5 text-[#b3b3b3] text-[0.85rem] md:text-[0.9rem]">
                 <span><b className="text-white font-bold">{products.length}</b> tracks</span>
                 <span><b className="text-white font-bold">{profile?.followers_count || 0}</b> followers</span>
                 <span><b className="text-white font-bold">{profile?.following_count || 0}</b> following</span>
               </div>
-              <div className="flex items-center gap-4 pl-5 border-l border-white/10">
+              <div className="flex items-center gap-5 md:gap-4 md:pl-5 md:border-l border-white/10">
                 <SocialLinkSmall href={profile?.socials?.instagram} icon={FaInstagram} />
                 <SocialLinkSmall href={profile?.socials?.youtube} icon={FaYoutube} />
                 <SocialLinkSmall href={profile?.socials?.tiktok} icon={FaTiktok} />
@@ -275,14 +275,14 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="flex gap-8 mt-4">
+            <div className="flex justify-center md:justify-start gap-6 md:gap-8 mt-6 md:mt-4">
               <TabButton label="PRODUCTOS" active={activeTab === 'products'} onClick={() => setActiveTab('products')} />
               <TabButton label="SERVICIOS" active={activeTab === 'services'} onClick={() => setActiveTab('services')} />
               <TabButton label="INFO" active={activeTab === 'about'} onClick={() => setActiveTab('about')} />
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pb-8">
+          <div className="flex items-center justify-center md:justify-start gap-3 pb-8 md:pb-8">
             {currentUserProfile && currentUserProfile.nickname === profile?.nickname ? (
               <>
                 <ActionButton label="Personalizar" onClick={() => setIsPersonalizerOpen(true)} />
@@ -292,7 +292,7 @@ export default function Profile() {
               <>
                 <button
                   onClick={handleFollowToggle}
-                  className={`px-[24px] py-2 rounded-[20px] text-[0.75rem] font-bold transition-all hover:-translate-y-[2px] shadow-lg ${isFollowing
+                  className={`px-[20px] md:px-[24px] py-1.5 md:py-2 rounded-[20px] text-[0.7rem] md:text-[0.75rem] font-bold transition-all hover:-translate-y-[2px] shadow-lg ${isFollowing
                     ? 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
                     : 'bg-white text-black hover:bg-gray-200'
                     }`}
@@ -309,7 +309,7 @@ export default function Profile() {
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto px-10 mt-5 relative z-10 pb-20">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-10 mt-5 relative z-10 pb-20">
         {activeTab === 'products' && (
           <div className="animate-fadeIn">
             <div className="flex items-center justify-between mb-5">
@@ -338,12 +338,12 @@ export default function Profile() {
               ))}
             </div>
 
-            <div className="pro-toolbar-container flex justify-between items-center bg-[#080808]/80 backdrop-blur-md border border-white/5 rounded-lg h-14 p-0 mb-6 sticky top-[80px] z-20 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-              <div className="toolbar-section left flex items-center h-full">
-                <div className="h-full flex items-center border-r border-white/5 px-6">
-                  <button className="flex items-center gap-2 text-[#eab308] text-[0.75rem] font-extrabold uppercase tracking-[1px]"><span className="text-xs">🔥</span> POPULAR <ChevronDown size={14} /></button>
+            <div className="pro-toolbar-container flex flex-col md:flex-row justify-between items-center bg-[#080808]/80 backdrop-blur-md border border-white/5 rounded-lg h-auto md:h-14 p-2 md:p-0 mb-6 sticky top-[80px] z-20 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+              <div className="toolbar-section left flex items-center h-full w-full md:w-auto">
+                <div className="h-full flex items-center border-r border-white/5 px-4 md:px-6">
+                  <button className="flex items-center gap-2 text-[#eab308] text-[0.7rem] md:text-[0.75rem] font-extrabold uppercase tracking-[1px] whitespace-nowrap"><span className="text-xs">🔥</span> POPULAR <ChevronDown size={14} /></button>
                 </div>
-                <div className="flex items-center h-full overflow-x-auto no-scrollbar">
+                <div className="flex items-center h-full overflow-x-auto no-scrollbar scroll-smooth">
                   <FilterTab label="DRUM KITS" active={filter === 'drum kit'} onClick={() => setFilter('drum kit')} />
                   <FilterTab label="LOOPS" active={filter === 'loop kit'} onClick={() => setFilter('loop kit')} />
                   <FilterTab label="PRESETS" active={filter === 'preset'} onClick={() => setFilter('preset')} />
@@ -521,27 +521,40 @@ function TrackListRow({ product, producerName, isCurrent, isPlaying, onPlay, for
   };
 
   return (
-    <div onClick={onPlay} className={`group grid grid-cols-[60px_330px_2fr_210px_80px_110px] items-center gap-4 py-[8px] px-[8px] min-h-[73px] border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer overflow-hidden backdrop-blur-sm ${isCurrent ? 'bg-white/5' : ''}`}>
-      <div className="w-[56px] h-[56px] rounded-[8px] overflow-hidden bg-[#1a1a1a] shrink-0 border border-white/5">
-        <SecureImage src={product.image_url} className="w-full h-full object-cover brightness-[0.9]" alt="" />
-      </div>
-      <div className="flex flex-col min-w-0 pr-4">
-        <h4 onClick={goToProduct} className="text-[0.95rem] font-bold text-[#eee] group-hover:text-violet-400 truncate leading-tight transition-colors">{product.name}</h4>
-        <div className="relative inline-block w-fit" onMouseEnter={handleArtistEnter} onMouseLeave={onArtistLeave}>
-          <p className="text-[0.75rem] text-[#666] font-bold hover:text-white transition-colors truncate mt-1">{producerName || 'OFFSZN'}</p>
+    <div onClick={onPlay} className={`group flex flex-col md:grid md:grid-cols-[60px_330px_2fr_210px_80px_110px] items-start md:items-center gap-4 py-4 md:py-[8px] px-4 md:px-[8px] min-h-[73px] border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer overflow-hidden backdrop-blur-sm ${isCurrent ? 'bg-white/5' : ''}`}>
+      <div className="flex items-center gap-4 w-full">
+        <div className="w-[52px] h-[52px] md:w-[56px] md:h-[56px] rounded-[8px] overflow-hidden bg-[#1a1a1a] shrink-0 border border-white/5">
+          <SecureImage src={product.image_url} className="w-full h-full object-cover brightness-[0.9]" alt="" />
+        </div>
+        <div className="flex flex-col min-w-0 flex-1 pr-4">
+          <h4 onClick={goToProduct} className="text-[0.9rem] md:text-[0.95rem] font-bold text-[#eee] group-hover:text-violet-400 truncate leading-tight transition-colors">{product.name}</h4>
+          <div className="relative inline-block w-fit" onMouseEnter={handleArtistEnter} onMouseLeave={onArtistLeave}>
+            <p className="text-[0.7rem] md:text-[0.75rem] text-[#666] font-bold hover:text-white transition-colors truncate mt-1">{producerName || 'OFFSZN'}</p>
+          </div>
+        </div>
+        <div className="md:hidden flex items-center gap-3">
+          <button onClick={handleAddToCart} className={`text-[0.9rem] font-extrabold ${isFree ? 'text-emerald-400' : 'text-white'}`}>{isFree ? 'FREE' : formatPrice(priceBasic)}</button>
+          <button
+            onClick={handleLike}
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isLiked ? 'text-red-500 bg-red-500/10' : 'text-[#555]'}`}
+          >
+            <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
+          </button>
         </div>
       </div>
-      <div className="flex items-center gap-4 pr-4">
+
+      <div className="flex items-center gap-4 w-full md:w-auto pr-4">
         <button className="w-9 h-9 shrink-0 rounded-full bg-[#1a1a1a] border border-[#333] hover:bg-white hover:text-black hover:border-white flex items-center justify-center text-white transition-all transform hover:scale-105 shadow-lg">
           {isCurrent && isPlaying ? <BiPause size={22} /> : <BiPlay size={22} className="ml-0.5" />}
         </button>
-        <div className="flex-1 hidden md:flex items-center gap-4">
+        <div className="flex-1 flex items-center gap-4">
           <div className="flex items-center gap-[1.5px] h-6 flex-1 opacity-60 group-hover:opacity-100 transition-opacity">
-            {[...Array(60)].map((_, j) => (<div key={j} className={`w-[2px] rounded-full transition-all ${isCurrent && isPlaying ? 'bg-violet-500 animate-pulse' : 'bg-[#444]'}`} style={{ height: `${Math.random() * 60 + 20}%` }}></div>))}
+            {[...Array(30)].map((_, j) => (<div key={j} className={`w-[2px] rounded-full transition-all ${isCurrent && isPlaying ? 'bg-violet-500 animate-pulse' : 'bg-[#444]'}`} style={{ height: `${Math.random() * 60 + 20}%` }}></div>))}
           </div>
           <div className="flex items-center gap-1 text-[0.7rem] text-[#555] font-mono group-hover:text-[#888] transition-colors shrink-0"><Clock size={12} />{product.duration || '02:45'}</div>
         </div>
       </div>
+
       <div className="hidden lg:flex items-center gap-2 pr-2">
         <span className="text-[0.65rem] font-bold text-[#555] uppercase tracking-wider whitespace-nowrap">{product.bpm || '120'} BPM</span>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -549,10 +562,12 @@ function TrackListRow({ product, producerName, isCurrent, isPlaying, onPlay, for
           <span className="bg-white/5 border border-white/5 rounded-full px-2.5 py-0.5 text-[0.65rem] text-[#777] font-bold uppercase tracking-wider group-hover:text-gray-400 transition-colors">STEMS</span>
         </div>
       </div>
-      <div className="flex justify-center text-[0.9rem] font-extrabold text-[#eee]">
+
+      <div className="hidden md:flex justify-center text-[0.9rem] font-extrabold text-[#eee]">
         <button onClick={handleAddToCart} className={`${isFree ? 'text-emerald-400' : 'hover:text-violet-400 transition-colors'}`}>{isFree ? 'FREE' : formatPrice(priceBasic)}</button>
       </div>
-      <div className="flex items-center justify-end gap-3 pr-2">
+
+      <div className="hidden md:flex items-center justify-end gap-3 pr-2">
         <button
           onClick={handleLike}
           className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isLiked ? 'text-red-500 bg-red-500/10' : 'text-[#555] hover:text-white hover:bg-white/10'}`}

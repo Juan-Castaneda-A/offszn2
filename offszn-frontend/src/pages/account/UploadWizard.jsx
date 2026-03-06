@@ -195,23 +195,23 @@ export default function UploadWizard() {
     <div className="min-h-screen bg-black text-white selection:bg-violet-500/30 overflow-x-hidden">
 
       {/* --- PREMIUM HEADER --- */}
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-black/80 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex justify-between items-center shadow-2xl h-[72px]">
-        <div className="flex items-center gap-5">
+      <header className="fixed top-0 left-0 right-0 z-[100] bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 py-4 flex justify-between items-center shadow-2xl h-[64px] sm:h-[72px]">
+        <div className="flex items-center gap-3 sm:gap-5">
           <button
             onClick={() => navigate('/dashboard')}
-            className="p-2.5 rounded-xl hover:bg-white/5 text-gray-500 hover:text-white transition-all border border-transparent hover:border-white/10 group"
+            className="p-2 sm:p-2.5 rounded-xl hover:bg-white/5 text-gray-500 hover:text-white transition-all border border-transparent hover:border-white/10 group"
           >
             <X size={18} className="group-hover:rotate-90 transition-transform duration-500" />
           </button>
 
-          <div className="h-8 w-px bg-white/10"></div>
+          <div className="h-6 sm:h-8 w-px bg-white/10"></div>
 
           <div className="flex flex-col">
-            <h1 className="text-sm font-bold uppercase tracking-[0.2em] text-white">
-              STUDIO <span className="text-violet-500">PIPELINE</span>
+            <h1 className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.2em] text-white">
+              STUDIO <span className="text-violet-500 hidden xs:inline">PIPELINE</span>
             </h1>
-            <p className="text-[10px] text-gray-500 uppercase tracking-widest font-medium">
-              Publicando {productType === 'beat' ? 'Instrumental' : 'Producto'}
+            <p className="text-[8px] sm:text-[10px] text-gray-500 uppercase tracking-widest font-medium">
+              {productType === 'beat' ? 'Instrumental' : 'Producto'}
             </p>
           </div>
         </div>
@@ -237,7 +237,7 @@ export default function UploadWizard() {
       <main className="max-w-[1000px] mx-auto pt-[120px] pb-[140px] px-6 min-h-screen">
 
         {/* --- LEGACY STEP INDICATOR --- */}
-        <div className="relative flex justify-between items-center mb-16 max-w-2xl mx-auto px-4">
+        <div className="relative flex justify-between items-center mb-10 sm:mb-16 max-w-2xl mx-auto px-2 sm:px-4">
           {/* Background Line */}
           <div className="absolute top-1/2 left-5 right-5 h-[2px] bg-white/5 -translate-y-1/2 z-0"></div>
 
@@ -279,11 +279,11 @@ export default function UploadWizard() {
       </main>
 
       {/* --- LEGACY FIXED FOOTER --- */}
-      <footer className="fixed bottom-0 left-0 right-0 h-[80px] bg-black/90 backdrop-blur-xl border-t border-white/10 z-[100] px-8 flex items-center justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
-        <div className="w-full max-w-[1200px] grid grid-cols-[200px_1fr_200px] items-center gap-8">
+      <footer className="fixed bottom-0 left-0 right-0 h-auto sm:h-[80px] bg-black/90 backdrop-blur-xl border-t border-white/10 z-[100] px-4 sm:px-8 py-4 sm:py-0 flex items-center justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
+        <div className="w-full max-w-[1200px] flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-8">
 
           {/* Navigation Left */}
-          <div className="flex justify-start">
+          <div className="hidden sm:flex w-[120px] lg:w-[200px] justify-start">
             <button
               onClick={prevStep}
               disabled={isPublishing}
@@ -296,49 +296,60 @@ export default function UploadWizard() {
           </div>
 
           {/* Player Center */}
-          <div className="flex items-center gap-6 bg-white/[0.03] border border-white/5 rounded-2xl p-2 px-6 h-14 flex-1 max-w-2xl mx-auto">
+          <div className="flex items-center gap-4 sm:gap-6 bg-white/[0.03] border border-white/5 rounded-2xl p-2 px-4 sm:px-6 h-12 sm:h-14 flex-1 w-full sm:max-w-2xl mx-auto order-2 sm:order-none">
             <button
               onClick={togglePlay}
               disabled={!previewFile}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 flex-shrink-0
                 ${previewFile
                   ? 'bg-violet-600 text-white hover:bg-violet-500 hover:shadow-violet-500/20'
                   : 'bg-white/5 text-gray-700 cursor-not-allowed'}`}
             >
-              {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} className="ml-0.5" fill="currentColor" />}
+              {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} className="ml-0.5" fill="currentColor" />}
             </button>
 
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="flex justify-between items-center mb-1">
-                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <div className="flex justify-between items-center mb-0.5 sm:mb-1 gap-4">
+                <p className="text-[8px] sm:text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 truncate">
                   <Music size={10} className={previewFile ? 'text-violet-500' : 'text-gray-700'} />
-                  {previewFile ? previewFile.name : 'Ningún archivo seleccionado'}
+                  {previewFile ? previewFile.name : 'No file'}
                 </p>
-                <span className="text-[9px] font-mono text-gray-500">
+                <span className="text-[8px] sm:text-[9px] font-mono text-gray-500 whitespace-nowrap">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
               </div>
-              <div ref={waveformRef} className="w-full opacity-80 hover:opacity-100 transition-opacity" />
+              <div ref={waveformRef} className="w-full opacity-60 sm:opacity-80 hover:opacity-100 transition-opacity" />
             </div>
           </div>
 
-          {/* Navigation Right */}
-          <div className="flex justify-end gap-4">
+          {/* Navigation Right (and back-button for mobile) */}
+          <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-[200px] lg:w-[250px] order-1 sm:order-none">
+            {/* Back Button for Mobile only */}
+            <button
+              onClick={prevStep}
+              disabled={isPublishing}
+              className={`sm:hidden flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all disabled:opacity-0
+                ${currentStep === 1 ? 'pointer-events-none opacity-0' : ''}`}
+            >
+              <ChevronLeft size={16} />
+              Atrás
+            </button>
+
             {currentStep < 4 ? (
               <button
                 onClick={nextStep}
-                className="flex items-center gap-2 bg-white text-black px-8 py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-violet-500 hover:text-white transition-all shadow-xl active:scale-95"
+                className="flex items-center gap-2 bg-white text-black px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-violet-500 hover:text-white transition-all shadow-xl active:scale-95 ml-auto"
               >
-                Continuar
+                Siguiente
                 <ChevronRight size={16} />
               </button>
             ) : (
               <button
                 onClick={() => handlePublish(false)}
                 disabled={isPublishing || youtubeStatus === 'authorizing'}
-                className="flex items-center gap-2 bg-violet-600 text-white px-10 py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-violet-500 transition-all shadow-[0_0_20px_rgba(139,92,246,0.4)] disabled:opacity-50 active:scale-95 translate-y-0 hover:-translate-y-0.5"
+                className="flex items-center gap-2 bg-violet-600 text-white px-6 sm:px-10 py-2.5 sm:py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-violet-500 transition-all shadow-[0_0_20px_rgba(139,92,246,0.4)] disabled:opacity-50 active:scale-95 ml-auto"
               >
-                {isPublishing || youtubeStatus === 'authorizing' ? 'Publicando...' : `Lanzar ${productType === 'beat' ? 'Beat' : 'Item'}`}
+                {isPublishing || youtubeStatus === 'authorizing' ? '...' : 'Lanzar'}
                 <Sparkles size={14} />
               </button>
             )}

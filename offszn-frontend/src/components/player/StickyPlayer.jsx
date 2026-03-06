@@ -144,50 +144,50 @@ const StickyPlayer = () => {
   if (!currentTrack) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full h-[90px] bg-[#0A0A0A] border-t border-white/5 flex items-center justify-between px-4 md:px-8 z-[9999] backdrop-blur-xl shadow-2xl">
+    <div className="fixed bottom-0 left-0 w-full h-[75px] md:h-[90px] bg-[#0A0A0A] border-t border-white/5 flex items-center justify-between px-4 md:px-8 z-[9999] backdrop-blur-xl shadow-2xl">
 
       {/* LEFT: INFO */}
-      <div className="flex items-center gap-4 w-[25%] min-w-[180px]">
-        <Link to={`/${currentTrack.product_type || 'beat'}/${currentTrack.public_slug || currentTrack.id}`} className="relative w-14 h-14 rounded-lg overflow-hidden shrink-0 group">
+      <div className="flex items-center gap-3 md:gap-4 flex-1 md:flex-none md:w-[25%] min-w-0 md:min-w-[180px]">
+        <Link to={`/${currentTrack.product_type || 'beat'}/${currentTrack.public_slug || currentTrack.id}`} className="relative w-11 h-11 md:w-14 md:h-14 rounded-lg overflow-hidden shrink-0 group">
           <img
             src={secureCover || '/placeholder.jpg'}
             alt="Cover"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <i className="bi bi-arrows-fullscreen text-white text-xs"></i>
+            <i className="bi bi-arrows-fullscreen text-white text-[10px]"></i>
           </div>
         </Link>
-        <div className="flex flex-col overflow-hidden">
-          <Link to={`/${currentTrack.product_type || 'beat'}/${currentTrack.public_slug || currentTrack.id}`} className="text-white text-sm font-bold truncate hover:text-violet-400 transition-colors">
+        <div className="flex flex-col overflow-hidden pr-2">
+          <Link to={`/${currentTrack.product_type || 'beat'}/${currentTrack.public_slug || currentTrack.id}`} className="text-white text-[13px] md:text-sm font-bold truncate hover:text-violet-400 transition-colors">
             {currentTrack.name}
           </Link>
-          <Link to={`/@${currentTrack.users?.nickname || currentTrack.producer_nickname}`} className="text-[11px] text-zinc-500 truncate hover:text-zinc-300">
+          <Link to={`/@${currentTrack.users?.nickname || currentTrack.producer_nickname}`} className="text-[10px] md:text-[11px] text-zinc-500 truncate hover:text-zinc-300">
             {currentTrack.users?.nickname || currentTrack.producer_nickname || 'Productor'}
           </Link>
         </div>
       </div>
 
       {/* CENTER: CONTROLS & WAVEFORM */}
-      <div className="flex flex-col items-center justify-center flex-1 max-w-[600px] px-4">
-        <div className="flex items-center gap-6 mb-2">
-          <button onClick={playPrev} className="text-zinc-400 hover:text-white text-2xl transition-all hover:scale-110">
+      <div className="flex flex-col items-center justify-center px-2 md:px-4 md:flex-1 md:max-w-[600px]">
+        <div className="flex items-center gap-4 md:gap-6">
+          <button onClick={playPrev} className="hidden md:block text-zinc-400 hover:text-white text-2xl transition-all hover:scale-110">
             <BiSkipPrevious />
           </button>
 
           <button
             onClick={togglePlay}
-            className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center text-2xl hover:scale-105 transition-all shadow-lg active:scale-95"
+            className="w-10 h-10 md:w-12 md:h-12 bg-white text-black rounded-full flex items-center justify-center text-xl md:text-2xl hover:scale-105 transition-all shadow-lg active:scale-95"
           >
             {isPlaying ? <BiPause /> : <BiPlay className="ml-1" />}
           </button>
 
-          <button onClick={playNext} className="text-zinc-400 hover:text-white text-2xl transition-all hover:scale-110">
+          <button onClick={playNext} className="hidden md:block text-zinc-400 hover:text-white text-2xl transition-all hover:scale-110">
             <BiSkipNext />
           </button>
         </div>
 
-        <div className="flex items-center w-full gap-3 text-[10px] font-bold text-zinc-600">
+        <div className="hidden md:flex items-center w-full gap-3 text-[10px] font-bold text-zinc-600 mt-2">
           <span className="w-8 text-right tabular-nums">{currentTime}</span>
           <div ref={waveformRef} className="flex-1 min-w-[200px]" />
           <span className="w-8 text-left tabular-nums">{totalTime}</span>
@@ -195,7 +195,7 @@ const StickyPlayer = () => {
       </div>
 
       {/* RIGHT: ACTIONS & VOLUME */}
-      <div className="flex items-center justify-end gap-6 w-[25%] min-w-[200px]">
+      <div className="flex items-center justify-end gap-3 md:gap-6 md:w-[25%] md:min-w-[200px] shrink-0">
         <div className="hidden lg:flex items-center gap-3">
           <button onClick={handleVolumeToggle} className="text-zinc-400 hover:text-white text-xl transition-colors">
             {isMuted || volume === 0 ? <BiVolumeMute /> : <BiVolumeFull />}
@@ -216,18 +216,18 @@ const StickyPlayer = () => {
 
         <button
           onClick={handleLike}
-          className={`text-xl transition-all hover:scale-110 ${isLiked ? 'text-red-500' : 'text-zinc-400 hover:text-white'}`}
+          className={`hidden sm:flex text-xl transition-all hover:scale-110 ${isLiked ? 'text-red-500' : 'text-zinc-400 hover:text-white'}`}
         >
           <BiHeart fill={isLiked ? "currentColor" : "none"} />
         </button>
 
-        <button className="bg-violet-600 text-white px-5 py-2.5 rounded-full text-xs font-black flex items-center gap-2 hover:bg-violet-500 transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0">
-          <BiCartAdd size={18} />
-          <span>{currentTrack.is_free ? 'GRATIS' : formatPrice(currentTrack.price_basic)}</span>
+        <button className="bg-violet-600 text-white px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[10px] md:text-xs font-black flex items-center gap-1.5 md:gap-2 hover:bg-violet-500 transition-all shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+          <BiCartAdd size={16} />
+          <span className="hidden sm:inline">{currentTrack.is_free ? 'GRATIS' : formatPrice(currentTrack.price_basic)}</span>
         </button>
 
         <button onClick={closePlayer} className="text-zinc-600 hover:text-white transition-colors">
-          <BiX size={24} />
+          <BiX size={20} md:size={24} />
         </button>
       </div>
     </div>

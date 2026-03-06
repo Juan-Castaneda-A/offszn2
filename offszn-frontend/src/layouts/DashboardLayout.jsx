@@ -1,29 +1,28 @@
-import React from 'react';
-import { Outlet, useLocation, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom';
 import { useUploadStore } from '../store/uploadStore';
-// He cambiado TODOS los iconos por versiones que SÍ existen en BoxIcons
 import {
-  BiGridAlt,          // Dashboard
-  BiDisc,             // Mis Kits
-  BiCloudUpload,      // Subir (Antes fallaba como BiCloudArrowUpFill)
-  BiFile,             // Licencias
-  BiPurchaseTag,      // Cupones
-  BiGroup,            // Colaboraciones
-  BiBook,             // Cursos
-  BiBarChartAlt2,     // Estadísticas
-  BiMoviePlay,        // Reels
-  BiRocket,           // Upgrade
-  BiDollar            // Negociar
+  BiGridAlt,
+  BiDisc,
+  BiCloudUpload,
+  BiFile,
+  BiPurchaseTag,
+  BiGroup,
+  BiBook,
+  BiBarChartAlt2,
+  BiMoviePlay,
+  BiRocket,
+  BiDollar,
+  BiMenu,
+  BiX
 } from 'react-icons/bi';
-
-import logo from '../assets/images/LOGO-OFFSZN.png'; // Tu logo
-
-import { useNavigate } from 'react-router-dom';
+import logo from '../assets/images/LOGO-OFFSZN.png';
 import { useAuthStore } from '../store/authStore';
 
 export default function DashboardLayout() {
   const { user, profile, loading } = useAuthStore();
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   React.useEffect(() => {
     if (!loading && user && (!profile || !profile.nickname)) {
@@ -31,9 +30,10 @@ export default function DashboardLayout() {
     }
   }, [user, profile, loading, navigate]);
 
-  if (loading) return null; // O un spinner
+  if (loading) return null;
+
   return (
-    <div className="min-h-screen bg-black text-white font-inter flex">
+    <div className="min-h-screen bg-black text-white font-inter flex flex-col lg:flex-row">
       {/* --- FONDO RADIAL GLOW --- */}
       <div className="fixed inset-0 z-0 pointer-events-none"
         style={{
@@ -41,11 +41,32 @@ export default function DashboardLayout() {
         }}
       />
 
+      {/* --- MOBILE HEADER --- */}
+      <header className="lg:hidden h-16 bg-black border-b border-[#1A1A1A] flex items-center justify-between px-6 sticky top-0 z-[60]">
+        <Link to="/" className="w-8 h-8 flex items-center justify-center">
+          <img src={logo} alt="OFFSZN" className="w-7 mix-blend-screen" />
+        </Link>
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="text-white text-3xl p-1"
+        >
+          {isSidebarOpen ? <BiX /> : <BiMenu />}
+        </button>
+      </header>
+
       {/* --- SIDEBAR --- */}
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      {/* --- BACKDROP (Mobile) --- */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 ml-[80px] p-10 relative z-10">
+      <main className="flex-1 p-6 md:p-10 relative z-10 lg:ml-[80px]">
         <Outlet />
       </main>
     </div>
@@ -53,55 +74,70 @@ export default function DashboardLayout() {
 }
 
 // --- SUB-COMPONENTE: SIDEBAR ---
-function Sidebar() {
+function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const isActive = (path) => location.pathname.startsWith(path);
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-[80px] bg-black border-r border-[#1A1A1A] z-50 flex flex-col items-center py-5 gap-2">
+    <aside className={`
+      fixed top-0 left-0 h-screen w-[280px] lg:w-[80px] bg-black border-r border-[#1A1A1A] z-50 
+      flex flex-col items-center py-5 gap-2 transition-transform duration-300 lg:translate-x-0
+      ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+    `}>
 
-      {/* LOGO */}
-      <Link to="/" className="w-11 h-11 flex items-center justify-center mb-2">
+      {/* LOGO (Desktop) */}
+      <Link to="/" className="hidden lg:flex w-11 h-11 items-center justify-center mb-2">
         <img src={logo} alt="OFFSZN" className="w-9 mix-blend-screen" />
       </Link>
 
+      {/* LOGO (Mobile Header inside sidebar if needed) */}
+      <div className="lg:hidden flex items-center gap-3 w-full px-6 mb-6">
+        <img src={logo} alt="OFFSZN" className="w-8 mix-blend-screen" />
+        <span className="font-bold text-lg tracking-tight">OFFSZN <span className="text-primary italic">HQ</span></span>
+      </div>
+
       {/* --- GRUPO 1: GESTIÓN --- */}
       <Divider />
-      <SidebarItem to="/dashboard" icon={<BiGridAlt />} label="Dashboard" active={location.pathname === '/dashboard' || location.pathname === '/dashboard/'} />
-      <SidebarItem to="/dashboard/my-products" icon={<BiDisc />} label="Mis Kits" active={isActive('/dashboard/my-products')} />
+      <SidebarItem to="/dashboard" icon={<BiGridAlt />} label="Dashboard" active={location.pathname === '/dashboard' || location.pathname === '/dashboard/'} onClick={onClose} />
+      <SidebarItem to="/dashboard/my-products" icon={<BiDisc />} label="Mis Kits" active={isActive('/dashboard/my-products')} onClick={onClose} />
 
       <SidebarItem
         to="/dashboard/upload"
         icon={<BiCloudUpload />}
         label="Subir"
         active={isActive('/dashboard/upload')}
-        onClick={() => useUploadStore.getState().resetForm()}
+        onClick={() => {
+          useUploadStore.getState().resetForm();
+          onClose();
+        }}
       />
 
       {/* --- GRUPO 2: NEGOCIO --- */}
       <Divider />
-<SidebarItem to="/dashboard/licenses" icon={<BiFile />} label="Licencias" active={isActive('/dashboard/licenses')} />
-      <SidebarItem to="/dashboard/coupons" icon={<BiPurchaseTag />} label="Cupones" active={isActive('/dashboard/coupons')} />
-      <SidebarItem to="/dashboard/collaborations" icon={<BiGroup />} label="Colaboraciones" active={isActive('/dashboard/collaborations')} />
-      <SidebarItem to="/dashboard/negotiations" icon={<BiDollar />} label="Negociar" active={isActive('/dashboard/negotiations')} />
+      <SidebarItem to="/dashboard/licenses" icon={<BiFile />} label="Licencias" active={isActive('/dashboard/licenses')} onClick={onClose} />
+      <SidebarItem to="/dashboard/coupons" icon={<BiPurchaseTag />} label="Cupones" active={isActive('/dashboard/coupons')} onClick={onClose} />
+      <SidebarItem to="/dashboard/collaborations" icon={<BiGroup />} label="Colaboraciones" active={isActive('/dashboard/collaborations')} onClick={onClose} />
+      <SidebarItem to="/dashboard/negotiations" icon={<BiDollar />} label="Negociar" active={isActive('/dashboard/negotiations')} onClick={onClose} />
 
       {/* --- GRUPO 3: ACADEMIA --- */}
       <Divider />
-      <SidebarItem to="#" icon={<BiBook />} label="Cursos (Próximamente)" active={false} />
-      <SidebarItem to="/dashboard/analytics" icon={<BiBarChartAlt2 />} label="Estadísticas" active={isActive('/dashboard/analytics')} />
+      <SidebarItem to="#" icon={<BiBook />} label="Cursos (Próximamente)" active={false} disabled />
+      <SidebarItem to="/dashboard/analytics" icon={<BiBarChartAlt2 />} label="Estadísticas" active={isActive('/dashboard/analytics')} onClick={onClose} />
 
       {/* --- GRUPO 4: SOCIAL --- */}
       <Divider />
-      <SidebarItem to="#" icon={<BiMoviePlay />} label="Reels (Próximamente)" active={false} />
+      <SidebarItem to="#" icon={<BiMoviePlay />} label="Reels (Próximamente)" active={false} disabled />
 
       {/* --- UPGRADE (ROCKET) --- */}
-      <div className="mt-auto">
+      <div className="mt-auto w-full px-4 lg:px-0 flex justify-center">
         <Link
           to="/dashboard/plans"
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-[#FFD700] bg-[rgba(255,215,0,0.1)] border border-[rgba(255,215,0,0.2)] hover:scale-105 hover:bg-[rgba(255,215,0,0.2)] hover:shadow-[0_0_15px_rgba(255,215,0,0.2)] transition-all duration-200 relative group"
+          onClick={onClose}
+          className="w-full lg:w-10 h-12 lg:h-10 rounded-xl flex items-center lg:justify-center px-4 lg:px-0 text-[#FFD700] bg-[rgba(255,215,0,0.1)] border border-[rgba(255,215,0,0.2)] hover:scale-105 hover:bg-[rgba(255,215,0,0.2)] hover:shadow-[0_0_15px_rgba(255,215,0,0.2)] transition-all duration-200 relative group gap-3"
         >
-          <BiRocket size={20} />
-          <span className="absolute left-[70px] bg-[#111] border border-[#333] text-white text-xs px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-50 font-medium">
+          <BiRocket size={20} className="shrink-0" />
+          <span className="lg:hidden text-xs font-bold uppercase tracking-widest">Mejorar Plan</span>
+          <span className="hidden lg:block absolute left-[70px] bg-[#111] border border-[#333] text-white text-xs px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-50 font-medium">
             Mejorar Plan
           </span>
         </Link>
@@ -110,22 +146,24 @@ function Sidebar() {
   );
 }
 
-function SidebarItem({ to, icon, label, active, onClick }) {
+function SidebarItem({ to, icon, label, active, onClick, disabled }) {
   return (
     <Link
-      to={to}
-      onClick={onClick}
+      to={disabled ? '#' : to}
+      onClick={disabled ? (e) => e.preventDefault() : onClick}
       className={`
-        w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-all duration-200 relative group
+        w-full lg:w-10 h-12 lg:h-10 rounded-xl flex items-center lg:justify-center px-6 lg:px-0 gap-4 transition-all duration-200 relative group
+        ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
         ${active
           ? 'bg-[#8B5CF6] text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]'
           : 'text-[#666] hover:text-white hover:bg-[rgba(255,255,255,0.05)]'
         }
       `}
     >
-      {icon}
+      <span className="text-xl lg:text-2xl shrink-0">{icon}</span>
+      <span className="lg:hidden text-sm font-medium">{label}</span>
 
-      <span className="absolute left-[70px] bg-[#111] border border-[#333] text-white text-xs px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-50 font-medium">
+      <span className="hidden lg:block absolute left-[70px] bg-[#111] border border-[#333] text-white text-xs px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-50 font-medium">
         {label}
       </span>
     </Link>
@@ -133,5 +171,7 @@ function SidebarItem({ to, icon, label, active, onClick }) {
 }
 
 function Divider() {
-  return <div className="w-10 border-b border-[#222] my-1.5 opacity-50"></div>;
+  return <div className="w-full lg:w-10 px-6 lg:px-0 my-1.5">
+    <div className="w-full border-b border-[#222] opacity-50"></div>
+  </div>;
 }

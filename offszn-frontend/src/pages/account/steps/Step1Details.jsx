@@ -53,7 +53,7 @@ export default function Step1Details() {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
 
             {/* --- CATEGORY SELECTOR (Solo para PRESET) --- */}
             {productType === 'preset' && (
@@ -67,7 +67,7 @@ export default function Step1Details() {
                                 <button
                                     key={cat.id}
                                     onClick={() => updateField('category', cat.id)}
-                                    className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all duration-300 group
+                                    className={`flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-6 rounded-2xl border-2 transition-all duration-300 group
                                     ${isActive
                                             ? 'bg-violet-500/10 border-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.2)]'
                                             : 'bg-[#111] border-white/5 text-gray-600 hover:border-white/10 hover:text-gray-400'}`}
@@ -83,7 +83,7 @@ export default function Step1Details() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] lg:grid-cols-[300px_1fr] gap-8 sm:gap-12">
 
                 {/* --- IZQUIERDA: PORTADA --- */}
                 <div className="space-y-4">

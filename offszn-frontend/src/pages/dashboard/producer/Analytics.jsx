@@ -37,35 +37,35 @@ export default function Analytics() {
         <div className="w-full max-w-[1500px] mx-auto space-y-12 pb-20 animate-in fade-in slide-in-from-bottom-8 duration-1000">
 
             {/* --- HERO HEADER --- */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 sm:gap-10">
                 <div>
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="group flex items-center gap-3 text-gray-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-[0.2em] mb-8 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:border-white/10"
+                        className="group flex items-center gap-3 text-gray-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 bg-white/5 px-4 py-2 rounded-full border border-white/5 hover:border-white/10"
                     >
                         <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
                         Panel Principal
                     </button>
-                    <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center gap-3 mb-4 sm:mb-6">
                         <div className="px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded-full">
                             <span className="text-[9px] font-black text-violet-500 uppercase tracking-widest">Inteligencia</span>
                         </div>
                         <div className="h-px w-8 bg-white/5"></div>
                     </div>
-                    <h1 className="text-6xl font-black uppercase tracking-tighter text-white leading-none">
+                    <h1 className="text-4xl sm:text-5xl lg:text-8xl font-black uppercase tracking-tighter text-white leading-none">
                         Analytics <span className="text-violet-500">Center</span>
                     </h1>
-                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] mt-4 flex items-center gap-2">
-                        <Target size={12} className="text-violet-500" /> Monitoreo de tracción, conversiones y revenue en tiempo real
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-[9px] sm:text-[10px] mt-3 sm:mt-4 flex items-center gap-2">
+                        <Target size={12} className="text-violet-500" /> Monitoreo en tiempo real
                     </p>
                 </div>
 
-                <div className="flex p-1.5 bg-[#0A0A0A] rounded-[24px] border border-white/5 backdrop-blur-xl shadow-inner">
+                <div className="flex p-1 bg-[#0A0A0A] rounded-[24px] border border-white/5 backdrop-blur-xl shadow-inner w-full sm:w-auto">
                     {PERIODS.map(p => (
                         <button
                             key={p.id}
                             onClick={() => setPeriod(p.id)}
-                            className={`px-8 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${period === p.id
+                            className={`flex-1 sm:flex-none px-4 sm:px-8 py-2.5 sm:py-3 rounded-[18px] text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${period === p.id
                                 ? 'bg-white text-black shadow-2xl scale-[1.02]'
                                 : 'text-gray-500 hover:text-white hover:bg-white/5'
                                 }`}
@@ -89,26 +89,26 @@ export default function Analytics() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
 
                 {/* --- CHART SECTION --- */}
-                <div className="xl:col-span-2 bg-[#0A0A0A] border border-white/5 p-10 rounded-[48px] relative overflow-hidden group shadow-2xl">
+                <div className="xl:col-span-2 bg-[#0A0A0A] border border-white/5 p-6 sm:p-10 rounded-[40px] sm:rounded-[48px] relative overflow-hidden group shadow-2xl">
                     <div className="absolute -top-10 -right-10 p-4 opacity-[0.02] group-hover:scale-125 transition-all duration-1000 rotate-12 pointer-events-none">
                         <TrendingUp size={240} />
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16 relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 mb-10 sm:mb-16 relative z-10">
                         <div>
-                            <h3 className="text-white font-black uppercase tracking-tighter text-2xl mb-2 flex items-center gap-3">
+                            <h3 className="text-white font-black uppercase tracking-tighter text-xl sm:text-2xl mb-2 flex items-center gap-3">
                                 <TrendingUp size={20} className="text-violet-500" /> Rendimiento
                             </h3>
-                            <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.2em]">Data histórica procesada por periodo seleccionado</p>
+                            <p className="text-[9px] sm:text-[10px] font-black text-gray-700 uppercase tracking-[0.2em]">Data histórica procesada</p>
                         </div>
-                        <div className="flex items-center gap-8 bg-black/40 px-6 py-3 rounded-2xl border border-white/5">
+                        <div className="flex items-center gap-4 sm:gap-8 bg-black/40 px-4 sm:px-6 py-3 rounded-2xl border border-white/5">
                             <LegendItem color="bg-violet-500" label="Visitas" />
                             <div className="w-px h-4 bg-white/5" />
                             <LegendItem color="bg-emerald-500" label="Ventas" />
                         </div>
                     </div>
 
-                    <div className="h-[480px] relative z-10">
+                    <div className="h-[350px] sm:h-[480px] relative z-10">
                         {loading ? (
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="flex flex-col items-center gap-4">
@@ -127,17 +127,17 @@ export default function Analytics() {
                 </div>
 
                 {/* --- TOP LEADERBOARD --- */}
-                <div className="bg-[#0A0A0A] border border-white/5 p-10 rounded-[48px] flex flex-col shadow-2xl relative overflow-hidden">
+                <div className="bg-[#0A0A0A] border border-white/5 p-6 sm:p-10 rounded-[40px] sm:rounded-[48px] flex flex-col shadow-2xl relative overflow-hidden">
                     <div className="absolute -bottom-10 -left-10 opacity-[0.02]">
                         <Trophy size={180} />
                     </div>
 
-                    <div className="flex items-center justify-between mb-12 relative z-10">
+                    <div className="flex items-center justify-between mb-10 sm:mb-12 relative z-10">
                         <div>
-                            <h3 className="text-white font-black uppercase tracking-tighter text-2xl mb-1 flex items-center gap-3">
+                            <h3 className="text-white font-black uppercase tracking-tighter text-xl sm:text-2xl mb-1 flex items-center gap-3">
                                 <Trophy size={20} className="text-amber-500" /> Top Activos
                             </h3>
-                            <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest">Ranking por revenue generado</p>
+                            <p className="text-[9px] font-black text-gray-700 uppercase tracking-widest">Ranking por revenue</p>
                         </div>
                     </div>
 
@@ -184,25 +184,25 @@ export default function Analytics() {
 
 function MetricCard({ label, value, icon: Icon, color, loading }) {
     return (
-        <div className="bg-[#0A0A0A] border border-white/5 p-10 rounded-[48px] group hover:bg-white/[0.02] hover:border-white/10 transition-all duration-700 relative overflow-hidden shadow-2xl">
+        <div className="bg-[#0A0A0A] border border-white/5 p-6 sm:p-10 rounded-[32px] sm:rounded-[48px] group hover:bg-white/[0.02] hover:border-white/10 transition-all duration-700 relative overflow-hidden shadow-2xl">
             <div className="absolute -top-6 -right-6 p-6 opacity-0 group-hover:opacity-[0.03] transition-all duration-1000 group-hover:scale-125 pointer-events-none">
                 <Icon size={120} />
             </div>
 
-            <div className="flex items-center justify-between mb-10">
-                <div className={`p-5 rounded-2xl bg-white/[0.03] border border-white/5 ${color} group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]`}>
+            <div className="flex items-center justify-between mb-8 sm:mb-10">
+                <div className={`p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-white/5 ${color} group-hover:scale-110 group-hover:rotate-12 transition-all duration-700 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]`}>
                     <Icon size={20} />
                 </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
                 <div className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-600">
                     {label}
                 </div>
                 {loading ? (
-                    <div className="h-10 w-24 bg-white/5 rounded-xl animate-pulse"></div>
+                    <div className="h-8 sm:h-10 w-24 bg-white/5 rounded-xl animate-pulse"></div>
                 ) : (
-                    <div className="text-4xl font-black tracking-tighter text-white leading-none">
+                    <div className="text-3xl sm:text-4xl font-black tracking-tighter text-white leading-none">
                         {value}
                     </div>
                 )}

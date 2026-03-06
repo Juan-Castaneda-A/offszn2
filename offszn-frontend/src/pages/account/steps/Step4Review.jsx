@@ -25,14 +25,14 @@ export default function Step4Review() {
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-16">
 
             {/* --- CONFIRMATION HERO --- */}
-            <div className="bg-emerald-500/[0.03] border border-emerald-500/20 rounded-[40px] p-8 flex items-center gap-6 shadow-2xl relative overflow-hidden group">
+            <div className="bg-emerald-500/[0.03] border border-emerald-500/20 rounded-[30px] sm:rounded-[40px] p-6 sm:p-8 flex items-center gap-4 sm:gap-6 shadow-2xl relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                <div className="relative z-10 p-4 bg-emerald-500/20 rounded-3xl text-emerald-400 shadow-2xl animate-bounce">
-                    <CheckCircle2 size={32} />
+                <div className="relative z-10 p-3 sm:p-4 bg-emerald-500/20 rounded-2xl sm:rounded-3xl text-emerald-400 shadow-2xl animate-bounce">
+                    <CheckCircle2 size={24} className="sm:size-[32px]" />
                 </div>
                 <div className="relative z-10">
-                    <h3 className="text-xl font-black text-white uppercase tracking-[0.2em] mb-1">{heroTitle}</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{heroDesc}</p>
+                    <h3 className="text-base sm:text-xl font-black text-white uppercase tracking-[0.2em] mb-1">{heroTitle}</h3>
+                    <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-widest">{heroDesc}</p>
                 </div>
             </div>
 
@@ -42,25 +42,25 @@ export default function Step4Review() {
                 <div className="space-y-6">
                     <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4 block">Marketplace Visuals</label>
 
-                    <div className="group relative bg-black rounded-[48px] overflow-hidden border border-white/5 transition-all duration-1000 hover:border-violet-500/40 shadow-3xl">
+                    <div className="group relative bg-black rounded-[32px] sm:rounded-[48px] overflow-hidden border border-white/5 transition-all duration-1000 hover:border-violet-500/40 shadow-3xl">
                         {/* Cover Image Engine */}
                         <div className="aspect-square relative overflow-hidden">
                             {coverImage?.preview ? (
                                 <img src={coverImage.preview} alt="Preview" crossOrigin="anonymous" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
                             ) : (
                                 <div className="w-full h-full bg-[#050505] flex items-center justify-center text-gray-900">
-                                    {isBeat ? <Music size={80} strokeWidth={1} /> : <Layers size={80} strokeWidth={1} />}
+                                    {isBeat ? <Music size={60} strokeWidth={1} className="sm:size-[80px]" /> : <Layers size={60} strokeWidth={1} className="sm:size-[80px]" />}
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 transition-opacity duration-1000 group-hover:opacity-70"></div>
 
                             {/* Dynamic Badges */}
-                            <div className="absolute bottom-6 left-6 flex items-center gap-3">
-                                <div className={`px-6 py-3 rounded-2xl text-[12px] font-black shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 group-hover:scale-110 ${isFree ? 'bg-emerald-500 text-black' : 'bg-white text-black'}`}>
+                            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 flex items-center gap-2 sm:gap-3">
+                                <div className={`px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] sm:text-[12px] font-black shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 group-hover:scale-110 ${isFree ? 'bg-emerald-500 text-black' : 'bg-white text-black'}`}>
                                     {isFree ? 'FREE DOWNLOAD' : `$${parseFloat(minPrice || 0).toFixed(2)}`}
                                 </div>
                                 {musicalKey && (
-                                    <div className="bg-black/80 backdrop-blur-2xl px-4 py-3 rounded-2xl text-[10px] font-black text-white border border-white/10 uppercase tracking-widest">
+                                    <div className="bg-black/80 backdrop-blur-2xl px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black text-white border border-white/10 uppercase tracking-widest">
                                         {musicalKey}
                                     </div>
                                 )}
@@ -68,7 +68,7 @@ export default function Step4Review() {
                         </div>
 
                         {/* Metadata Details */}
-                        <div className="p-8 space-y-4">
+                        <div className="p-6 sm:p-8 space-y-4">
                             <h3 className="text-2xl font-black text-white truncate tracking-tight uppercase leading-tight">{title || 'Untitled Prototype'}</h3>
                             <div className="flex items-center gap-4 text-[10px] font-black uppercase text-gray-600 tracking-[0.2em]">
                                 {bpm && <span className="flex items-center gap-2"><Zap size={12} className="text-violet-500" /> {bpm} BPM</span>}

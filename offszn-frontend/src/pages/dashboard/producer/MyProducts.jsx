@@ -90,16 +90,16 @@ export default function MyProducts() {
 
             {/* --- SELECTION BAR (TOP FLOATING) --- */}
             {selectedIds.size > 0 && (
-                <div className="fixed top-0 left-0 right-0 h-[64px] bg-[#0A0A0A] border-b border-[#222] z-[100] flex items-center justify-between px-6 animate-in slide-in-from-top duration-300">
-                    <div className="flex items-center gap-4">
+                <div className="fixed top-0 left-0 right-0 h-[64px] bg-[#111] border-b border-[#222] z-[100] flex items-center justify-between px-4 sm:px-6 animate-in slide-in-from-top duration-300">
+                    <div className="flex items-center gap-3 sm:gap-4">
                         <button
                             onClick={deselectAll}
-                            className="w-6 h-6 flex items-center justify-center bg-violet-500 text-white rounded cursor-pointer"
+                            className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-violet-500 text-white rounded cursor-pointer"
                         >
-                            <div className="w-3 h-0.5 bg-white rounded-full"></div>
+                            <div className="w-2.5 h-0.5 bg-white rounded-full"></div>
                         </button>
-                        <span className="text-white text-sm font-semibold transition-all">
-                            {selectedIds.size} seleccionados
+                        <span className="text-white text-xs sm:text-sm font-semibold transition-all">
+                            {selectedIds.size} <span className="hidden xs:inline">seleccionados</span><span className="xs:hidden">sel.</span>
                         </span>
                     </div>
 
@@ -144,13 +144,13 @@ export default function MyProducts() {
             )}
 
             {/* --- HEADER --- */}
-            <div className="flex flex-col md:flex-row justify-between items-baseline md:items-center gap-6 mb-8 mt-4">
-                <div className="flex items-baseline gap-3">
-                    <h1 className="text-[32px] font-bold text-white tracking-tight font-display">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 mt-4">
+                <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3">
+                    <h1 className="text-2xl sm:text-[32px] font-bold text-white tracking-tight font-display">
                         Mis Productos
                     </h1>
                     {user && (
-                        <span className="text-[18px] text-[#888] font-normal">
+                        <span className="text-sm sm:text-[18px] text-[#888] font-normal">
                             | @{user.email?.split('@')[0]}
                         </span>
                     )}

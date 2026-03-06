@@ -206,15 +206,15 @@ export default function Step2Files() {
 
 function HorizontalUploadSlot({ label, description, file, onChange, accept, icon }) {
     return (
-        <div className={`relative flex items-center h-[72px] bg-[#111] border rounded-2xl px-6 transition-all duration-300 group overflow-hidden
+        <div className={`relative flex items-center min-h-[72px] bg-[#111] border rounded-2xl px-4 sm:px-6 py-3 sm:py-0 transition-all duration-300 group overflow-hidden
             ${file ? 'border-violet-500/30' : 'border-white/5 hover:border-white/20'}`}>
 
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0
                 ${file ? 'bg-violet-600 text-white' : 'bg-white/5 text-gray-600 group-hover:text-white group-hover:bg-white/10'}`}>
                 {file ? <CheckCircle2 size={20} /> : icon}
             </div>
 
-            <div className="ml-6 flex-1 min-w-0">
+            <div className="ml-4 sm:ml-6 flex-1 min-w-0">
                 <div className="flex items-center gap-3">
                     <p className="text-[11px] font-bold text-white uppercase tracking-widest truncate">{file ? file.name : label}</p>
                     {file && <span className="text-[9px] text-gray-600 font-bold">{(file.size / (1024 * 1024)).toFixed(2)} MB</span>}

@@ -54,11 +54,11 @@ export default function TypeSelector() {
         <div className="relative w-full flex flex-col items-center justify-center font-sans selection:bg-violet-500/30 min-h-[calc(100vh-80px)]">
             <div className="relative z-10 w-full max-w-[800px]">
                 {/* Header */}
-                <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-forwards" style={{ animationDelay: '0.1s' }}>
-                    <h1 className="font-display text-5xl md:text-[48px] font-bold tracking-[-1.5px] mb-4 bg-gradient-to-br from-white to-[#e0e0e0] bg-clip-text text-transparent leading-tight">
+                <div className="text-center mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-forwards" style={{ animationDelay: '0.1s' }}>
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-[48px] font-bold tracking-[-1.5px] mb-3 sm:mb-4 bg-gradient-to-br from-white to-[#e0e0e0] bg-clip-text text-transparent leading-tight">
                         ¿Qué quieres subir hoy?
                     </h1>
-                    <p className="text-[#888] text-base">Selecciona el tipo de contenido para comenzar.</p>
+                    <p className="text-[#888] text-sm sm:text-base">Selecciona el tipo de contenido para comenzar.</p>
                 </div>
 
                 {/* Bento Grid */}
@@ -69,7 +69,7 @@ export default function TypeSelector() {
                             <button
                                 key={type.id}
                                 onClick={() => selectType(type.id)}
-                                className="group relative bg-[#111] border border-[#222] p-8 rounded-2xl text-center transition-all duration-300 hover:bg-[#141414] hover:-translate-y-1 flex flex-col items-center justify-center h-[240px] animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-forwards shadow-lg hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                                className="group relative bg-[#111] border border-[#222] p-6 sm:p-8 rounded-2xl text-center transition-all duration-300 hover:bg-[#141414] hover:-translate-y-1 flex flex-col items-center justify-center min-h-[180px] sm:h-[240px] animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-forwards shadow-lg hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                                 style={{
                                     animationDelay: type.animDelay
                                 }}

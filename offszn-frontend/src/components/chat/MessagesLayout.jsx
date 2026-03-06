@@ -8,7 +8,7 @@ import GroupCreationModal from './GroupCreationModal';
 
 export default function MessagesLayout() {
     const { user } = useAuth();
-    const { fetchConversations, setupRealtime, isNewChatModalOpen, isGroupModalOpen } = useChatStore();
+    const { fetchConversations, setupRealtime, isNewChatModalOpen, isGroupModalOpen, activeConvId } = useChatStore();
 
     useEffect(() => {
         if (user) {
@@ -21,7 +21,7 @@ export default function MessagesLayout() {
     return (
         <div id="messages-layout-root" className="flex flex-col flex-1 h-full w-full overflow-hidden relative" style={{ minHeight: 0 }}>
             {/* The chat interface */}
-            <div className="chat-wrapper">
+            <div className={`chat-wrapper ${activeConvId ? 'is-viewing-chat' : ''}`}>
                 <ChatSidebar />
                 <ChatArea />
             </div>
