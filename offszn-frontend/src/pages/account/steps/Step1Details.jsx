@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useUploadStore } from '../../../store/uploadStore';
-import { Tag as TagIcon, X, ImageIcon, Youtube, Info, Music2, Mic, Star, Sliders, Music } from 'lucide-react';
+import { Tag as TagIcon, X, ImageIcon, Youtube, Info, Music2, Mic, Star, Sliders, Music, Video, Zap } from 'lucide-react';
 import ImageCropper from '../../../components/ImageCropper';
+import VideoMiniEditor from '../../../components/VideoMiniEditor';
 
 export default function Step1Details() {
     const {
         title, description, tags, coverImage, productType, youtubeSync, category,
+        videoMode, videoFile, processedCover,
         updateField, addTag, removeTag
     } = useUploadStore();
 
@@ -18,6 +20,7 @@ export default function Step1Details() {
 
     const [tagInput, setTagInput] = useState('');
     const [showCropper, setShowCropper] = useState(false);
+    const [showVideoEditor, setShowVideoEditor] = useState(false);
     const [tempImage, setTempImage] = useState(null);
 
     const handleTagKeyDown = (e) => {
@@ -49,7 +52,22 @@ export default function Step1Details() {
             url: null,
             file: null
         });
+        updateField('processedCover', null); // Clear video processed cover if manually cropping
         setShowCropper(false);
+    };
+
+    const handleVideoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            updateField('videoFile', file);
+            setShowVideoEditor(true);
+        }
+    };
+
+    const onVideoEditorComplete = ({ file, preview }) => {
+        updateField('processedCover', { file, preview });
+        updateField('coverImage', { preview, url: null, file: null }); // Use preview for UI
+        setShowVideoEditor(false);
     };
 
     return (
@@ -97,28 +115,34 @@ export default function Step1Details() {
                                 <>
                                     <img src={coverImage.preview} alt="Cover" className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
-                                        <span className="text-[10px] font-bold text-white uppercase tracking-widest">Cambiar Portada</span>
+                                        <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                                            {videoMode ? 'Cambiar Video' : 'Cambiar Portada'}
+                                        </span>
                                     </div>
                                 </>
                             ) : (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600 group-hover:text-violet-500 transition-colors">
-                                    <ImageIcon size={40} strokeWidth={1.5} />
-                                    <p className="mt-4 text-[10px] font-bold uppercase tracking-widest">Subir Imagen</p>
-                                    <p className="mt-2 text-[9px] uppercase tracking-widest opacity-50">3000x3000px</p>
+                                    {videoMode ? <Video size={40} strokeWidth={1.5} /> : <ImageIcon size={40} strokeWidth={1.5} />}
+                                    <p className="mt-4 text-[10px] font-bold uppercase tracking-widest">
+                                        {videoMode ? 'Subir Video' : 'Subir Imagen'}
+                                    </p>
+                                    <p className="mt-2 text-[9px] uppercase tracking-widest opacity-50">
+                                        {videoMode ? 'MP4 / MOV' : '3000x3000px'}
+                                    </p>
                                 </div>
                             )}
                             <input
                                 type="file"
-                                accept="image/*"
+                                accept={videoMode ? "video/*" : "image/*"}
                                 className="absolute inset-0 opacity-0 cursor-pointer z-20"
-                                onChange={handleImageChange}
+                                onChange={videoMode ? handleVideoChange : handleImageChange}
                             />
                         </div>
                     </div>
 
                     {/* YouTube Sync Toggle (Solo para Beats) */}
                     {productType === 'beat' && (
-                        <div className="pt-6">
+                        <div className="pt-6 space-y-4">
                             <button
                                 onClick={() => updateField('youtubeSync', !youtubeSync)}
                                 className={`w-full p-4 rounded-2xl border transition-all flex items-center gap-4 group
@@ -137,6 +161,32 @@ export default function Step1Details() {
                                     </p>
                                 </div>
                             </button>
+
+                            {youtubeSync && (
+                                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                                    <div className="flex items-center justify-between px-1">
+                                        <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">Opciones de Video</label>
+                                    </div>
+                                    <button
+                                        onClick={() => updateField('videoMode', !videoMode)}
+                                        className={`w-full p-4 rounded-2xl border transition-all flex items-center gap-4 group
+                                            ${videoMode
+                                                ? 'bg-violet-500/5 border-violet-500/20 text-violet-500'
+                                                : 'bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/10'}`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+                                            ${videoMode ? 'bg-violet-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]' : 'bg-white/5 text-gray-500'}`}>
+                                            <Video size={18} />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest">Subir Video Propio</p>
+                                            <p className={`text-[9px] uppercase tracking-widest mt-0.5 ${videoMode ? 'text-violet-500/70' : 'text-gray-600'}`}>
+                                                {videoMode ? 'Activado (Editor Habilitado)' : 'Imagen + Audio (Visualizer)'}
+                                            </p>
+                                        </div>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -220,6 +270,14 @@ export default function Step1Details() {
                     image={tempImage}
                     onCrop={onCropComplete}
                     onCancel={() => setShowCropper(false)}
+                />
+            )}
+            {/* Video Editor Modal */}
+            {showVideoEditor && videoFile && (
+                <VideoMiniEditor
+                    videoFile={videoFile}
+                    onComplete={onVideoEditorComplete}
+                    onCancel={() => setShowVideoEditor(false)}
                 />
             )}
         </div>

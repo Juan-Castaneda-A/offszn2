@@ -33,6 +33,46 @@ export const loadFFmpeg = async (onProgress) => {
 };
 
 /**
+ * Extracts a single frame from a video at a specific time.
+ */
+export const extractFrame = async (videoBlob, timeInSeconds) => {
+    const ff = await loadFFmpeg();
+    await ff.writeFile('video.mp4', await fetchFile(videoBlob));
+
+    // Extract 1 frame at specific time
+    await ff.exec([
+        '-ss', timeInSeconds.toString(),
+        '-i', 'video.mp4',
+        '-vframes', '1',
+        '-q:v', '2',
+        'out.jpg'
+    ]);
+
+    const data = await ff.readFile('out.jpg');
+    return new Blob([data.buffer], { type: 'image/jpeg' });
+};
+
+/**
+ * Generates a short GIF from a video range.
+ */
+export const generateGIF = async (videoBlob, start, duration, onProgress) => {
+    const ff = await loadFFmpeg(onProgress);
+    await ff.writeFile('video.mp4', await fetchFile(videoBlob));
+
+    // Generate GIF (optimized for size/quality balance)
+    await ff.exec([
+        '-ss', start.toString(),
+        '-t', duration.toString(),
+        '-i', 'video.mp4',
+        '-vf', 'fps=10,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
+        'out.gif'
+    ]);
+
+    const data = await ff.readFile('out.gif');
+    return new Blob([data.buffer], { type: 'image/gif' });
+};
+
+/**
  * Renders a simple visualizer video (Still image + Audio).
  */
 export const generateVideo = async (coverBlob, audioBlob, onProgress) => {

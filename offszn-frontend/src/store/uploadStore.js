@@ -45,6 +45,13 @@ const initialFormState = {
     youtubeStatus: 'idle', // 'idle', 'rendering', 'uploading', 'success', 'error'
     youtubeProgress: 0,
     youtubeVideoId: null,
+
+    // Video Mode & Mini-Editor
+    videoFile: null,      // The original video file
+    videoMode: false,     // Whether the user is using a video instead of image/audio
+    coverType: 'image',   // 'image' or 'gif'
+    gifRange: [0, 3],     // [start, end] in seconds
+    processedCover: null, // { file: null, preview: null } - The result of the mini-editor
 };
 
 export const useUploadStore = create(

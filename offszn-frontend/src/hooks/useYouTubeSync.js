@@ -35,23 +35,35 @@ export const useYouTubeSync = () => {
                 token = await requestAuthToken();
             }
 
-            // 2. Render Video (Client Side - FFmpeg)
-            setYoutubeStatus('rendering');
-            setYoutubeProgress(5);
+            // Get fresh state AGAIN just in case something changed during auth
+            const currentState = useUploadStore.getState();
+            const { videoMode, videoFile } = currentState;
 
-            // Handle both File objects and DataURLs from the cropper
-            const coverBlob = coverImage.preview;
-            const audioBlob = files.mp3_tagged;
+            let finalVideoBlob;
 
-            if (!audioBlob) throw new Error('No audio file found for YouTube render.');
+            if (videoMode && videoFile) {
+                console.log('🎥 Video Mode active, using uploaded file directly.');
+                finalVideoBlob = videoFile;
+                setYoutubeProgress(50); // Fast skip since we don't render
+            } else {
+                // 2. Render Video (Client Side - FFmpeg)
+                setYoutubeStatus('rendering');
+                setYoutubeProgress(5);
 
-            const videoBlob = await generateVideo(
-                coverBlob,
-                audioBlob,
-                (progress) => setYoutubeProgress(10 + Math.round(progress * 0.6)) // 10% to 70%
-            );
+                // Handle both File objects and DataURLs from the cropper
+                const coverBlob = coverImage.preview;
+                const audioBlob = files.mp3_tagged;
 
-            console.log('✅ Video Rendered successfully');
+                if (!audioBlob) throw new Error('No audio file found for YouTube render.');
+
+                finalVideoBlob = await generateVideo(
+                    coverBlob,
+                    audioBlob,
+                    (progress) => setYoutubeProgress(10 + Math.round(progress * 0.6)) // 10% to 70%
+                );
+            }
+
+            console.log('✅ Video ready for upload');
 
             setYoutubeStatus('uploading');
             setYoutubeProgress(75);
@@ -65,7 +77,7 @@ export const useYouTubeSync = () => {
                 privacy: 'public'
             };
 
-            const ytResponse = await uploadToYouTube(videoBlob, youtubeMetadata, token);
+            const ytResponse = await uploadToYouTube(finalVideoBlob, youtubeMetadata, token);
             const videoId = ytResponse.id;
 
             console.log('✅ YouTube Upload Success! ID:', videoId);

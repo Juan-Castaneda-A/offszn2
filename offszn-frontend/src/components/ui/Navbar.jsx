@@ -256,8 +256,15 @@ const Navbar = () => {
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <UserLink to="/dashboard" icon={LayoutDashboard} label="Panel de Control" onClick={closeDropdowns} />
+                      <UserLink to="/dashboard/my-products" icon={Layers} label="Mis Kits" onClick={closeDropdowns} />
                       <UserLink to="/dashboard/upload" icon={UploadCloud} label="Subir Producto" onClick={closeDropdowns} />
+
+                      <div className="h-px bg-white/5 my-2 mx-3" />
+
+                      <UserLink to="/dashboard/my-purchases" icon={History} label="Mis Compras" onClick={closeDropdowns} />
+                      <UserLink to="/dashboard/favorites" icon={Heart} label="Favoritos" onClick={closeDropdowns} />
                       <UserLink to="/dashboard/settings" icon={Settings} label="Configuración" onClick={closeDropdowns} />
+
                       <button onClick={signOut} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors w-full text-left border-t border-white/5 mt-2 pt-2">
                         <LogOut className="w-4 h-4" /> Cerrar Sesión
                       </button>

@@ -27,6 +27,15 @@ export const useBeatUpload = () => {
     return new Blob([u8arr], { type: mime });
   };
 
+  const blobToDataURL = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   // --- MAIN FUNCTION ---
   const handleSaveProduct = async (fileObjects, formState, isDraft = false) => {
     if (isPublishing) return;
@@ -68,10 +77,21 @@ export const useBeatUpload = () => {
       // 2. File Uploads (Supabase Storage)
 
       // A) Cover Image (Cloudinary via Backend)
-      if (formState.coverImage?.preview) {
+      // Check if we have a processed cover from the video editor first, otherwise use the standard coverImage
+      let finalCoverDataURL = null;
+
+      if (formState.processedCover?.file) {
+        // If it's a Blob from the video editor, convert to DataURL
+        finalCoverDataURL = await blobToDataURL(formState.processedCover.file);
+      } else if (formState.coverImage?.preview) {
+        // If it's already a preview (likely DataURL from cropper), use it
+        finalCoverDataURL = formState.coverImage.preview;
+      }
+
+      if (finalCoverDataURL && finalCoverDataURL.startsWith('data:')) {
         setUploadProgress({ message: 'Subiendo portada...', progress: 20 });
         const { data: cloudRes } = await apiClient.post('/cloudinary/upload', {
-          image: formState.coverImage.preview,
+          image: finalCoverDataURL,
           folder: 'products'
         });
         productData.image_url = cloudRes.url;
