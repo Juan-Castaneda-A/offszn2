@@ -3,7 +3,54 @@ import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl as getPresignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3Client } from "../../storage/r2Client.js";
 
+
 const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || "offszn-storage";
+
+/**
+ * Maps frontend folder names to the official Cloudflare R2 structure.
+ */
+const getMappedPath = (folder) => {
+    const mapping = {
+        'mp3_tagged': 'beats/mp3/',
+        'wav_untagged': 'products/audio/',
+        'stems': 'secure-products/beats/',
+        'kits': 'secure-products/kits/',
+        'presets': 'secure-products/kits/',
+        'covers': 'products/covers/' // Added in case it's used later
+    };
+
+    return mapping[folder] || '';
+};
+
+/**
+ * Sanitizes a filename: fixes encoding, removes accents, special characters and replaces spaces.
+ */
+const sanitizeFilename = (filename) => {
+    if (!filename) return `file_${Date.now()}`;
+
+    // 1. Fix Multer UTF-8 encoding (Multer is known for using latin1)
+    let decodedName = filename;
+    try {
+        decodedName = Buffer.from(filename, 'latin1').toString('utf8');
+    } catch (e) {
+        console.warn("Could not decode filename from latin1, using original:", filename);
+    }
+
+    // 2. Remove accents/diacritics
+    const normalized = decodedName.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    // 3. Remove special characters (keep dots and hyphens) and replace spaces
+    const sanitized = normalized
+        .replace(/[^\w\s.-]/g, '')
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+
+    // 4. Add timestamp to avoid collisions
+    const ext = sanitized.includes('.') ? sanitized.split('.').pop() : '';
+    const nameWithoutExt = sanitized.includes('.') ? sanitized.substring(0, sanitized.lastIndexOf('.')) : sanitized;
+
+    return `${nameWithoutExt}_${Date.now()}${ext ? '.' + ext : ''}`;
+};
 
 export const getSignedUrl = async (req, res) => {
     try {
@@ -14,14 +61,11 @@ export const getSignedUrl = async (req, res) => {
         }
 
         // SANITIZATION: If the key comes as a full URL, strip the domain.
-        // Example: https://offszn-storage.../beats/file.mp3 -> beats/file.mp3
         if (key.startsWith('http')) {
             const r2Base = '.r2.cloudflarestorage.com/';
             if (key.includes(r2Base)) {
                 key = key.split(r2Base)[1];
             } else if (key.includes('/')) {
-                // Fallback for other structures (e.g. custom domain), though less likely with R2 default
-                // Try to assume everything after the 3rd slash is the path
                 const parts = key.split('/');
                 if (parts.length > 3) {
                     key = parts.slice(3).join('/');
@@ -34,15 +78,15 @@ export const getSignedUrl = async (req, res) => {
             key = key.substring(1);
         }
 
-        // Decode URI components in case the URL was encoded (e.g. spaces as %20)
+        // Decode URI components
         key = decodeURIComponent(key);
 
         const command = new GetObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME || "offszn-storage",
+            Bucket: R2_BUCKET_NAME,
             Key: key,
         });
 
-        // Sign for 1 hour (3600 seconds)
+        // Sign for 1 hour
         const url = await getPresignedUrl(s3Client, command, { expiresIn: 3600 });
 
         res.json({ downloadUrl: url });
@@ -59,9 +103,13 @@ export const uploadToR2 = async (req, res) => {
         }
 
         const { folder } = req.body;
-        const userId = req.user.userId;
-        const fileName = `${Date.now()}_${req.file.originalname.replace(/\s+/g, '_')}`;
-        const key = folder ? `${userId}/${folder}/${fileName}` : `${userId}/${fileName}`;
+        // userId is not used in the key anymore as per user preference
+
+        const mappedPrefix = getMappedPath(folder);
+        const fileName = sanitizeFilename(req.file.originalname);
+        const key = `${mappedPrefix}${fileName}`;
+
+        console.log(`[R2 Upload] Creating key: ${key} (Original: ${req.file.originalname})`);
 
         const command = new PutObjectCommand({
             Bucket: R2_BUCKET_NAME,
