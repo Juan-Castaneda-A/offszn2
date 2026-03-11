@@ -65,13 +65,34 @@ const ProductDetail = () => {
         const found = response.data;
 
         if (found) {
+          const defaultLicenses = {
+            basic: { name: 'Licencia Básica (MP3)', features: ['MP3 de Alta Calidad', '5,000 Streams', 'Sin Monetización'] },
+            premium: { name: 'Licencia Premium (WAV)', features: ['MP3 + WAV', '50,000 Streams', 'Monetización Limitada'] },
+            trackout: { name: 'Licencia Trackout', features: ['MP3 + WAV + Pistas Separadas', 'Streams Ilimitados', 'Monetización Completa'] },
+            unlimited: { name: 'Licencia Ilimitada', features: ['Licencia Comercial Ilimitada', 'Exclusividad de Radio', 'Todos los Archivos'] }
+          };
+
+          const userSettings = found.users?.license_settings || {};
+
+          const getFeatures = (key) => {
+            const set = userSettings[key];
+            if (!set) return defaultLicenses[key].features;
+
+            const fileStr = set.files?.stems ? 'MP3 + WAV + TRACKOUT' : (set.files?.wav ? 'MP3 + WAV' : 'MP3 Alta Calidad');
+            const streamStr = set.streams === 'UNLIMITED' ? 'Streams Ilimitados' : `${set.streams} Streams`;
+            const radioStr = set.radio === 'ILIMITADO' ? 'Radio/Ventas Ilimitadas' : (set.radio === 'No Permitido' ? 'Sin Monetización' : `Ventas: ${set.sales}`);
+
+            return [fileStr, streamStr, radioStr];
+          };
+
           setProduct({
             ...found,
             available_licenses: [
-              { id: 'basic', name: 'Basic Lease', price: found.price_basic, features: ['MP3 de Alta Calidad', '5,000 Streams', 'Sin Monetización'] },
-              { id: 'premium', name: 'Premium Lease', price: found.price_premium || (found.price_basic + 20), features: ['MP3 + WAV', '50,000 Streams', 'Monetización Limitada'] },
-              { id: 'unlimited', name: 'Unlimited Trackout', price: found.price_exclusive || (found.price_basic + 80), features: ['MP3 + WAV + TRACKOUTS', 'Streams Ilimitados', 'Monetización Ilimitada'] }
-            ].filter(l => l.price > 0 || found.is_free),
+              { id: 'basic', name: userSettings['basic']?.name || defaultLicenses.basic.name, price: found.price_basic, features: getFeatures('basic') },
+              { id: 'premium', name: userSettings['premium']?.name || defaultLicenses.premium.name, price: found.price_premium, features: getFeatures('premium') },
+              { id: 'trackout', name: userSettings['trackout']?.name || defaultLicenses.trackout.name, price: found.price_stems, features: getFeatures('trackout') },
+              { id: 'unlimited', name: userSettings['unlimited']?.name || defaultLicenses.unlimited.name, price: found.price_exclusive, features: getFeatures('unlimited') }
+            ].filter(l => (typeof l.price === 'number' && l.price > 0) || found.is_free),
             likes_count: (Number(found.likes_count || 0) === 0 && found.is_liked) ? 1 : Number(found.likes_count || 0)
           });
           setIsLiked(!!found.is_liked);

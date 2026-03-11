@@ -32,6 +32,8 @@ const initialFormState = {
     // Step 3: Pricing
     basePrice: '',
     promoPrice: '',
+    trackoutPrice: '',
+    unlimitedPrice: '',
     isFree: false,
     collaborators: [], // { id: string, nickname: string, email: string, split: number }
 

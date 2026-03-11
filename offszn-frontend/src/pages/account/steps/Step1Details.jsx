@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useUploadStore } from '../../../store/uploadStore';
-import { Tag as TagIcon, X, ImageIcon, Youtube, Info, Music2, Mic, Star, Sliders, Music, Video, Zap } from 'lucide-react';
+import { X, ImageIcon, Youtube, Info, Mic, Star, Sliders, Music, Video } from 'lucide-react';
 import ImageCropper from '../../../components/ImageCropper';
 import VideoMiniEditor from '../../../components/VideoMiniEditor';
 
 export default function Step1Details() {
     const {
         title, description, tags, coverImage, productType, youtubeSync, category,
-        videoMode, videoFile, processedCover,
+        videoMode, videoFile,
         updateField, addTag, removeTag
     } = useUploadStore();
 
@@ -52,7 +52,7 @@ export default function Step1Details() {
             url: null,
             file: null
         });
-        updateField('processedCover', null); // Clear video processed cover if manually cropping
+        updateField('processedCover', null);
         setShowCropper(false);
     };
 
@@ -66,17 +66,22 @@ export default function Step1Details() {
 
     const onVideoEditorComplete = ({ file, preview }) => {
         updateField('processedCover', { file, preview });
-        updateField('coverImage', { preview, url: null, file: null }); // Use preview for UI
+        updateField('coverImage', { preview, url: null, file: null });
         setShowVideoEditor(false);
     };
 
     return (
-        <div className="space-y-8 sm:space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="w-full">
+            {/* Title above step */}
+            <div className="flex items-center gap-2 mb-6">
+                <i className="bi bi-info-circle text-[20px] text-white"></i>
+                <h2 className="text-[20px] font-bold m-0 text-white">Detalles del Beat</h2>
+            </div>
 
             {/* --- CATEGORY SELECTOR (Solo para PRESET) --- */}
             {productType === 'preset' && (
-                <div className="space-y-6">
-                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1 block">Categoría del Preset</label>
+                <div className="mb-8">
+                    <label className="block text-sm font-medium text-[#888] mb-2">Categoría del Preset <span className="text-[#ef4444]">*</span></label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {PRESET_CATEGORIES.map((cat) => {
                             const Icon = cat.icon;
@@ -85,15 +90,13 @@ export default function Step1Details() {
                                 <button
                                     key={cat.id}
                                     onClick={() => updateField('category', cat.id)}
-                                    className={`flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-6 rounded-2xl border-2 transition-all duration-300 group
+                                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200
                                     ${isActive
-                                            ? 'bg-violet-500/10 border-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.2)]'
-                                            : 'bg-[#111] border-white/5 text-gray-600 hover:border-white/10 hover:text-gray-400'}`}
+                                            ? 'bg-violet-500/10 border-[#8b5cf6] text-white shadow-[0_0_15px_rgba(139,92,246,0.3)]'
+                                            : 'bg-[#111] border-[#222] text-[#888] hover:border-[#444] hover:bg-[#161616]'}`}
                                 >
-                                    <div className={`transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-violet-500' : ''}`}>
-                                        <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                                    </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{cat.label}</span>
+                                    <Icon size={24} className={isActive ? 'text-[#8b5cf6]' : ''} />
+                                    <span className="text-sm font-medium">{cat.label}</span>
                                 </button>
                             );
                         })}
@@ -101,90 +104,93 @@ export default function Step1Details() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] lg:grid-cols-[300px_1fr] gap-8 sm:gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] md:gap-8">
 
                 {/* --- IZQUIERDA: PORTADA --- */}
-                <div className="space-y-4">
-                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1 block">Portada del Item</label>
-                    <div className="relative aspect-square w-full">
+                <div className="mb-6 md:mb-0">
+                    <label className="block text-sm font-medium text-[#888] mb-2">Portada <span className="text-[#ef4444]">*</span></label>
+                    <div className="relative aspect-square w-full md:w-[200px] md:h-[200px]">
                         <div
-                            className={`relative w-full h-full rounded-2xl border-2 border-dashed transition-all duration-300 overflow-hidden cursor-pointer group
-                                ${coverImage?.preview ? 'border-transparent' : 'border-white/10 hover:border-violet-500/50 bg-white/[0.02]'}`}
+                            className={`relative w-full h-full rounded-xl transition-all duration-300 overflow-hidden cursor-pointer group flex items-center justify-center flex-col text-center border-2 border-dashed
+                                ${coverImage?.preview ? 'border-transparent bg-transparent' : 'border-[#333] hover:border-[#8b5cf6]/50 bg-white/[0.02]'}`}
                         >
                             {coverImage?.preview ? (
                                 <>
                                     <img src={coverImage.preview} alt="Cover" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
-                                        <span className="text-[10px] font-bold text-white uppercase tracking-widest">
-                                            {videoMode ? 'Cambiar Video' : 'Cambiar Portada'}
-                                        </span>
+                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <i className="bi bi-camera text-2xl text-white"></i>
                                     </div>
                                 </>
                             ) : (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-600 group-hover:text-violet-500 transition-colors">
-                                    {videoMode ? <Video size={40} strokeWidth={1.5} /> : <ImageIcon size={40} strokeWidth={1.5} />}
-                                    <p className="mt-4 text-[10px] font-bold uppercase tracking-widest">
-                                        {videoMode ? 'Subir Video' : 'Subir Imagen'}
-                                    </p>
-                                    <p className="mt-2 text-[9px] uppercase tracking-widest opacity-50">
-                                        {videoMode ? 'MP4 / MOV' : '3000x3000px'}
-                                    </p>
+                                <div className="p-4 flex flex-col items-center justify-center h-full">
+                                    <i className="bi bi-image text-3xl text-[#555] mb-2 group-hover:text-[#8b5cf6] transition-colors"></i>
+                                    <span className="text-[13px] text-[#888] font-medium leading-[1.3] group-hover:text-white transition-colors">Upload<br />Image</span>
+                                    <small className="text-[#555] text-[10px] mt-2">1:1 Square</small>
                                 </div>
                             )}
                             <input
                                 type="file"
-                                accept={videoMode ? "video/*" : "image/*"}
-                                className="absolute inset-0 opacity-0 cursor-pointer z-20"
-                                onChange={videoMode ? handleVideoChange : handleImageChange}
+                                accept="image/*"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                onChange={handleImageChange}
                             />
                         </div>
                     </div>
 
-                    {/* YouTube Sync Toggle (Solo para Beats) */}
-                    {productType === 'beat' && (
-                        <div className="pt-6 space-y-4">
-                            <button
-                                onClick={() => updateField('youtubeSync', !youtubeSync)}
-                                className={`w-full p-4 rounded-2xl border transition-all flex items-center gap-4 group
-                                    ${youtubeSync
-                                        ? 'bg-red-500/5 border-red-500/20 text-red-500'
-                                        : 'bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/10'}`}
-                            >
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
-                                    ${youtubeSync ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-white/5 text-gray-500'}`}>
-                                    <Youtube size={18} fill={youtubeSync ? "currentColor" : "none"} />
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest">Sync YouTube</p>
-                                    <p className={`text-[9px] uppercase tracking-widest mt-0.5 ${youtubeSync ? 'text-red-500/70' : 'text-gray-600'}`}>
-                                        {youtubeSync ? 'Activado' : 'Desactivado'}
-                                    </p>
-                                </div>
-                            </button>
+                    {/* YouTube Sync Options (If active) */}
+                    {productType === 'beat' && youtubeSync && (
+                        <div className="mt-6">
+                            <label className="block text-sm font-medium text-[#888] mb-2">YouTube Visualizer</label>
 
-                            {youtubeSync && (
-                                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-500">
-                                    <div className="flex items-center justify-between px-1">
-                                        <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-500">Opciones de Video</label>
+                            <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+                                {/* Option 1: Static Image + Audio */}
+                                <label className={`flex items-start gap-3 p-3 cursor-pointer transition-colors border-b border-[#222] ${!videoMode ? 'bg-[#1a1a1a]' : 'hover:bg-[#161616]'}`}>
+                                    <input
+                                        type="radio"
+                                        name="ytMode"
+                                        checked={!videoMode}
+                                        onChange={() => updateField('videoMode', false)}
+                                        className="mt-1 accent-[#8b5cf6]"
+                                    />
+                                    <div>
+                                        <span className={`block text-sm font-medium ${!videoMode ? 'text-white' : 'text-[#888]'}`}>Imagen + Audio</span>
+                                        <span className="block text-xs text-[#666] mt-0.5">Se genera un video 1080p c/ la portada</span>
                                     </div>
-                                    <button
-                                        onClick={() => updateField('videoMode', !videoMode)}
-                                        className={`w-full p-4 rounded-2xl border transition-all flex items-center gap-4 group
-                                            ${videoMode
-                                                ? 'bg-violet-500/5 border-violet-500/20 text-violet-500'
-                                                : 'bg-white/[0.02] border-white/5 text-gray-500 hover:border-white/10'}`}
-                                    >
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
-                                            ${videoMode ? 'bg-violet-600 text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]' : 'bg-white/5 text-gray-500'}`}>
-                                            <Video size={18} />
+                                </label>
+
+                                {/* Option 2: Custom Video */}
+                                <label className={`flex items-start gap-3 p-3 cursor-pointer transition-colors ${videoMode ? 'bg-[#1a1a1a]' : 'hover:bg-[#161616]'}`}>
+                                    <input
+                                        type="radio"
+                                        name="ytMode"
+                                        checked={videoMode}
+                                        onChange={() => updateField('videoMode', true)}
+                                        className="mt-1 accent-[#8b5cf6]"
+                                    />
+                                    <div>
+                                        <span className={`block text-sm font-medium ${videoMode ? 'text-white' : 'text-[#888]'}`}>Video Personalizado</span>
+                                        <span className="block text-xs text-[#666] mt-0.5">Sube un loop visual (MP4/MOV)</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {/* Custom Video Uploader */}
+                            {videoMode && (
+                                <div className="mt-3 relative w-full h-[60px]">
+                                    <div className="w-full h-full border border-dashed border-[#333] hover:border-[#8b5cf6]/50 rounded-lg bg-white/[0.02] flex items-center justify-center cursor-pointer transition-colors group">
+                                        <div className="flex items-center gap-2">
+                                            <i className="bi bi-film text-[#555] group-hover:text-[#8b5cf6] transition-colors"></i>
+                                            <span className="text-xs text-[#888] font-medium group-hover:text-white transition-colors">
+                                                {videoFile ? videoFile.name : 'Select Video File'}
+                                            </span>
                                         </div>
-                                        <div className="text-left">
-                                            <p className="text-[10px] font-bold uppercase tracking-widest">Subir Video Propio</p>
-                                            <p className={`text-[9px] uppercase tracking-widest mt-0.5 ${videoMode ? 'text-violet-500/70' : 'text-gray-600'}`}>
-                                                {videoMode ? 'Activado (Editor Habilitado)' : 'Imagen + Audio (Visualizer)'}
-                                            </p>
-                                        </div>
-                                    </button>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="video/*"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        onChange={handleVideoChange}
+                                    />
                                 </div>
                             )}
                         </div>
@@ -192,75 +198,67 @@ export default function Step1Details() {
                 </div>
 
                 {/* --- DERECHA: FORMULARIO --- */}
-                <div className="space-y-8">
+                <div className="flex-1">
 
                     {/* Título */}
-                    <div className="space-y-3">
-                        <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1 block">Título del Producto <span className="text-red-500">*</span></label>
+                    <div className="mb-6 relative">
+                        <label className="block text-sm font-medium text-[#888] mb-2">Nombre del Track <span className="text-[#ef4444]">*</span></label>
                         <input
                             type="text"
-                            placeholder="Ej: Lunar Echoes (Beat)"
+                            placeholder="Ej: Lunar Echoes"
                             value={title}
                             onChange={(e) => updateField('title', e.target.value)}
-                            className="w-full bg-[#111] border border-white/5 rounded-xl px-6 py-4 text-lg font-medium text-white placeholder-gray-700 focus:outline-none focus:border-violet-500 transition-all shadow-xl"
+                            className="w-full bg-[#111] border border-[#222] rounded-lg px-4 py-3 text-[15px] text-white placeholder-[#555] focus:outline-none focus:border-[#fff] focus:bg-[#1a1a1a] transition-all"
+                            maxLength="60"
                         />
-                    </div>
-
-                    {/* Descripción */}
-                    <div className="space-y-3 text-right">
-                        <div className="flex justify-between items-center px-1">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Descripción</label>
-                            <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">{description.length} / 1000</span>
-                        </div>
-                        <textarea
-                            placeholder="Cuéntanos más sobre este item..."
-                            rows={6}
-                            value={description}
-                            onChange={(e) => updateField('description', e.target.value)}
-                            className="w-full bg-[#111] border border-white/5 rounded-xl px-6 py-4 text-sm text-gray-300 placeholder-gray-700 focus:outline-none focus:border-violet-500 transition-all resize-none h-[140px] shadow-xl"
-                        />
+                        <span className="absolute right-0 top-0 text-[12px] text-[#666]">{title.length}/60</span>
                     </div>
 
                     {/* Etiquetas */}
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-center px-1">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Etiquetas (Tags)</label>
-                            <span className={`text-[9px] font-bold uppercase tracking-widest ${tags.length >= 8 ? 'text-red-500' : 'text-gray-600'}`}>
-                                {tags.length} / 8
-                            </span>
-                        </div>
+                    <div className="mb-6 relative">
+                        <label className="block text-sm font-medium text-[#888] mb-2">Etiquetas (3 mínimo) <span className="text-[#ef4444]">*</span></label>
+                        <span className={`absolute right-0 top-0 text-[12px] ${tags.length >= 8 ? 'text-[#ef4444]' : 'text-[#666]'}`}>
+                            {tags.length}/8
+                        </span>
 
-                        <div className="bg-[#111] border border-white/5 rounded-xl p-3 min-h-[56px] flex flex-wrap gap-2 focus-within:border-violet-500 transition-all shadow-xl">
+                        <div className={`w-full bg-[#111] border rounded-lg p-[8px_12px] min-h-[48px] flex flex-wrap gap-2 items-center transition-all ${tags.length >= 8 ? 'border-[#ef4444]/30 bg-[#ef4444]/5' : 'border-[#222] focus-within:border-[#fff] focus-within:bg-[#1a1a1a]'}`}>
                             {tags.map((tag) => (
-                                <div key={tag} className="flex items-center gap-2 bg-[#1a1a1a] border border-white/10 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg group">
-                                    {tag}
+                                <div key={tag} className="flex items-center gap-1.5 bg-[#222] border border-[#333] text-white text-[13px] font-medium px-2.5 py-1 rounded-md">
+                                    #{tag}
                                     <button
                                         onClick={() => removeTag(tag)}
-                                        className="text-gray-600 hover:text-red-500 transition-colors"
+                                        className="text-[#888] hover:text-[#ef4444] flex items-center justify-center p-0 bg-transparent border-none cursor-pointer"
                                     >
-                                        <X size={12} />
+                                        <X size={14} />
                                     </button>
                                 </div>
                             ))}
 
                             <input
                                 type="text"
-                                placeholder={tags.length < 8 ? "Añadir etiqueta..." : ""}
+                                placeholder={tags.length < 8 ? "Escribe y presiona Enter..." : ""}
                                 value={tagInput}
                                 onChange={(e) => setTagInput(e.target.value)}
                                 onKeyDown={handleTagKeyDown}
                                 disabled={tags.length >= 8}
-                                className="flex-1 bg-transparent border-none outline-none text-white text-sm font-medium px-2 min-w-[120px] disabled:opacity-0"
+                                className="flex-1 min-w-[120px] bg-transparent border-none outline-none text-[#fff] text-[15px] p-0 placeholder-[#555] disabled:opacity-0"
                             />
                         </div>
-
-                        <div className="flex items-center gap-2 px-1 opacity-50">
-                            <Info size={12} className="text-violet-500" />
-                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">
-                                Pulsa Enter o Coma para añadir una etiqueta.
-                            </p>
-                        </div>
                     </div>
+
+                    {/* Descripción */}
+                    <div className="mb-6 relative">
+                        <label className="block text-sm font-medium text-[#888] mb-2">Descripción (Opcional)</label>
+                        <span className="absolute right-0 top-0 text-[12px] text-[#666]">{description.length}/1000</span>
+                        <textarea
+                            placeholder="Cuéntanos más sobre este track..."
+                            rows={4}
+                            value={description}
+                            onChange={(e) => updateField('description', e.target.value)}
+                            className="w-full bg-[#111] border border-[#222] rounded-lg px-4 py-3 text-[15px] text-white placeholder-[#555] focus:outline-none focus:border-[#fff] focus:bg-[#1a1a1a] transition-all resize-none min-h-[120px] max-h-[120px] overflow-y-auto leading-[1.5]"
+                        />
+                    </div>
+
                 </div>
             </div>
 

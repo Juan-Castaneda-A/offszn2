@@ -98,7 +98,7 @@ export const getProductById = async (req, res) => {
             .select(`
                 *,
                 users!producer_id (
-                    id, nickname, avatar_url, is_verified
+                    id, nickname, avatar_url, is_verified, license_settings
                 )
             `);
 

@@ -46,6 +46,8 @@ export const useBeatUpload = () => {
       if (!user) throw new Error("Debes iniciar sesión para subir contenido.");
 
       // 1. Database Object Construction
+      const nameSlug = formState.title.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-').substring(0, 50);
+      const tempSlug = `${nameSlug}-${Math.random().toString(36).substring(2, 7)}`;
       const productData = {
         name: formState.title,
         description: formState.description || '',
@@ -57,9 +59,12 @@ export const useBeatUpload = () => {
         // Pricing
         price_basic: parseFloat(formState.basePrice) || 0,
         price_premium: parseFloat(formState.promoPrice) || 0,
+        price_stems: parseFloat(formState.trackoutPrice) || 0,
+        price_exclusive: parseFloat(formState.unlimitedPrice) || 0,
         is_free: formState.isFree || false,
 
         // Metadata & Status
+        public_slug: tempSlug,
         visibility: formState.visibility || 'public',
         status: isDraft ? 'draft' : 'approved',
         release_date: formState.date || new Date().toISOString(),

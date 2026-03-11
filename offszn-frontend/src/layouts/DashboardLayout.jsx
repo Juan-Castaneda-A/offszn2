@@ -22,6 +22,8 @@ import { useAuthStore } from '../store/authStore';
 export default function DashboardLayout() {
   const { user, profile, loading } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isUploadPage = location.pathname.startsWith('/dashboard/upload');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   React.useEffect(() => {
@@ -42,23 +44,27 @@ export default function DashboardLayout() {
       />
 
       {/* --- MOBILE HEADER --- */}
-      <header className="lg:hidden h-16 bg-black border-b border-[#1A1A1A] flex items-center justify-between px-6 sticky top-0 z-[60]">
-        <Link to="/" className="w-8 h-8 flex items-center justify-center">
-          <img src={logo} alt="OFFSZN" className="w-7 mix-blend-screen" />
-        </Link>
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="text-white text-3xl p-1"
-        >
-          {isSidebarOpen ? <BiX /> : <BiMenu />}
-        </button>
-      </header>
+      {!isUploadPage && (
+        <header className="lg:hidden h-16 bg-black border-b border-[#1A1A1A] flex items-center justify-between px-6 sticky top-0 z-[60]">
+          <Link to="/" className="w-8 h-8 flex items-center justify-center">
+            <img src={logo} alt="OFFSZN" className="w-7 mix-blend-screen" />
+          </Link>
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="text-white text-3xl p-1"
+          >
+            {isSidebarOpen ? <BiX /> : <BiMenu />}
+          </button>
+        </header>
+      )}
 
       {/* --- SIDEBAR --- */}
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      {!isUploadPage && (
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      )}
 
       {/* --- BACKDROP (Mobile) --- */}
-      {isSidebarOpen && (
+      {isSidebarOpen && !isUploadPage && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
@@ -66,7 +72,7 @@ export default function DashboardLayout() {
       )}
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 p-6 md:p-10 relative z-10 lg:ml-[80px]">
+      <main className={`flex-1 p-6 md:p-10 relative z-10 ${isUploadPage ? 'w-full' : 'lg:ml-[80px]'}`}>
         <Outlet />
       </main>
     </div>

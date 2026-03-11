@@ -1,243 +1,192 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useUploadStore } from '../../../store/uploadStore';
-import { CheckCircle2, HandCoins, Music, DollarSign, Tag, Info, AlertCircle, Calendar, Eye, Users, ShieldCheck, Zap, Globe, FileCheck, Layers, Youtube, Play } from 'lucide-react';
+import { Info, Check, X, ShieldCheck, FileText, FileAudio, Youtube, Users, AlertCircle, DollarSign } from 'lucide-react';
+import { useAuth } from '../../../store/authStore';
 
 export default function Step4Review() {
+    const { profile } = useAuth();
     const {
         title, description, tags, coverImage,
         files, bpm, musicalKey, visibility, date,
         basePrice, promoPrice, isFree, collaborators, productType,
-        youtubeSync, setYoutubeSync,
-        category
+        youtubeSync, category, setStep
     } = useUploadStore();
 
     const isBeat = productType === 'beat';
-    const isLoop = productType === 'loopkit';
-    const isKit = productType === 'drumkit' || productType === 'preset';
 
-    const minPrice = isFree ? 0 : (isBeat ? Math.min(parseFloat(basePrice) || 0, parseFloat(promoPrice) || Infinity) : (parseFloat(basePrice) || 0));
-
-    // ... (Confirm Hero content adjustments)
-    const heroTitle = isBeat ? "Beat Infrastructure Ready" : (isKit ? "Kit Distribution Ready" : "Sample Pipeline Ready");
-    const heroDesc = isBeat ? "Protocolo de validación completado. El beat está listo." : "Contenido empaquetado y listo para sincronizar con el marketplace.";
-
-    return (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-16">
-
-            {/* --- CONFIRMATION HERO --- */}
-            <div className="bg-emerald-500/[0.03] border border-emerald-500/20 rounded-[30px] sm:rounded-[40px] p-6 sm:p-8 flex items-center gap-4 sm:gap-6 shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                <div className="relative z-10 p-3 sm:p-4 bg-emerald-500/20 rounded-2xl sm:rounded-3xl text-emerald-400 shadow-2xl animate-bounce">
-                    <CheckCircle2 size={24} className="sm:size-[32px]" />
-                </div>
-                <div className="relative z-10">
-                    <h3 className="text-base sm:text-xl font-black text-white uppercase tracking-[0.2em] mb-1">{heroTitle}</h3>
-                    <p className="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-widest">{heroDesc}</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-16">
-
-                {/* --- RENDER PREVIEW (MARKETPLACE CARD) --- */}
-                <div className="space-y-6">
-                    <label className="text-[10px] font-black text-gray-700 uppercase tracking-[0.3em] ml-4 block">Marketplace Visuals</label>
-
-                    <div className="group relative bg-black rounded-[32px] sm:rounded-[48px] overflow-hidden border border-white/5 transition-all duration-1000 hover:border-violet-500/40 shadow-3xl">
-                        {/* Cover Image Engine */}
-                        <div className="aspect-square relative overflow-hidden">
-                            {coverImage?.preview ? (
-                                <img src={coverImage.preview} alt="Preview" crossOrigin="anonymous" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                            ) : (
-                                <div className="w-full h-full bg-[#050505] flex items-center justify-center text-gray-900">
-                                    {isBeat ? <Music size={60} strokeWidth={1} className="sm:size-[80px]" /> : <Layers size={60} strokeWidth={1} className="sm:size-[80px]" />}
-                                </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-90 transition-opacity duration-1000 group-hover:opacity-70"></div>
-
-                            {/* Dynamic Badges */}
-                            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 flex items-center gap-2 sm:gap-3">
-                                <div className={`px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] sm:text-[12px] font-black shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 group-hover:scale-110 ${isFree ? 'bg-emerald-500 text-black' : 'bg-white text-black'}`}>
-                                    {isFree ? 'FREE DOWNLOAD' : `$${parseFloat(minPrice || 0).toFixed(2)}`}
-                                </div>
-                                {musicalKey && (
-                                    <div className="bg-black/80 backdrop-blur-2xl px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black text-white border border-white/10 uppercase tracking-widest">
-                                        {musicalKey}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Metadata Details */}
-                        <div className="p-6 sm:p-8 space-y-4">
-                            <h3 className="text-2xl font-black text-white truncate tracking-tight uppercase leading-tight">{title || 'Untitled Prototype'}</h3>
-                            <div className="flex items-center gap-4 text-[10px] font-black uppercase text-gray-600 tracking-[0.2em]">
-                                {bpm && <span className="flex items-center gap-2"><Zap size={12} className="text-violet-500" /> {bpm} BPM</span>}
-                                {bpm && <span className="w-1 h-1 rounded-full bg-white/10"></span>}
-                                <span className="flex items-center gap-2 capitalize"><Globe size={12} /> {productType} {category && `• ${category}`} • {visibility}</span>
-                            </div>
-
-                            {/* Tags Array */}
-                            <div className="flex flex-wrap gap-2 pt-2">
-                                {tags.map(tag => (
-                                    <span key={tag} className="text-[9px] font-black uppercase tracking-widest bg-white/[0.02] text-gray-500 px-3 py-1.5 rounded-xl border border-white/5 group-hover:border-violet-500/20 group-hover:text-violet-400 transition-all">
-                                        #{tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
+    // Verification Items Builder
+    const renderVerificationItem = (label, value, isMissing = false, icon = null, stepIndex = 1) => {
+        if (isMissing) {
+            return (
+                <div onClick={() => setStep(stepIndex)} className="verification-item-missing cursor-pointer transition-transform hover:scale-[1.02]" style={{ padding: '10px 12px', borderRadius: '8px', margin: '4px 0', display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.4)', boxShadow: '0 0 10px rgba(239, 68, 68, 0.1)' }}>
+                    <div className="verification-item-icon" style={{ color: '#EF4444' }}>
+                        <X size={16} />
                     </div>
+                    <div className="verification-item-text" style={{ flex: 1, fontSize: '14px', color: '#EF4444' }}>{label}</div>
+                    <div className="verification-item-value" style={{ fontWeight: 600, color: '#EF4444', fontSize: '14px' }}>Falta</div>
                 </div>
+            );
+        }
 
-                {/* --- TECHNICAL BREAKDOWN --- */}
-                <div className="space-y-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <SummaryBlock
-                            icon={<FileCheck size={18} className="text-violet-500" />}
-                            title="Asset Pipeline"
-                            content={
-                                <div className="flex flex-wrap gap-3 mt-4">
-                                    {isBeat ? (
-                                        <>
-                                            <FileBadge label="Encoded MP3" exists={files.mp3_tagged} color="emerald" />
-                                            <FileBadge label="Lossless WAV" exists={files.wav_untagged} color="violet" />
-                                            <FileBadge label="Multitrack ZIP" exists={files.stems} color="blue" />
-                                        </>
-                                    ) : (
-                                        <FileBadge label="Main Product ZIP" exists={files.zip_file} color="violet" />
-                                    )}
-                                </div>
-                            }
-                        />
-                        <SummaryBlock
-                            icon={<HandCoins size={18} className="text-violet-500" />}
-                            title="Monetization"
-                            content={
-                                <div className="space-y-2 mt-4">
-                                    {isBeat ? (
-                                        <>
-                                            <PriceRow label="Studio License" price={basePrice} />
-                                            <PriceRow label="Commercial License" price={promoPrice} />
-                                        </>
-                                    ) : (
-                                        <PriceRow label="Product Price" price={basePrice} />
-                                    )}
-                                    {isFree && <div className="text-[9px] text-emerald-500 font-black uppercase tracking-widest mt-2 border-t border-emerald-500/10 pt-2 flex items-center gap-2"> <Zap size={10} /> Free Download Enabled</div>}
-                                </div>
-                            }
-                        />
-                        <SummaryBlock
-                            icon={<Users size={18} className="text-violet-500" />}
-                            title="Royalties Split"
-                            content={
-                                <div className="mt-4 space-y-3">
-                                    {collaborators.length > 0 ? collaborators.map(c => (
-                                        <div key={c.id} className="text-[10px] font-black text-gray-500 flex justify-between uppercase tracking-widest group/split">
-                                            <span className="flex items-center gap-2"><ShieldCheck size={10} className="text-emerald-500" /> {c.nickname}</span>
-                                            <span className="text-violet-500 group-hover:text-white transition-colors">{c.split}%</span>
-                                        </div>
-                                    )) : <p className="text-[10px] text-gray-800 uppercase font-black tracking-widest italic flex items-center gap-2"> <Info size={12} /> No additional authors detected </p>}
-                                </div>
-                            }
-                        />
-                        <SummaryBlock
-                            icon={<Calendar size={18} className="text-violet-500" />}
-                            title="Deployment"
-                            content={
-                                <div className="mt-4 flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <span className="uppercase text-gray-700 text-[10px] font-black tracking-widest block">Scheduled Date</span>
-                                        <span className="text-sm font-black text-white uppercase">{date || 'Immediate Pipeline'}</span>
-                                    </div>
-                                    <div className="w-10 h-10 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-gray-800">
-                                        <Layers size={20} />
-                                    </div>
-                                </div>
-                            }
-                        />
-                        <SummaryBlock
-                            icon={<Youtube size={18} className="text-red-500" />}
-                            title="YouTube Release"
-                            content={
-                                <div className="flex flex-col gap-4 mt-2">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Sincronizar Canal</span>
-                                        <button
-                                            onClick={() => setYoutubeSync(!youtubeSync)}
-                                            className={`w-12 h-6 rounded-full transition-all relative ${youtubeSync ? 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]' : 'bg-white/10'}`}
-                                        >
-                                            <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${youtubeSync ? 'left-7' : 'left-1'}`} />
-                                        </button>
-                                    </div>
-                                    {youtubeSync && (
-                                        <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl flex items-center gap-3 animate-in zoom-in duration-300">
-                                            <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
-                                                <Play size={14} className="text-red-500 fill-current" />
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] text-white font-black uppercase tracking-tight">Visualizer Automático</p>
-                                                <p className="text-[9px] text-gray-600 font-medium">Se generará un video 1080p con tu portada.</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            }
-                        />
-                    </div>
-
-                    {/* --- LEGAL DISCLAIMER --- */}
-                    <div className="p-8 bg-amber-500/[0.02] border border-amber-500/10 rounded-[40px] flex gap-6 shadow-2xl">
-                        <AlertCircle className="text-amber-500 shrink-0" size={24} />
-                        <div className="space-y-2">
-                            <p className="text-[11px] text-amber-500/80 font-black uppercase tracking-[0.1em]">Legal Protocol & Compliance</p>
-                            <p className="text-[10px] text-amber-200/30 leading-relaxed font-bold uppercase tracking-tight">
-                                Al ejecutar la publicación, certificas la propiedad intelectual total de este material. Cualquier infracción de copyright resultará en la suspensión inmediata de la cuenta y la incautación de fondos asociados.
-                            </p>
-                        </div>
-                    </div>
+        return (
+            <div onClick={() => setStep(stepIndex)} className="verification-item cursor-pointer transition-transform hover:scale-[1.02]" style={{
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', marginBottom: '12px',
+                background: value === 'OK' || value === 'Activado' ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                borderRadius: '8px',
+                border: value === 'OK' || value === 'Activado' ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(255, 255, 255, 0.05)',
+                boxShadow: value === 'OK' || value === 'Activado' ? '0 0 10px rgba(16, 185, 129, 0.1)' : 'none'
+            }}>
+                <div className="verification-item-icon" style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                    {icon || (value === 'OK' || value === 'Activado' ? <Check size={16} color="#10b981" /> : <Check size={16} color="#00ff88" />)}
+                </div>
+                <div className="verification-item-text" style={{ flex: 1, fontSize: '14px', color: '#ddd' }}>{label}</div>
+                <div className="verification-item-value" style={{ fontWeight: 600, color: value === 'OK' || value === 'Activado' ? '#10b981' : '#fff', fontSize: '15px' }}>
+                    {value}
                 </div>
             </div>
-        </div>
-    );
-}
-
-function SummaryBlock({ icon, title, content }) {
-    return (
-        <div className="space-y-4">
-            <div className="flex items-center gap-3 text-gray-700 uppercase">
-                <div className="p-2 bg-white/[0.02] rounded-xl border border-white/5">
-                    {icon}
-                </div>
-                <span className="text-[10px] font-black tracking-[0.3em]">{title}</span>
-            </div>
-            <div className="bg-black border border-white/5 rounded-[32px] p-6 min-h-[100px] shadow-inner group">
-                {content}
-            </div>
-        </div>
-    );
-}
-
-function FileBadge({ label, exists, color }) {
-    if (!exists) return <span className="text-[9px] bg-white/[0.02] text-gray-900 border border-white/5 px-4 py-2 rounded-xl font-black uppercase tracking-widest">{label}</span>;
-
-    const colors = {
-        emerald: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-        violet: 'bg-violet-500/10 text-violet-500 border-violet-500/20',
-        blue: 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+        );
     };
 
     return (
-        <span className={`text-[9px] px-4 py-2 rounded-xl font-black uppercase tracking-widest border shadow-2xl flex items-center gap-2 ${colors[color]}`}>
-            <div className="w-1 h-1 rounded-full bg-current animate-pulse"></div>
-            {label}
-        </span>
-    );
-}
+        <div className="form-step active animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h3 className="section-title text-[20px] font-bold mb-6 flex items-center gap-2.5">
+                Vista Previa del Beat
+            </h3>
 
-function PriceRow({ label, price }) {
-    return (
-        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest group/row">
-            <span className="text-gray-700 group-hover:text-gray-400 transition-colors">{label}</span>
-            <span className="text-white bg-white/5 px-3 py-1 rounded-lg border border-white/5 transition-all group-hover:scale-110">${parseFloat(price || 0).toFixed(2)}</span>
+            <div className="preview-layout grid gap-8 max-w-[1200px]" style={{ gridTemplateColumns: 'minmax(300px, 400px) 1fr' }}>
+
+                {/* --- MARKETPLACE CARD PREVIEW --- */}
+                <div className="marketplace-card-preview relative self-start">
+                    <h4 className="mb-4 text-[14px] text-[#888]">Cómo se verá en el marketplace</h4>
+
+                    <div className="drumkit-card bg-[#141414]/80 rounded-xl overflow-hidden border border-white/5 backdrop-blur-md transition-all duration-300">
+                        <div className="card-cover w-full aspect-square bg-[#0a0a0a] flex items-center justify-center overflow-hidden relative">
+                            {coverImage?.preview ? (
+                                <>
+                                    <img src={coverImage.preview} alt="Cover" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-80 pointer-events-none"></div>
+                                </>
+                            ) : (
+                                <span className="text-[#666] text-sm font-medium">Sin portada</span>
+                            )}
+
+                            {/* Card Badges Over Cover */}
+                            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                                <div>
+                                    {isFree ? (
+                                        <div className="card-price text-[#00ff88] text-lg font-bold drop-shadow-md">FREE</div>
+                                    ) : (
+                                        <div className="card-price text-white text-lg font-bold drop-shadow-md">
+                                            {promoPrice && promoPrice < basePrice ? (
+                                                <>
+                                                    <span className="old-price line-through text-white/50 text-[13px] mr-2 font-medium">${basePrice}</span>
+                                                    ${promoPrice}
+                                                </>
+                                            ) : (
+                                                <>${basePrice || '0.00'}</>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                <button className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white cursor-pointer hover:bg-white/20 hover:scale-105 transition-all shadow-lg">
+                                    <i className="bi bi-play-fill text-xl ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="card-content p-4 bg-[#0a0a0a]/60">
+                            <h3 className="text-base font-semibold mb-2 leading-tight line-clamp-2 break-words text-white/90">
+                                {title || 'Sin título'}
+                            </h3>
+
+                            <div className="card-tags flex flex-wrap gap-1.5 mb-3 min-h-[24px]">
+                                {tags.slice(0, 3).map(tag => (
+                                    <span key={tag} className="bg-white/5 px-2 py-1 rounded text-[10px] font-medium uppercase tracking-[0.5px] text-white/60 border border-white/10">
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <div className="card-producer text-[13px] text-[#888] flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-full bg-[#222] inline-block"></span>
+                                Tú (Productor)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* --- VERIFICATION PANEL --- */}
+                <div className="verification-panel bg-[#141414] rounded-xl p-6 border border-[#2a2a2a]">
+                    <h4 className="mb-6 text-[18px] font-bold text-white">Verificar Información</h4>
+
+                    {/* section: Files */}
+                    <div className="verification-section mb-6 pb-6 border-b border-white/5">
+                        <div className="verification-label text-[11px] font-bold text-[#888] mb-3 uppercase tracking-widest">Archivos</div>
+                        <div className="verification-items">
+                            {isBeat ? (
+                                <>
+                                    {renderVerificationItem('Audio Principal (MP3)', files?.mp3_tagged ? 'OK' : null, !files?.mp3_tagged, <FileAudio size={16} color={files?.mp3_tagged ? "#10b981" : "#EF4444"} />, 2)}
+                                    {renderVerificationItem('Audio WAV (Sin Tags)', files?.wav_untagged ? 'OK' : null, !files?.wav_untagged, <FileAudio size={16} color={files?.wav_untagged ? "#10b981" : "#EF4444"} />, 2)}
+                                    {files?.stems && renderVerificationItem('Stems / Trackouts', 'Trackouts listos', false, <FileText size={16} color="#10b981" />, 2)}
+                                </>
+                            ) : (
+                                renderVerificationItem('Archivo Principal (ZIP)', files?.zip_file ? 'OK' : null, !files?.zip_file, <FileText size={16} color={files?.zip_file ? "#10b981" : "#EF4444"} />, 2)
+                            )}
+                            {renderVerificationItem('Portada Analizada', coverImage ? 'OK' : null, !coverImage, null, 1)}
+                        </div>
+                    </div>
+
+                    {/* section: Details */}
+                    <div className="verification-section mb-6 pb-6 border-b border-white/5">
+                        <div className="verification-label text-[11px] font-bold text-[#888] mb-3 uppercase tracking-widest">Detalles</div>
+                        <div className="verification-items">
+                            {renderVerificationItem('Título validado', title ? title : null, !title, null, 1)}
+                            {isBeat && renderVerificationItem('Datos Musicales', (bpm && musicalKey) ? `${bpm} BPM • ${musicalKey}` : null, !(bpm && musicalKey), null, 2)}
+                            {renderVerificationItem('Visibilidad & Fecha', `${visibility === 'public' ? 'Público' : 'Privado'} - ${date || 'Inmediato'}`, false, null, 1)}
+                            {renderVerificationItem('Precio de Venta', basePrice ? `$${basePrice}` : 'Free Download', (!basePrice && !isFree), <DollarSign size={16} color={basePrice || isFree ? "#10b981" : "#EF4444"} />, 3)}
+                            {youtubeSync && (
+                                <div onClick={() => setStep(0)} className="verification-item cursor-pointer transition-transform hover:scale-[1.02]" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', marginBottom: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.4)', boxShadow: '0 0 10px rgba(239, 68, 68, 0.1)' }}>
+                                    <div className="verification-item-icon" style={{ color: '#ef4444' }}><Youtube size={16} /></div>
+                                    <div className="verification-item-text" style={{ flex: 1, fontSize: '14px', color: '#ffeaeb' }}>Sincronización YouTube</div>
+                                    <div className="verification-item-value" style={{ fontWeight: 600, color: '#ef4444', fontSize: '14px' }}>Activado</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* section: Collabs */}
+                    <div className="verification-section mb-6 pb-6 border-b border-white/5">
+                        <div className="verification-label text-[11px] font-bold text-[#888] mb-3 uppercase tracking-widest">Colaboradores</div>
+                        <div className="verification-items">
+                            {/* Uploader */}
+                            <div onClick={() => setStep(3)} className="verification-item cursor-pointer transition-transform hover:scale-[1.02]" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', marginBottom: '12px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '8px', border: '1px solid rgba(139, 92, 246, 0.4)', boxShadow: '0 0 10px rgba(139, 92, 246, 0.1)' }}>
+                                <div className="verification-item-icon" style={{ color: '#8b5cf6' }}><Users size={16} /></div>
+                                <div className="verification-item-text" style={{ flex: 1, fontSize: '14px', color: '#e0f2fe' }}>Split de Royalties</div>
+                                <div className="verification-item-value" style={{ fontWeight: 600, color: '#8b5cf6', fontSize: '14px' }}>{Math.max(0, 100 - collaborators.reduce((acc, c) => acc + Number(c.split || 0), 0))}% para {profile?.nickname || 'Tú (Productor)'}</div>
+                            </div>
+                            {/* Rest of Collborators */}
+                            {collaborators.map((c, idx) => (
+                                <div key={idx} onClick={() => setStep(3)} className="verification-item cursor-pointer transition-transform hover:scale-[1.02]" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px', marginBottom: '12px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.4)', boxShadow: '0 0 10px rgba(59, 130, 246, 0.1)' }}>
+                                    <div className="verification-item-icon" style={{ color: '#3b82f6' }}><Users size={16} /></div>
+                                    <div className="verification-item-text" style={{ flex: 1, fontSize: '14px', color: '#e0f2fe' }}>Split de Royalties</div>
+                                    <div className="verification-item-value" style={{ fontWeight: 600, color: '#3b82f6', fontSize: '14px' }}>{c.split}% para {c.nickname}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Promotion hint */}
+                    <div className="mt-5 text-center p-4 rounded-lg bg-white/[0.03] border border-white/10 flex flex-col items-center justify-center">
+                        <span className="text-[13px] text-[#aaa] flex items-center gap-2">
+                            <AlertCircle size={14} className="text-[#8b5cf6]" /> ¿Quieres agregar una promoción (Ej: 2x1) a tus Beats?
+                        </span>
+                        <a href="/cuenta/preferencias" target="_blank" className="mt-2 text-[#fff] text-[13px] font-semibold underline underline-offset-4 hover:text-[#ccc] transition-colors">
+                            Ver Ofertas Activas
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
+

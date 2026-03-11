@@ -182,7 +182,7 @@ const Explore = () => {
                   {currentHero.name}
                 </h1>
                 <p className="text-zinc-400 mb-8 max-w-md text-lg md:text-xl font-semibold leading-relaxed">
-                  De <span className="text-white">@{currentHero.producer_nickname || 'OFFSZN'}</span>.
+                  De <span className="text-white">@{currentHero.producer_nickname || currentHero.users?.nickname || 'OFFSZN'}</span>.
                   Potencia tus producciones con este sonido legendario.
                 </p>
                 <div className="flex flex-wrap gap-3 sm:gap-5 mb-8">
@@ -325,7 +325,7 @@ const ListView = ({ title, subtitle, items, onPlay, currentTrack, isPlaying }) =
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-base font-black text-white truncate uppercase tracking-tight group-hover:text-violet-400 transition-colors">{item.name}</h4>
-              <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wide">@{item.producer_nickname || 'OFFSZN'}</p>
+              <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-wide">@{item.producer_nickname || item.users?.nickname || 'OFFSZN'}</p>
             </div>
 
             {/* Fake Waveform for Aesthetic */}

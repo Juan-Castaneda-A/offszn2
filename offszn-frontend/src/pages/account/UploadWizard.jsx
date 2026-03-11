@@ -6,8 +6,8 @@ import { useBeatUpload } from '../../hooks/useBeatUpload';
 import apiClient from '../../api/client';
 import { useYouTubeSync } from '../../hooks/useYouTubeSync';
 import { initGoogleAuth, requestAuthToken } from '../../utils/YouTubeUploader';
-import { PublishOverlay, ExitConfirmModal, FirstTimeModal } from '../../components/UploadModals';
-import { X, ChevronRight, ChevronLeft, UploadCloud, Save, Sparkles, Youtube, Zap, Shield, HelpCircle, Play, Pause, Music } from 'lucide-react';
+import { PublishOverlay } from '../../components/UploadModals';
+import { X, Save } from 'lucide-react';
 import WaveSurfer from 'wavesurfer.js';
 
 // New specialized steps
@@ -43,13 +43,13 @@ export default function UploadWizard() {
 
     wavesurferRef.current = WaveSurfer.create({
       container: waveformRef.current,
-      waveColor: 'rgba(255, 255, 255, 0.1)',
+      waveColor: 'rgba(255, 255, 255, 0.2)',
       progressColor: '#8b5cf6',
       cursorColor: 'transparent',
       barWidth: 2,
       barGap: 3,
       responsive: true,
-      height: 32,
+      height: 30,
       barRadius: 2,
     });
 
@@ -70,10 +70,16 @@ export default function UploadWizard() {
   }, []);
 
   useEffect(() => {
-    if (wavesurferRef.current && previewFile && previewFile instanceof File) {
-      const url = URL.createObjectURL(previewFile);
-      wavesurferRef.current.load(url);
-      return () => URL.revokeObjectURL(url);
+    if (wavesurferRef.current) {
+      if (previewFile && (previewFile instanceof File || previewFile instanceof Blob)) {
+        const url = URL.createObjectURL(previewFile);
+        wavesurferRef.current.load(url).catch(e => {
+          if (e?.name !== 'AbortError') console.error('Wavesurfer load error:', e);
+        });
+      } else {
+        wavesurferRef.current.empty();
+        setIsPlaying(false);
+      }
     }
   }, [previewFile]);
 
@@ -182,7 +188,7 @@ export default function UploadWizard() {
   const steps = [
     { id: 1, label: 'Detalles', component: <Step1Details /> },
     { id: 2, label: 'Archivos', component: <Step2Files /> },
-    { id: 3, label: 'Precios', component: <Step3Pricing /> },
+    { id: 3, label: 'Distribución', component: <Step3Pricing /> },
     { id: 4, label: 'Revisión', component: <Step4Review /> },
   ];
 
@@ -192,168 +198,127 @@ export default function UploadWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-violet-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white font-sans overflow-x-hidden selection:bg-violet-500/30 flex flex-col">
 
-      {/* --- PREMIUM HEADER --- */}
-      <header className="fixed top-0 left-0 right-0 z-[100] bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 py-4 flex justify-between items-center shadow-2xl h-[64px] sm:h-[72px]">
-        <div className="flex items-center gap-3 sm:gap-5">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="p-2 sm:p-2.5 rounded-xl hover:bg-white/5 text-gray-500 hover:text-white transition-all border border-transparent hover:border-white/10 group"
-          >
-            <X size={18} className="group-hover:rotate-90 transition-transform duration-500" />
-          </button>
-
-          <div className="h-6 sm:h-8 w-px bg-white/10"></div>
-
-          <div className="flex flex-col">
-            <h1 className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.2em] text-white">
-              STUDIO <span className="text-violet-500 hidden xs:inline">PIPELINE</span>
-            </h1>
-            <p className="text-[8px] sm:text-[10px] text-gray-500 uppercase tracking-widest font-medium">
-              {productType === 'beat' ? 'Instrumental' : 'Producto'}
-            </p>
-          </div>
-        </div>
-
+      {/* --- HEADER MATCHING LEGACY HTML --- */}
+      <header className="px-10 py-5 border-b border-[#2a2a2a] flex items-center justify-between bg-black/80 backdrop-blur-md sticky top-0 z-[100]">
+        <div className="text-2xl font-extrabold tracking-tight">Studio Pipeline</div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => handlePublish(true)}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-all"
+            className="bg-transparent border border-[#333] text-white px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all hover:bg-white/5"
           >
-            <Save size={14} />
-            Borrador
+            Guardar Borrador
           </button>
-
-          <div className="h-8 w-px bg-white/10 hidden sm:block"></div>
-
-          <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-full">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-[9px] font-bold text-emerald-500/80 uppercase tracking-widest">Live Auto-Save</span>
-          </div>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-10 h-10 border border-[#333] rounded-full flex items-center justify-center text-white bg-transparent cursor-pointer transition-all hover:bg-white/5"
+          >
+            <X size={18} />
+          </button>
         </div>
       </header>
 
-      <main className="max-w-[1000px] mx-auto pt-[120px] pb-[140px] px-6 min-h-screen">
+      <main className="flex-1 w-full max-w-[1000px] mx-auto pt-10 px-5 pb-[140px]">
 
         {/* --- LEGACY STEP INDICATOR --- */}
-        <div className="relative flex justify-between items-center mb-10 sm:mb-16 max-w-2xl mx-auto px-2 sm:px-4">
+        <div className="flex justify-center mb-12 relative w-full px-5">
           {/* Background Line */}
-          <div className="absolute top-1/2 left-5 right-5 h-[2px] bg-white/5 -translate-y-1/2 z-0"></div>
+          <div className="absolute top-1/2 left-5 w-[calc(100%-40px)] h-[2px] bg-[#222] -translate-y-1/2 z-0"></div>
 
           {/* Progress Line */}
           <div
-            className="absolute top-1/2 left-5 h-[2px] bg-gradient-to-r from-violet-600 to-indigo-500 -translate-y-1/2 z-0 transition-all duration-700 shadow-[0_0_15px_rgba(139,92,246,0.5)]"
-            style={{ width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 10px)` }}
+            className="absolute top-1/2 left-5 h-[3px] bg-gradient-to-r from-[#8b5cf6] to-[#a78bfa] -translate-y-1/2 z-10 transition-all duration-500 shadow-[0_0_12px_rgba(139,92,246,0.6)]"
+            style={{ width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - ${currentStep === 1 ? '0px' : '40px'})` }}
           ></div>
 
-          {steps.map((s) => (
-            <div
-              key={s.id}
-              className="relative z-10 flex flex-col items-center group cursor-pointer"
-              onClick={() => {
-                if (s.id < currentStep) useUploadStore.setState({ currentStep: s.id });
-              }}
-            >
+          {/* Step Nodes */}
+          {steps.map((s, index) => {
+            const isActive = currentStep === s.id;
+            const isCompleted = currentStep > s.id;
+
+            return (
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 border-2
-                  ${currentStep === s.id
-                    ? 'bg-violet-600 border-violet-600 text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] scale-110'
-                    : currentStep > s.id
-                      ? 'bg-violet-600 border-violet-600 text-white'
-                      : 'bg-black border-white/10 text-gray-600 group-hover:border-white/30'}`}
+                key={s.id}
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold relative z-20 mx-10 transition-all duration-300 cursor-pointer
+                  ${isActive || isCompleted
+                    ? 'bg-[#8b5cf6] border-[#8b5cf6] text-white shadow-[0_4px_16px_rgba(139,92,246,0.5)]'
+                    : 'bg-black border-2 border-[#222] text-[#888]'}`}
+                onClick={() => {
+                  if (s.id < currentStep) useUploadStore.setState({ currentStep: s.id });
+                }}
               >
-                {currentStep > s.id ? <Zap size={14} fill="currentColor" /> : s.id}
+                {/* Check or Number */}
+                {isCompleted ? <i className="bi bi-check-lg text-lg"></i> : s.id}
+
+                {/* Step Label */}
+                <span className={`absolute top-[50px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-medium transition-colors duration-300
+                  ${isActive || isCompleted ? 'text-white' : 'text-[#888]'}`}
+                >
+                  {s.label}
+                </span>
               </div>
-              <span className={`absolute top-12 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest transition-colors duration-500 ${currentStep >= s.id ? 'text-white' : 'text-gray-600'}`}>
-                {s.label}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* --- STEP CONTENT --- */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="animate-in fade-in slide-in-from-bottom-3 duration-500 fill-mode-forwards mt-10">
           {steps.find(s => s.id === currentStep)?.component}
         </div>
       </main>
 
       {/* --- LEGACY FIXED FOOTER --- */}
-      <footer className="fixed bottom-0 left-0 right-0 h-auto sm:h-[80px] bg-black/90 backdrop-blur-xl border-t border-white/10 z-[100] px-4 sm:px-8 py-4 sm:py-0 flex items-center justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
-        <div className="w-full max-w-[1200px] flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-8">
+      <footer className="fixed bottom-0 left-0 right-0 h-auto sm:h-[80px] bg-[#0a0a0a] border-t border-[#222] z-[100] px-5 sm:px-10 py-4 sm:py-0 flex items-center justify-between shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
 
-          {/* Navigation Left */}
-          <div className="hidden sm:flex w-[120px] lg:w-[200px] justify-start">
-            <button
-              onClick={prevStep}
-              disabled={isPublishing}
-              className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all disabled:opacity-0
+        {/* Navigation Left */}
+        <div className="flex-1 flex justify-start">
+          <button
+            onClick={prevStep}
+            disabled={isPublishing || currentStep === 1}
+            className={`bg-transparent border-none text-[#888] font-semibold text-sm cursor-pointer px-4 py-2 hover:text-white transition-colors flex items-center gap-2
                 ${currentStep === 1 ? 'pointer-events-none opacity-0' : ''}`}
-            >
-              <ChevronLeft size={16} />
-              Volver
-            </button>
-          </div>
+          >
+            <i className="bi bi-chevron-left"></i> Atrás
+          </button>
+        </div>
 
-          {/* Player Center */}
-          <div className="flex items-center gap-4 sm:gap-6 bg-white/[0.03] border border-white/5 rounded-2xl p-2 px-4 sm:px-6 h-12 sm:h-14 flex-1 w-full sm:max-w-2xl mx-auto order-2 sm:order-none">
-            <button
-              onClick={togglePlay}
-              disabled={!previewFile}
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 flex-shrink-0
+        {/* Player Center (Minimalist) */}
+        <div className="flex-2 flex items-center max-w-[500px] w-full mx-5 gap-4">
+          <button
+            onClick={togglePlay}
+            disabled={!previewFile}
+            className={`w-10 h-10 rounded-full flex items-center justify-center border-none shadow-lg shrink-0 transition-transform hover:scale-105 active:scale-95
                 ${previewFile
-                  ? 'bg-violet-600 text-white hover:bg-violet-500 hover:shadow-violet-500/20'
-                  : 'bg-white/5 text-gray-700 cursor-not-allowed'}`}
-            >
-              {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} className="ml-0.5" fill="currentColor" />}
-            </button>
+                ? 'bg-white text-black cursor-pointer'
+                : 'bg-[#222] text-[#666] cursor-not-allowed'}`}
+          >
+            <i className={`bi ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'} text-xl ${!isPlaying ? 'ml-1' : ''}`}></i>
+          </button>
+          <div className="flex-1 w-full" ref={waveformRef}></div>
+          <span className="text-[#888] text-xs font-medium tabular-nums min-w-[35px] text-right">
+            {formatTime(currentTime)}
+          </span>
+        </div>
 
-            <div className="flex-1 min-w-0 flex flex-col justify-center">
-              <div className="flex justify-between items-center mb-0.5 sm:mb-1 gap-4">
-                <p className="text-[8px] sm:text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 truncate">
-                  <Music size={10} className={previewFile ? 'text-violet-500' : 'text-gray-700'} />
-                  {previewFile ? previewFile.name : 'No file'}
-                </p>
-                <span className="text-[8px] sm:text-[9px] font-mono text-gray-500 whitespace-nowrap">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
-              </div>
-              <div ref={waveformRef} className="w-full opacity-60 sm:opacity-80 hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-
-          {/* Navigation Right (and back-button for mobile) */}
-          <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-[200px] lg:w-[250px] order-1 sm:order-none">
-            {/* Back Button for Mobile only */}
+        {/* Navigation Right */}
+        <div className="flex-1 flex justify-end">
+          {currentStep < 4 ? (
             <button
-              onClick={prevStep}
-              disabled={isPublishing}
-              className={`sm:hidden flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-all disabled:opacity-0
-                ${currentStep === 1 ? 'pointer-events-none opacity-0' : ''}`}
+              onClick={nextStep}
+              className="bg-white text-black border-none px-6 py-2.5 rounded-lg font-bold text-sm cursor-pointer transition-transform hover:-translate-y-0.5 shadow-[0_4px_15px_rgba(255,255,255,0.2)] flex items-center gap-2"
             >
-              <ChevronLeft size={16} />
-              Atrás
+              Siguiente <i className="bi bi-chevron-right text-xs"></i>
             </button>
-
-            {currentStep < 4 ? (
-              <button
-                onClick={nextStep}
-                className="flex items-center gap-2 bg-white text-black px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-violet-500 hover:text-white transition-all shadow-xl active:scale-95 ml-auto"
-              >
-                Siguiente
-                <ChevronRight size={16} />
-              </button>
-            ) : (
-              <button
-                onClick={() => handlePublish(false)}
-                disabled={isPublishing || youtubeStatus === 'authorizing'}
-                className="flex items-center gap-2 bg-violet-600 text-white px-6 sm:px-10 py-2.5 sm:py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-violet-500 transition-all shadow-[0_0_20px_rgba(139,92,246,0.4)] disabled:opacity-50 active:scale-95 ml-auto"
-              >
-                {isPublishing || youtubeStatus === 'authorizing' ? '...' : 'Lanzar'}
-                <Sparkles size={14} />
-              </button>
-            )}
-          </div>
+          ) : (
+            <button
+              onClick={() => handlePublish(false)}
+              disabled={isPublishing || youtubeStatus === 'authorizing'}
+              className="bg-[#8b5cf6] text-white border-none px-8 py-2.5 rounded-lg font-bold text-sm cursor-pointer transition-transform hover:-translate-y-0.5 shadow-[0_4px_15px_rgba(139,92,246,0.4)] disabled:opacity-50 flex items-center gap-2"
+            >
+              {isPublishing || youtubeStatus === 'authorizing' ? 'Publicando...' : 'Publicar Ahora'}
+            </button>
+          )}
         </div>
       </footer>
 
